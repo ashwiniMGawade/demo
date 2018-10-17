@@ -1,0 +1,32 @@
+<section ng-controller="SitesController" ng-init="findOne()" ng-show="site.siteId">
+  <div class="page-header">
+    <h1>Site: <span ng-bind="site.name" class="capitalize"></span></h1>
+  </div>
+  <!--<div class="pull-right">-->
+    <!--<a class="btn btn-primary" ui-sref="sites.edit({siteId: site.siteId})">-->
+      <!--<i class="glyphicon glyphicon-edit"></i>-->
+    <!--</a>-->
+    <!--<a class="btn btn-primary" ng-click="remove();">-->
+      <!--<i class="glyphicon glyphicon-trash"></i>-->
+    <!--</a>-->
+  <!--</div>-->
+  <!--<p class="list-group-item-text" ng-bind="site.code"></p>-->
+
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="site.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="site.code"></td></tr>
+      <tr ng-if="(siteAccessRoles.update | intersect : authentication.user.roles)> 0 || (siteAccessRoles.delete | intersect : authentication.user.roles)> 0">
+        <th>Actions</th>
+        <td>
+          <!--button type="button" class="btn btn-xs btn-primary" ng-click="exportcsv(tenant);">Export</button-->
+          <button ng-if="(siteAccessRoles.update | intersect : authentication.user.roles)> 0" type="button" class="btn btn-xs1 btn-primary" ui-sref="sites.edit({siteId: site.siteId})">Edit</button>
+          <button ng-if="(siteAccessRoles.delete | intersect : authentication.user.roles)> 0" type="button" class="btn btn-xs1 btn-primary" ng-click="remove(site);">Delete</button>
+        </td>
+      </tr>
+    </table>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+  </div>
+</section>

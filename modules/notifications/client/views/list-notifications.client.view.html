@@ -1,0 +1,35 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h1>Notifications</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()"  ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="notification in $data">
+        <td ng-bind="notification.summary" class="capitalize breakword" title="'Summary'" sortable="'summary'" class="breakword"></td>
+        <td ng-bind="notification.start | date:'medium' : 'UTC'" title="'Start Date(UTC)'" style="width:190px" sortable="'start'"></td>
+        <td ng-if="isRoot || isL1ops" ng-bind="notification.end | date:'medium' : 'UTC'" title="'End Date(UTC)'" style="width:190px" sortable="'end'"></td>
+        <td ng-bind="notification.category" title="'Category'" sortable="'category'"></td>
+        <td ng-if="isRoot || isL1ops" ng-bind="notification.sendEmail" title="'Send Email'" sortable="'sendEmail'" style="width:120px" ></td>
+        <td ng-if="(notificationAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="notifications.edit({notificationId: notification.notificationId})">Edit</button></td>
+
+        <td ng-if="!(isRoot || isL1ops)" ><button  ng-click="$event.stopPropagation();markAsRead(notification)"  type="button" class="btn btn-xs btn-primary">Details</button></td>
+        <td ng-if="isRoot || isL1ops" ><button type="button" class="btn btn-xs btn-primary" ui-sref="notifications.view({notificationId: notification.notificationId})">Details</button></td>
+        
+        <td ng-if="!(isRoot || isL1ops)" title="'Status'">
+          <span ng-show="!notification.acknowledge" class="label label-danger new-badge" style="position: relative">NEW</span>
+          <span ng-show="notification.acknowledge"  style="position: relative">Read</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

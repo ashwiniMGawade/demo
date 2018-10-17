@@ -1,0 +1,15 @@
+<section ng-controller="SupportController">  
+  <div ng-include="'/modules/support/client/views/terms-and-conditions.client.view.html'"></div>  
+  <div style="margin: 50px 100px 15px 100px;">
+      <center>
+          <p>
+              <input type="checkbox" ng-model="confirmed">  I have read and approve the <b>End User Licence Agreement</b> for software</input>
+          </p>
+        </center>
+  </div>  
+  <div class="download">
+    <a class="{{confirmed ? '': 'disabled'}}" ng-href="{{confirmed? downloadsoftware: ''}}" download="{{confirmed? downloadsoftware: ''}}" title="{{confirmed ?'Download': 'Please accept the terms and condition to download the software'}}" target="_blank"><b>Download</b></a>
+    <br/>
+    <div ng-if="softwareKey && confirmed" class="{{confirmed ? '': 'disabled'}}" title="{{confirmed ?'Master Key': 'Please accept the terms and condition to see the software master key'}}">{{softwareKey}}</div>
+  </div>
+</section>

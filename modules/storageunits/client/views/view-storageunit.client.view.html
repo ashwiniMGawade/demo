@@ -1,0 +1,32 @@
+<section ng-controller="StorageunitsController" ng-init="findOne()" ng-show="storageunit.storageunitId">
+  <div class="page-header">
+    <h1>Storage Unit: <span ng-bind="storageunit.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="storageunit.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="storageunit.code"></td></tr>
+      <tr><th>Status</th><td ng-bind="storageunit.status"></td></tr>
+      <tr ng-show="isRoot || isL1ops"><th>Tenant</th><td ng-bind="storageunit.tenant.name"></td></tr>
+      <tr><th>Partner</th><td ng-bind="storageunit.partner.name"></td></tr>
+      <tr><th>Subtenant</th><td ng-bind="storageunit.subtenant.name"></td></tr>
+      <tr><th>{{labels.server.serverName}}</th><td ng-bind="storageunit.server.name"></td></tr>
+      <tr><th>Subscription</th><td ng-bind="storageunit.subscription.name"></td></tr>
+      <tr><th>Storage Group</th><td ng-bind="storageunit.storagegroup.name"></td></tr>
+      <tr><th>Protocol</th><td ng-bind="storageunit.protocol | uppercase"></td></tr>
+      <tr><th>Size (GB)</th><td ng-bind="storageunit.sizegb"></td></tr>
+      <tr><th>Mount</th><td>{{storageunit.mount}}<div ng-if="storageunit.mount1">   Or   {{storageunit.mount1}}</div></td></tr>
+      <tr ng-if="storageunit.protocol === 'nfs' || storageunit.protocol === 'iscsi'"><th>ACL</th><td ng-bind="storageunit.acl"></td></tr>
+      <tr ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0 ||  (SUAccessRoles.update | intersect : authentication.user.roles) > 0">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary"
+          ng-disabled="storageunit.status!=='Operational'"
+          ui-sref="storageunits.edit({storageunitId: storageunit.storageunitId})">Edit</button>
+
+          <button ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary" ng-disabled="storageunit.status!=='Operational'" ng-click="remove(storageunit);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</section>

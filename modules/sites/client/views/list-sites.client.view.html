@@ -1,0 +1,26 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Sites</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="site in $data">
+        <td ng-bind="site.name" class="capitalize breakword" title="'Name'" sortable="'name'"></td>
+        <td ng-bind="site.code" title="'Code'" sortable="'code'"></td>
+        <td ng-if="(siteAccessRoles.update | intersect : authentication.user.roles)> 0" ><button  type="button" class="btn btn-xs btn-primary" ui-sref="sites.edit({siteId: site.siteId})">Edit</button></td>
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="sites.view({siteId: site.siteId})">Details</button></td>
+      </tr>
+    </table>
+  </div>    
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

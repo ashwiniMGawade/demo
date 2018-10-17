@@ -1,0 +1,52 @@
+<section ng-controller="ServersController" ng-init="findOne()" ng-show="server.serverId">
+  <div class="page-header">
+    <h1>{{labels.server.serverName}}: <span ng-bind="server.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="server.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="server.code"></td></tr>
+      <tr><th>Status</th><td ng-bind="server.status"></td></tr>
+      <tr ng-show="isRoot || isL1ops"><th>Tenant</th><td ng-bind="server.tenant.name"></td></tr>
+      <tr><th>Partner</th><td ng-bind="server.partner.name"></td></tr>
+      <tr><th>Subtenant</th><td ng-bind="server.subtenant.name"></td></tr>
+      <tr><th>Site</th><td ng-bind="server.site.name"></td></tr>
+      <tr><th>Subscription</th><td ng-bind="server.subscription.name"></td></tr>
+      <tr><th>Allocated (GB)</th><td ng-bind="server.volumesCapacityTotal"></td></tr>
+      <tr><th>Used (GB)</th><td ng-bind="server.volumesUsedTotal"></td></tr>
+      <tr><th>IOPS</th><td ng-bind="server.iopsTotal"></td></tr>
+      <tr><th>Configuration</th><td ng-bind="validManagedToAssign[server.managed]"></td></tr>
+      <tr><th>Subnet</th><td ng-bind="server.subnet"></td></tr>
+      <tr><th>VLAN</th><td ng-bind="server.vlan"></td></tr>
+      <tr ng-if="serverSettings.gateway.enabled"><th>Gateway</th><td ng-bind="server.gateway"></td></tr>
+      <tr ng-show="server.managed==='Customer'"><th>Cluster IP</th><td ng-bind="server.ipVirtClus"></td></tr>
+      <tr ng-show="server.managed==='Customer'"><th>OnCommand System Manager</th><td>
+      <a href="{{sysManagerLink}}" target="_blank" title="Access to storage array via OnCommand System Manager">{{sysManagerLink}}</td></tr>
+      <tr><th>Primary IP</th><td ng-bind="server.ipMgmt"></td></tr>
+      <tr><th>Network Ref</th><td ng-bind="server.networkRef"></td></tr>
+      <tr ng-show="server.managed==='Customer'"><th>ICL IPs</th><td ng-bind="server.ipsIcl"></td></tr>       
+      <tr ng-show="server.managed==='Portal'"><th>NFS Enabled</th><td ng-bind="server.nfs" class="capitalize"></td></tr>
+      <tr ng-show="server.managed==='Portal'"><th>CIFS Enabled</th><td ng-bind="server.cifs" class="capitalize"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS Server Name</th><td ng-bind="server.cifsServername"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS Domain</th><td ng-bind="server.cifsDomain"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS DNS Domain</th><td ng-bind="server.cifsDnsDomain"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS DNS Servers</th><td ng-bind="server.cifsDnsServers"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS Site</th><td ng-bind="server.cifsSite"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS OU</th><td ng-bind="server.cifsOu"></td></tr>
+      <tr ng-show="server.managed==='Portal'"><th>iSCSI Enabled</th><td ng-bind="server.iscsi" class="capitalize"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.iscsi"><th>iSCSI Alias</th><td ng-bind="server.iscsiAlias"></td></tr>
+      <tr ng-show="server.managed==='Portal' && server.iscsi"><th>iSCSI IPs</th><td ng-bind="server.ipsSan"></td></tr>
+      <tr ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0 || (serverAccessRoles.delete | intersect : authentication.user.roles)> 0">
+        <th>Actions</th>
+        <td>
+          <button type="button" ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0" class="btn btn-xl btn-primary" ng-disabled="server.status!=='Operational'" ui-sref="servers.edit({serverId: server.serverId})">Edit</button>
+          <button ng-if="(serverAccessRoles.delete | intersect : authentication.user.roles)> 0" type="button" class="btn btn-xl btn-primary" ng-disabled="server.status!=='Operational'" ng-click="remove(server);">Delete</button>
+        </td>
+      </tr>
+    </table>
+    <div>
+      <p class="help-block">Please allow up to 15 minutes for Size & IOPS information to be updated.</p>
+      <p class="help-block">The Allocated size is total capacity configured for utilisation, including Snapshots.<br>The Used size is the total capacity utilised by the clients, including Snapshots.</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,155 @@
+<section ng-controller="StorageunitsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Storage Unit</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="storageunitForm" class="form-horizontal" ng-submit="create(storageunitForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group">
+          <p class="faint-text">A Storage Unit takes the form of a NetApp NFS Export, CIFS Share or iSCSI LUN. Configuration covers:<ul><li>Storage Type</li><li>Storage Size</li><li>Storage Access</li></ul></p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="Name" class="form-control"
+                  placeholder="Name"
+                  ng-maxlength="64"
+                  ng-minlength="3"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required>
+          <div ng-messages="storageunitForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+          </div>
+          <p class="help-block">Name to refer to the Storage Unit in this portal.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+            ng-pattern="/^[a-z][a-z0-9\_]*$/"
+            ng-maxlength="32"
+            ng-minlength="3"
+            required>
+          <div ng-messages="storageunitForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Code is required.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and underscores are allowed <br>First character must be alphabetical</p>
+
+            <p class="help-block error-text" ng-message="maxlength">Code should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Code must be minimum 3 characters long.</p>
+          </div>
+          <p class="help-block">The name of the NetApp NFS Export, CIFS Share or iSCSI LUN on the storage system.<br>The code will be visible in the NFS Export path and CIFS Share name.<br>Note: A Storage Group cannot contain multiple Storage Units with the same code.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="sizegb">Size (GB)</label>
+          <input name="sizegb" type="number" ng-model="sizegb" id="sizegb" class="form-control" placeholder="Size (GB)" required min="100" required max="16384" ng-pattern="/^[\d]*$/">
+          <div ng-messages="storageunitForm.sizegb.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storage Size in GB is required.</p>
+            <p class="help-block error-text" ng-message="min">Minimum value is 100.</p>
+            <p class="help-block error-text" ng-message="max">Maximum value is 16384.</p>
+            <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+            <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+          </div>
+          <p class="help-block">The presented size of the NFS Export, CIFS Share or iSCSI LUN.<br>
+            The containing Storage Group will automatically be resized accordingly.</br>
+            Minimum Storage Unit size will be 100GB to ensure workable performance.</br>
+            Note: LUN cannot be resized to more than 10x original size</p>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="isRoot">
+          <label for="tenantId">Tenant</label>
+          <select name="tenantId" ng-model="$parent.tenantId" id="tenantId" class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" required>
+            <option value="">Please select a tenant</option>
+          </select>
+          <div ng-messages="storageunitForm.tenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="serverId">{{labels.server.serverName}}</label>
+          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required ng-disabled="isRoot && !tenantId">
+            <option value="">Please select a {{labels.server.serverName}}</option>
+          </select>
+          <div ng-messages="storageunitForm.storagegroupId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} is required.</p>
+          </div>
+          <p class="help-block">The {{labels.server.serverName}} in which the Storage Unit is to reside in.</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="storagegroupId">Storage Group</label>
+          <select name="storagegroupId" ng-model="storagegroupId" id="storagegroupId" class="form-control" ng-options="storagegroup.storagegroupId as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required ng-disabled="!serverId">
+            <option value="">Please select a storage group</option>
+          </select>
+          <div ng-messages="storageunitForm.storagegroupId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storage Group name is required.</p>
+          </div>
+          <p class="help-block">The Storage Group in which the Storage Unit is to reside in.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="protocol">Protocol</label>
+          <select class="form-control" name="protocol" id="protocol" ng-model="protocol" required placeholder="">
+              <option value="">Please select protocol</option>
+              <option ng-repeat="protocol in validProtocolsToAssign | orderBy" value="{{protocol}}">{{protocol | uppercase}}</option>
+          </select>
+          <div ng-messages="storageunitForm.protocol.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Protocol is a required field.</p>
+          </div>
+          <p class="help-block">The Protocol with which the Storage Unit is to be accessed with.</p>
+        </div>
+
+
+        <div class="form-group" show-errors ng-if="protocol === 'iscsi'">
+          <label for="acl">Access Control List</label>
+          <input name="acl" type="text" ng-model="$parent.acl" id="acl" class="form-control" placeholder="ACL" ng-pattern="/^((?:iqn\.[0-9]{4}-[0-9]{2}(?:\.[A-Za-z](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+(?::[^,:]*)?)|(eui\.[0-9A-Fa-f]{16}))+(?:,((?:iqn\.[0-9]{4}-[0-9]{2}(?:\.[A-Za-z](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+(?::[^,:]*)?)|(eui\.[0-9A-Fa-f]{16}))+)*$/">
+          <div ng-messages="storageunitForm.acl.$error" role="alert">
+          <p class="help-block error-text" ng-message="pattern">Please enter valid ACL.</p>
+          <p class="help-block">The list of iSCSI IQNs or NFS Subnets or IP addresses allowed to access the Storage Unit.<br>Comma-separated notation without spaces is accepted.<br>iSCSI: e.g. iqn.1992-05.com.microsoft:servername<br>NFS: e.g. 10.20.30.40,10.20.30.41</p>
+          </div>
+        </div>
+
+        <div class="form-group" show-errors ng-if="protocol === 'nfs'">
+          <label for="acl">Access Control List</label>
+          <input name="acl" type="text" ng-model="$parent.acl" id="acl" class="form-control" placeholder="ACL" ng-pattern="/^(((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+((,((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+))*)$/">
+          <div ng-messages="storageunitForm.acl.$error" role="alert">
+          <p class="help-block error-text" ng-message="pattern">Please enter valid ACL.</p>
+          </div>
+          <p class="help-block">The list of iSCSI IQNs or NFS Subnets or IP addresses allowed to access the Storage Unit.<br>Comma-separated notation without spaces is accepted.<br>iSCSI: e.g. iqn.1992-05.com.microsoft:servername<br>NFS: e.g. 10.20.30.40,10.20.30.41</p>
+        </div>
+
+        <div ng-show="protocol === 'iscsi'">
+          <div class="form-group required" show-errors>
+            <label for="lunOs">Operating System & LUN Type</label>
+           <select class="form-control" name="lunOs" id="lunOs" ng-model="lunOs" ng-required="protocol === 'iscsi'">
+              <option value="">Please select operating system & type</option>
+              <option ng-repeat="(key, value) in validOSToAssign" ng-if="value" value="{{value}}">{{value}}</option>
+          </select>
+          <div ng-messages="storageunitForm.lunOs.$error" role="alert">
+           <p class="help-block error-text" ng-required="min">LUN OS is a required field</p>
+         </div>
+            <p class="help-block">Please ensure the correct Operating System & LUN Type is specified.<br>Note: Windows_2008 is typically to be selected for all Windows Servers since Windows 2008.</p>
+          </div>
+          <div class="form-group" show-errors>
+            <label for="lunId">LUN ID</label>
+            <input name="lunId" type="number" ng-model="lunId" id="lunId" class="form-control" placeholder="LUN ID" min="0" max="255">
+             <div ng-messages="storageunitForm.lunId.$error" role="alert">
+              <p class="help-block error-text" ng-message="min">Minimum value should be 0.</p>
+              <p class="help-block error-text" ng-message="max">Maximum value should be 255.</p>
+              <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+            </div>
+            <p class="help-block">Optional: Only to be entered if a specific LUN ID is required.<br>The storage system will by default select the next-available LUN ID.<br>Entering a LUN ID used by another LUN, which is presented to the same IQN will be prevented by the storage system.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-xl btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

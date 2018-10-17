@@ -1,0 +1,32 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Subscriptions</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="subscription in $data">
+        <td ng-bind="subscription.name" title="'Name'" sortable="'name'" class="breakword capitalize"></td>
+        <td ng-bind="subscription.code" title="'Code'" sortable="'code'"></td>
+        <td ng-bind="subscription.tenant.name" ng-if="isRoot || isPartner || isL1ops" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
+        <td ng-bind="subscription.partner.name" title="'Partner'" sortable="'partner.name'" class="breakword"></td>
+        <td ng-if="subscriptionSettings.site.enabled" ng-bind="subscription.site.name" title="'Site'" sortable="'site.name'" class="breakword"></td>
+        <td ng-if="subscriptionSettings.url.enabled">
+          <a type="button" class="btn btn-xs btn-primary" ng-href="{{subscription.url.indexOf('http') == -1 ? 'http://' + subscription.url : subscription.url }}" title="{{subscription.url}}" target="blank">Subscription Details</a>
+        </td>
+
+        <td ng-if="(subscriptionAccessRoles.update | intersect : authentication.user.roles) > 0 "><button type="button" class="btn btn-xs btn-primary" ui-sref="subscriptions.edit({subscriptionId: subscription.subscriptionId})">Edit</button></td>
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="subscriptions.view({subscriptionId: subscription.subscriptionId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

@@ -1,0 +1,28 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Subtenants</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="subtenant in $data">
+        <td ng-bind="subtenant.name" title="'Name'" sortable="'name'" class="breakword capitalize"></td>
+        <td ng-bind="subtenant.code" title="'Code'" sortable="'code'" class="breakword"></td>
+        <td ng-bind="subtenant.tenant.name" ng-if="isRoot || isL1ops" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
+
+        <td ng-if="(subtenantAccessRoles.update | intersect : authentication.user.roles) > 0 "><button type="button" class="btn btn-xs btn-primary" ui-sref="subtenants.edit({subtenantId: subtenant.subtenantId})">Edit</button></td>
+        
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="subtenants.view({subtenantId: subtenant.subtenantId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

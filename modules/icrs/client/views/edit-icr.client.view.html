@@ -1,0 +1,69 @@
+<section ng-controller="IcrsController" ng-init="findOne()" ng-show="icr.icrId">
+  <div class="page-header">
+    <h1>Inter-cluster Relationship</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="icrForm" ng-submit="update(icrForm.$valid)" novalidate class="form-horizontal">
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="message">Message</label>
+          <textarea name="message" ng-model="icr.message" id="message" class="form-control" rows="5" placeholder="Message to be sent along with Inter-cluster Relationship request"
+                 ng-minlength="3"
+                 ng-maxlength="1024"
+                 ng-pattern="/^[a-zA-Z0-9_ .,-]*$/"
+                 required ng-bind-html></textarea>
+          <div ng-messages="icrForm.message.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Message is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Message must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Message should be maximum 1024 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, underscores, dots, commas and dashes allowed</p>
+          </div>
+          <p class="help-block">The message field is only to be appended to or corrected in liaison with the requesting User.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="clusterExt">External Cluster</label>
+          <input name="clusterExt" type="text" ng-model="icr.clusterExt" id="clusterExt" class="form-control" placeholder="External Cluster" ng-maxlength="64" ng-pattern="/^[a-zA-Z0-9 -_]*$/" required ng-bind-html>
+          <div ng-messages="icrForm.clusterExt.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">External Cluster is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">External Cluster should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">External Cluster should contain only Alphanumeric characters including underscore, space and dash.</p>
+          </div>
+          <p class="help-block">
+            If the External Cluster name changes or incorrectly completed, this field is to be updated.
+            </p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="ipsExt">External Inter-Cluster IP Addresses</label>
+          <input name="ipsExt" type="text" ng-model="icr.ipsExt" id="ipsExt" class="form-control" placeholder="External Ip Addresses" ng-maxlength="128" ng-pattern="/^\*$|^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:\s*,\s*(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$/" required ng-bind-html>
+          <div ng-messages="icrForm.ipsExt.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">External IP address is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">External IP address should be maximum 128 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Invalid External IP addresses</p>
+          </div>
+          <p class="help-block">If the External Inter-Cluster IP Addresses change or are incorrectly completed, this field is to be updated.</p>
+          <p class="help-block">e.g. 10.20.130.11,10.20.130.12,10.20.130.13,10.20.130.14</p>
+        </div>
+
+        <div class="form-group required" show-errors ng-show="isRoot">
+          <label for="status">Status</label>
+          <select name="status" ng-model="icr.status" id="status" class="form-control" required>
+          <option value="">Please select Status</option>
+          <option ng-repeat="status in validStatusToAssign" value="{{status}}">{{status}}</option>
+          </select>
+          <div ng-messages="icrForm.status.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Status is required.</p>
+          </div>
+          <p class="help-block">When the progress of the configuration of the Inter-Cluster Relationship changes, this field is to be updated.</p>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Update" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

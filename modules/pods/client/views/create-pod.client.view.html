@@ -1,0 +1,53 @@
+<section ng-controller="PodsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Pod</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="podForm" class="form-horizontal" ng-submit="create(podForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
+            ng-minlength="3"
+            ng-maxlength="64"
+            ng-pattern="/^[a-zA-Z0-9\ -]*$/"
+            required>
+         <div ng-messages="podForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Pod name is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Pod name should have Minimum 3 characters.</p>
+            <p class="help-block error-text" ng-message="maxlength">Pod name should have Maximum 64 characters.</p>
+            <p class="help-block error-text" ng-message="pattern">Pod name can only include alphanumeric characters including space and dash.</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+          ng-minlength="3"
+          ng-maxlength="32"
+          ng-pattern="/^[a-z0-9]*$/" required>
+          <div ng-messages="podForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Pod code is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Code must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Code should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters are allowed</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="siteId">Site</label>
+          <select name="siteId" ng-model="siteId" id="siteId" class="form-control" ng-options="site.siteId as site.name for site in sites | orderBy: 'name'" required>
+            <option value="">Please select a site</option>
+          </select>
+          <div ng-messages="podForm.siteId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Site name is required.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

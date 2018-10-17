@@ -1,0 +1,101 @@
+<section ng-controller="StoragegroupsController" ng-init="findOne()" ng-show="storagegroup.storagegroupId">
+  <div class="page-header">
+    <h1>Storage Group: <span>{{ ::storagegroup.name }}</span></h1>
+  </div>
+  <form name="storagegroupForm" class="form-horizontal" ng-submit="update(storagegroupForm.$valid)" novalidate>
+    <div class="row show-grid">
+      <div class="col-md-6">
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="storagegroup.name" id="name" class="form-control"
+                  ng-minlength="3"
+                  ng-maxlength="64"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required placeholder="Name" ng-bind-html>
+          <div ng-messages="storagegroupForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Storage Group name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Storage Group name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes are allowed</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="annotation">Annotation</label>
+          <input name="annotation" type="text" ng-model="storagegroup.annotation" id="annotation" class="form-control"
+                  ng-maxlength="256"
+                  ng-pattern="/^[a-zA-Z0-9 -_]*$/" placeholder="Annotation" ng-bind-html>
+          <div ng-messages="storagegroupForm.annotation.$error" role="alert">
+            <p class="help-block error-text" ng-message="maxlength">Annotation should be maximum 256 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, underscore, spaces and dashes are allowed</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="tier">Tier</label>
+          <select name="tier" ng-model="storagegroup.tier" id="tier" class="form-control" required>
+            <option ng-repeat="tier in validTierToAssign | orderBy:'name'" value="{{tier.id}}">{{tier.name}}</option>
+          </select>
+          <div ng-messages="storagegroupForm.tier.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tier is required.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row show-grid">
+      <div class="form-group col-md-1">
+        <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left">
+      </div>
+      <div class="form-group col-md-5">
+        <label style="margin-top: 12px;">Enable Snapshot Policy</label>
+      </div>
+    </div>
+    <div ng-show="ssPolicyEnabled" class="row show-grid">
+      <div class="form-group col-md-1 policydropdown">
+        <label for="sspHourlyRetention">Hourly</label>
+        <select name="sspHourlyRetention" ng-model="sspHourlyRetention" id="sspHourlyRetention" class="form-control selectlist">
+          <option ng-repeat="sspHR in sspHourlyRetentions" value="{{sspHR}}">{{sspHR}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-1 policydropdown required">
+        <label for="sspDailyRetention">Daily</label>
+        <select name="sspDailyRetention" ng-model="sspDailyRetention" id="sspDailyRetention" class="form-control selectlist" required>
+          <option ng-repeat="sspDR in sspDailyRetentions" value="{{sspDR}}">{{sspDR}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-2 policydropdown required">
+        <label for="sspDailySchedule">@</label>
+        <select name="sspDailySchedule" ng-model="sspDailySchedule" id="sspDailySchedule" class="form-control selectlist" required>
+          <option ng-repeat="sspDS in sspDailySchedules" value="{{sspDS.val}}">{{sspDS.displayVal}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-1 policydropdown">
+        <label for="sspWeeklyRetention">Weekly</label>
+        <select name="sspWeeklyRetention" ng-model="sspWeeklyRetention" id="sspWeeklyRetention" class="form-control selectlist">
+          <option ng-repeat="sspWR in sspWeeklyRetentions" value="{{sspWR}}">{{sspWR}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-1 policydropdown">
+        <label for="sspMonthlyRetention">Monthly</label>
+        <select name="sspMonthlyRetention" ng-model="sspMonthlyRetention" id="sspMonthlyRetention" class="form-control selectlist">
+          <option ng-repeat="sspMR in sspMonthlyRetentions" value="{{sspMR}}">{{sspMR}}</option>
+        </select>
+      </div>
+    </div>
+    <div ng-show="ssPolicyEnabled" class="row show-grid">
+      <div class="form-group col-md-6">
+        <p class="faint-text">Hourly Snapshots are created at 00:05 past the hour.</br>
+        Daily Snapshot are created at the time specified.</br>
+        Weekly Snapshot are created at 00:15 every Sunday.</br>
+        Monthly Snapshot are created at 00:00 on first day of the month.</p>
+        Applied to primary storage, the Snapshot Policy specifies the Schedule & Retention<br>Note: If the new Snapshot Policy excludes a previously configure retention type (e.g. Weekly), those existing Snapshots will subsequently be deleted.
+      </div>
+    </div>
+    <div class="row show-grid">
+      <div class="form-group">
+        <input type="submit" value="Update" class="btn btn-xl btn-primary">
+      </div>
+    </div>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,28 @@
+<section ng-show="user.userId">
+  <div class="page-header">
+    <h1>User: <span ng-bind="user.displayName" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>First Name</th><td ng-bind="user.firstName"></td></tr>
+      <tr><th>Last Name</th><td ng-bind="user.lastName"></td></tr>
+      <tr><th>Username</th><td ng-bind="user.username"></td></tr>
+      <tr><th>Email</th><td ng-bind="user.email"></td></tr>
+      <tr><th>Phone</th><td ng-bind="user.phone"></td></tr>
+      <tr><th>Role</th><td ng-bind="user.roles" class="capitalize"></td></tr>
+      <tr ng-show="isRoot || isPartner"><th>Tenant</th><td ng-bind="user.tenant.name"></td></tr>
+      <tr><th>Partner</th><td ng-bind="user.partner.name"></td></tr>
+      <tr ng-if="(userAccessRoles.update | intersect : authentication.user.roles) > 0  || (userAccessRoles.delete | intersect : authentication.user.roles) > 0 ">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(userAccessRoles.update | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ui-sref="admin.user-edit({userId: user.userId})">Edit</button>
+
+          <button ng-if="(userAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ng-click="remove(user);">Delete</button>
+        </td>
+      </tr>
+    </table>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+  </div>
+</section>

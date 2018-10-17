@@ -1,0 +1,32 @@
+<section ng-controller="SubtenantsController" ng-init="findOne()" ng-show="subtenant.subtenantId">
+  <div class="page-header">
+    <h1>Subtenant: <span>{{ ::subtenant.name}}</span></h1>
+  </div>
+  <div class="row show-grid">
+    <div class="col-md-6">
+      <form name="subtenantForm" class="form-horizontal" ng-submit="update(subtenantForm.$valid)" novalidate>
+        <fieldset>
+          <div class="form-group required" show-errors>
+            <label for="name">Name</label>
+            <input name="name" type="text" ng-model="subtenant.name" id="name" class="form-control" placeholder="Name" ng-pattern="/^[a-zA-Z0-9\ -]*$/" ng-bind-html
+                  ng-minlength="3"
+                  ng-maxlength="64"
+                  required>
+            <div ng-messages="subtenantForm.name.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Subtenant name is required.</p>
+              <p class="help-block error-text" ng-message="minlength">Subtenant name must be minimum 3 characters long.</p>
+              <p class="help-block error-text" ng-message="maxlength">Subtenant name should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Subtenant name can only include alphanumeric characters including space and dash.</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="submit" value="Update" class="btn btn-primary">
+          </div>
+          <div ng-show="error" class="text-danger">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>

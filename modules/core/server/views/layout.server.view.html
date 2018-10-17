@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <base href="/">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="fragment" content="!">
+
+  <!-- Apple META -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <!-- Facebook META -->
+  <meta property="fb:app_id" content="{{facebookAppId}}">
+  <meta property="og:site_name" content="{{title}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:url" content="{{url}}">
+  <meta property="og:image" content="{{logo}}">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter META -->
+  <meta name="twitter:title" content="{{title}}">
+  <meta name="twitter:description" content="{{description}}">
+  <meta name="twitter:url" content="{{url}}">
+  <meta name="twitter:image" content="{{logo}}">
+
+  <!-- Fav Icon -->
+  <link href="{{favicon}}" rel="shortcut icon" type="image/x-icon">
+
+  <!-- Application CSS Files -->
+  {% for cssFile in cssFiles %}<link rel="stylesheet" href="{{cssFile}}">{% endfor %}
+</head>
+
+<body class="ng-cloak">
+  <header ng-include="'/modules/core/client/views/header.client.view.html'" ng-init="logo='{{siteLogo}}'" class="navbar navbar-fixed-top navbar-custom"></header>
+  <section class="content">
+    <section class="container">
+      <div ng-controller="HeaderController" class="termsAndConditions">
+        <div ng-if="authentication.user && !authentication.user.acceptTC" class="alert-warning center-align">
+          <input type="checkbox" ng-model="confirmed" ng-change="acceptTermsAndCondition()">  I have read and approve the <b><a href="/terms-and-conditions">End User Licence Agreement</a></b></input>
+        </div>
+      </div>
+      <flash-message duration="5000" show-close="true"></flash-message>
+      {% block content %}{% endblock %}
+    </section>
+  </section>
+
+  <footer class="navbar-default navbar-fixed-bottom">
+        <div class="container">
+          <small>Copyright © {{year}} NetApp. All rights reserved.</small>
+        </div>
+  </footer>
+
+  <!--Embedding The User Object and Features settings-->
+  <script type="text/javascript">
+    var user = {{ user | json | safe }};
+    var featuresSettings = {{ featuresSettings | json | safe }};
+    var expiryTime = {{expiryTime || 1800000}}  
+  </script>
+
+  <!--Load The Socket.io File-->
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+  <!--Application JavaScript Files-->
+  {% for jsFile in jsFiles %}<script type="text/javascript" src="{{jsFile}}"></script>{% endfor %}
+
+  {% if livereload %}
+  <!--Livereload script rendered -->
+
+  <script>document.write('<script src="http://' + location.host.split(':')[0] + ':35729/livereload.js"></' + 'script>')</script>
+  {% endif %}
+</body>
+
+</html>

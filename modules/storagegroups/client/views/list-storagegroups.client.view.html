@@ -1,0 +1,39 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Storage Groups</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>      
+    </div>
+    <div class="row">
+      <div class="col-md-4 right-loader">
+        <img src='/modules/core/client/img/loaders/loader.png' width="42px" height="32px" ng-click="refreshList();" title="Refresh">
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="storagegroup in $data">
+        <td ng-bind="storagegroup.name" title="'Name'" sortable="'name'" class="capitalize breakword"></td>
+        <td ng-bind="storagegroup.code" title="'Code'" sortable="'code'" class="breakword"></td>
+        <td ng-if="isRoot || isL1ops" ng-bind="storagegroup.tenant.name" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
+        <td ng-bind="storagegroup.subtenant.name" title="'Subtenant'" sortable="'subtenant.name'" class="breakword"></td>
+        <td ng-bind="storagegroup.server.name" ng-attr-title="{{labels.server.serverName}}" title="labels.server.serverName" sortable="'server.name'" class="breakword"></td>  
+        <td ng-bind="storagegroup.status" title="'Status'" sortable="'status'"></td>
+        
+        <td ng-if="(SGAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="storagegroup.status!=='Operational'" ui-sref="storagegroups.edit({storagegroupId: storagegroup.storagegroupId})">Edit</button></td>
+
+        <td ng-if="isRoot"><button type="button" class="btn btn-xs btn-primary" ui-sref="storagegroups.fix({storagegroupId: storagegroup.storagegroupId})">Fix</button></td>
+
+        
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="storagegroups.view({storagegroupId: storagegroup.storagegroupId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

@@ -1,0 +1,49 @@
+<section ng-controller="StoragegroupsController" ng-init="findOne()" ng-show="storagegroup.storagegroupId">
+  <div class="page-header">
+    <h1>Storage Group: <span ng-bind="storagegroup.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="storagegroup.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="storagegroup.code"></td></tr>
+      <tr><th>Status</th><td ng-bind="storagegroup.status"></td></tr>
+      <tr ng-show="isRoot || isL1ops"><th>Tenant</th><td ng-bind="storagegroup.tenant.name"></td></tr>
+      <tr><th>Partner</th><td ng-bind="storagegroup.partner.name"></td></tr>
+      <tr><th>Subtenant</th><td ng-bind="storagegroup.subtenant.name"></td></tr>
+      <tr><th>{{labels.server.serverName}}</th><td ng-bind="storagegroup.server.name"></td></tr>
+      <tr><th>Subscription</th><td ng-bind="storagegroup.subscription.name"></td></tr>
+      <tr>
+          <th>Tier</th>
+          <td class="capitalize">
+            <span ng-switch="storagegroup.tier">
+              <span ng-switch-when="standard">Standard</span>
+              <span ng-switch-when="premium">Premium</span>
+              <span ng-switch-when="performance">Performance</span>
+            </span>
+          </td>
+      </tr>
+      <tr><th>SnapshotPolicy</th><td><pre>{{detailedSnapShotDesc}}</pre></td></tr>
+      <tr><th>Annotation</th><td ng-bind="storagegroup.annotation"></td></tr>
+      <tr><th>Allocated (GB)</th><td ng-bind="storagegroup.sizeVolume"></td></tr>
+      <tr><th>Presented (GB)</th><td ng-bind="storagegroup.sizePresented"></td></tr>
+      <tr><th>Used (GB)</th><td ng-bind="storagegroup.sizeUsed"></td></tr>
+      <tr><th>Snapshot (GB)</th><td ng-bind="storagegroup.sizeSnapshot"></td></tr>
+      <tr>
+        <th>Actions</th>
+        <td>
+          <button ng-if="(snapshotAccessRoles.create | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary" ng-click="createSnapshot(storagegroup);">Create Snapshot</button>
+
+          <button ng-if="(snapshotAccessRoles.list | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary" ui-sref="snapshots.list({storagegroupId: storagegroup.storagegroupId})">List Snapshots</button>
+
+          <button ng-if="(SGAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary" ng-disabled="storagegroup.status!=='Operational'" ui-sref="storagegroups.edit({storagegroupId: storagegroup.storagegroupId})">Edit</button>
+
+          <button ng-if="(SGAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary" ng-disabled="storagegroup.status!=='Operational'" ng-click="remove(storagegroup);">Delete</button>
+        </td>
+      </tr>
+    </table>
+    <div>
+      <p class="help-block">Please allow up to 15 minutes for Size information to be updated.</p>
+      <p class="help-block">The Allocated size is capacity configured for usage by both active data & Snapshots.<br>The Presented size is the sum of all Storage Units contained in the Storage Group.<br>The Used size is the total capacity utilised by the clients, including Snapshots.<br>The Snapshot size is the total capacity utilised by all Snapshots.</p>
+    </div>
+  </div>
+</section>

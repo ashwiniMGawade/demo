@@ -1,0 +1,27 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h1>Inter-cluster Relationship</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="icr in $data">       
+        <td ng-bind="icr.tenant.name"  title="'Tenant'" sortable="'tenant.name'" ng-if="isRoot || isL1ops" class="breakword"></td>
+        <td ng-bind="icr.server.name" title="labels.server.serverName" ng-attr-title="{{labels.server.serverName}}"  sortable="'server.name'" class="breakword"></td>
+        <td ng-bind="icr.clusterExt" title="'ClusterExt'" sortable="'ClusterExt'" class="breakword"></td>
+        <td ng-bind="icr.status" title="'Status'" sortable="'status'"></td>
+        <td ng-if="(icrAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="icr.status==='Closed'" ui-sref="icrs.edit({icrId: icr.icrId})">Edit</button></td>
+        <td><button type="button" class="btn btn-xs btn-primary"  ui-sref="icrs.view({icrId: icr.icrId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

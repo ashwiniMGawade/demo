@@ -1,0 +1,145 @@
+<section ng-controller="StoragegroupsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Storage Group</h1>
+    <p class="help-block">A Storage Group (a.k.a. NetApp Volume), as opposed to a Storage Unit (NFS Export, CIFS Share or iSCSI LUN), is to be created in the following cases:<br>To group Storage Units together facilitating a consistent application-wide recovery point (Snapshot)</p>
+  </div>
+  <form name="storagegroupForm" class="form-horizontal" ng-submit="create(storagegroupForm.$valid)" novalidate>
+    <div class="row show-grid">
+      <div class="col-md-6">
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
+                  ng-minlength="3"
+                  ng-maxlength="64"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required>
+          <div ng-messages="storagegroupForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Storage Group name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Storage Group name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes are allowed</p>
+          </div>
+          <p class="help-block">Name to refer to the NetApp Volume in this portal</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+                  ng-minlength="3"
+                  ng-maxlength="32"
+                  ng-pattern="/^[a-z][a-z0-9_]*$/"
+                  required>
+          <div ng-messages="storagegroupForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Code is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Code is must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Code is should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and underscores are allowed <br>First character must be alphabetical</p>
+          </div>
+          <p class="help-block">The name of the NetApp Volume configured in the {{labels.server.serverName}}.<br>It is mandatory for the Storage Group Code be unique within a {{labels.server.serverName}}.<br>It can be useful (but not mandatory) for the Storage Group Code be unique across the entire environment. This promotes ease-of-management and allows future replication between {{labels.server.serverName}}s without naming issues.</p>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="annotation">Annotation</label>
+          <input name="annotation" type="text" ng-model="annotation" id="annotation" class="form-control" placeholder="Annotation"
+                  ng-maxlength="256"
+                  ng-pattern="/^[a-zA-Z0-9 -_]*$/">
+          <div ng-messages="storagegroupForm.annotation.$error" role="alert">
+            <p class="help-block error-text" ng-message="maxlength">Annotation should be maximum 256 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, underscore, spaces and dashes are allowed</p>
+          </div>
+          <p class="help-block">The annotation field can be referenced by CMDBs.<br>e.g. To facilitate tracking owners for Change Management purposes.<br>This field will be entered into the NetApp Volume's Comment field</p>
+        </div>
+        <div class="form-group required" show-errors ng-if="isRoot">
+          <label for="tenantId">Tenant</label>
+          <select name="tenantId" ng-model="$parent.tenantId" id="tenantId" class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" required>
+            <option value="">Please select a tenant</option>
+          </select>
+          <div ng-messages="storagegroupForm.tenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="serverId">{{labels.server.serverName}}</label>
+          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers |orderBy: 'name'" ng-disabled="isRoot && !tenantId" required>
+            <option value="">Please select a {{labels.server.serverName}}</option>
+          </select>
+          <div ng-messages="storagegroupForm.serverId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} name is required.</p>
+          </div>
+          <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="tier">Tier</label>
+          <select ng-model="tier" ng-options="tier.id as tier.name for tier in validTierToAssign" class="form-control" id="tier" name="tier" class="form-control" required></select>
+          <div ng-messages="storagegroupForm.tier.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tier is required.</p>
+          </div>
+          <p class="help-block">The tier of storage the NetApp Volume is to reside on: Performance (6144 IOPS/TB), Premium (1536 IOPS/TB), Standard (128 IOPS/TB)</p>
+        </div>
+      </div>
+    </div>
+    <div class="row show-grid">
+      <div class="form-group col-md-1">
+        <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left">
+      </div>
+      <div class="form-group col-md-5">
+        <label style="margin-top: 12px;">Enable Snapshot Policy</label>
+      </div>
+    </div>
+    <div ng-show="ssPolicyEnabled" class="row show-grid">
+      <div class="form-group col-md-1 policydropdown">
+        <label for="sspHourlyRetention">Hourly</label>
+        <select name="sspHourlyRetention" ng-model="sspHourlyRetention" id="sspHourlyRetention" class="form-control selectlist">
+          <option ng-repeat="sspHR in sspHourlyRetentions" value="{{sspHR}}">{{sspHR}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-1 policydropdown required">
+        <label for="sspDailyRetention">Daily</label>
+        <select name="sspDailyRetention" ng-model="sspDailyRetention" id="sspDailyRetention" class="form-control selectlist" required>
+          <option ng-repeat="sspDR in sspDailyRetentions" value="{{sspDR}}">{{sspDR}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-2 policydropdown required">
+        <label for="sspDailySchedule">@</label>
+        <select name="sspDailySchedule" ng-model="sspDailySchedule" id="sspDailySchedule" class="form-control selectlist" required>
+          <option ng-repeat="sspDS in sspDailySchedules" value="{{sspDS.val}}">{{sspDS.displayVal}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-1 policydropdown">
+        <label for="sspWeeklyRetention">Weekly</label>
+        <select name="sspWeeklyRetention" ng-model="sspWeeklyRetention" id="sspWeeklyRetention" class="form-control selectlist">
+          <option ng-repeat="sspWR in sspWeeklyRetentions" value="{{sspWR}}">{{sspWR}}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-1 policydropdown">
+        <label for="sspMonthlyRetention">Monthly</label>
+        <select name="sspMonthlyRetention" ng-model="sspMonthlyRetention" id="sspMonthlyRetention" class="form-control selectlist">
+          <option ng-repeat="sspMR in sspMonthlyRetentions" value="{{sspMR}}">{{sspMR}}</option>
+        </select>
+      </div>
+    </div>
+    <div ng-show="ssPolicyEnabled" class="row show-grid">
+      <div class="form-group col-md-6">
+        <p class="faint-text">A Snapshot Policy enables instantaneous backups to be created on the storage system.</br>
+A combination of Hourly, Daily, Weekly & Monthly schedules and retention periods can be selected.</br>
+</p>Notes:
+<ul>
+  <li>Snapshots do not impact performance.</li>
+  <li>Snapshots capacity usage is limited to changed blocks only (a.k.a. Delta / Incremental Forever)</li>
+</ul>
+<p class="faint-text">Hourly Snapshots are created at 00:05 past the hour.</br>
+Daily Snapshot are created at the time specified.</br>
+Weekly Snapshot are created at 00:15 every Sunday.</br>
+Monthly Snapshot are created at 00:00 on first day of the month.</p>
+      </div>
+    </div>
+    <div class="row show-grid">
+      <div class="col-md-6">
+        <div class="form-group">
+          <input type="submit" class="btn btn-xl btn-primary" value="Create">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </div>
+    </div>
+  </form>
+</section>

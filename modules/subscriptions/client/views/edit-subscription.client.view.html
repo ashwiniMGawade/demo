@@ -1,0 +1,57 @@
+<section ng-controller="SubscriptionsController" ng-init="findOne()" ng-show="subscription.subscriptionId">
+  <div class="page-header">
+    <h1>Subscription: <span>{{ ::subscription.name}}</span></h1>
+  </div>
+  <div class="row show-grid">
+    <div class="col-md-6">
+      <form name="subscriptionForm" class="form-horizontal" ng-submit="update(subscriptionForm.$valid)" novalidate>
+        <fieldset>
+          <div class="form-group required" show-errors>
+            <label for="name">Name</label>
+            <input name="name" type="text" ng-model="subscription.name" id="name" class="form-control" placeholder="Name"
+                    ng-maxlength="32"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                    required ng-bind-html>
+            <div ng-messages="subscriptionForm.name.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Subscription name is required.</p>
+              <p class="help-block error-text" ng-message="maxlength">Subscription name should be maximum 32 characters long.</p>
+              <p class="help-block error-text" ng-message="minlength">Subscription name must be minimum 3 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes are allowed</p>
+            </div>
+          </div>
+          <div ng-if="subscriptionSettings.description.enabled" class="form-group" ng-class="(subscriptionSettings.description.enabled && subscriptionSettings.description.mandatory) ? 'required' : ''" show-errors>
+            <label for="description">Description</label>
+            <input name="description" type="text" ng-model="subscription.description" id="description" class="form-control" placeholder="Description"
+                    ng-maxlength="256"
+                    ng-pattern="/^[a-zA-Z0-9\ ,-._]*$/"
+                    ng-required="subscriptionSettings.description.enabled && subscriptionSettings.description.mandatory" ng-bind-html>
+            <div ng-messages="subscriptionForm.description.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Description is required.</p>
+              <p class="help-block error-text" ng-message="maxlength">Description should be maximum 256 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, dashes, underscores, commas & dots are allowed</p>
+            </div>
+          </div>
+          <div ng-if="subscriptionSettings.url.enabled" class="form-group" ng-class="(subscriptionSettings.url.enabled && subscriptionSettings.url.mandatory) ? 'required' : ''" show-errors>
+            <label for="url">URL</label>
+            <input name="url" type="text" ng-model="subscription.url" id="url" class="form-control" placeholder="URL"
+                    ng-maxlength="256"
+                    ng-pattern="/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i"
+                    ng-required="subscriptionSettings.url.enabled && subscriptionSettings.url.mandatory" ng-bind-html>
+            <div ng-messages="subscriptionForm.url.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">URL is required.</p>
+              <p class="help-block error-text" ng-message="maxlength">URL should be maximum 256 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Invalid URL format.</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="submit" value="Update" class="btn btn-primary">
+          </div>
+          <div ng-show="error" class="text-danger">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>

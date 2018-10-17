@@ -1,0 +1,33 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div>
+        <h1>Snapshots : {{::storagegroup.name}} </h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-offset-4 col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="snapshot in $data">
+        <td ng-bind="snapshot.code" title="'Code'" sortable="'code'"></td>
+        <td ng-if="(snapshotAccessRoles.delete | intersect : authentication.user.roles) > 0">
+          <button type="button" class="btn btn-xs btn-primary" ng-click="deleteSnapshot(snapshot.code);">Delete</button></td>
+        <!--<td>-->
+          <!--<button type="button" class="btn btn-xs btn-primary" ng-click="restoreSnapshot(snapshot.name);">Restore</button></td>-->
+        <!--<td>-->
+          <!--<button type="button" class="btn btn-xs btn-primary" ng-click="cloneSnapshot(snapshot.name);">Clone</button></td>-->
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+  <div class="alert alert-warning text-center" ng-show="loading">
+    <span class="glyphicon glyphicon-refresh spinning"> </span> Loading...
+  </div>
+</section>

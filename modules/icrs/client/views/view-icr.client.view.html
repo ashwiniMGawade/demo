@@ -1,0 +1,28 @@
+<section ng-controller="IcrsController" ng-init="findOne()" ng-show="icr.icrId">
+  <div class="page-header">
+    <h1>ICR: <span ng-bind="icr.message" class="capitalize word-break-all"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Message</th><td ng-bind="icr.message" class="capitalize"></td></tr>
+      <tr><th>Partner</th><td ng-bind="icr.partner.name"></td></tr>
+      <tr><th>Tenant</th><td ng-bind="icr.tenant.name"></td></tr>
+      <tr><th>SubTenant</th><td ng-bind="icr.subtenant.name"></td></tr>
+      <tr><th>Server</th><td ng-bind="icr.server.name"></td></tr>
+      <tr><th>External Cluster</th><td ng-bind="icr.clusterExt" class="word-break-all"></td></tr>
+      <tr><th>External Inter-Cluster IP Addresses</th><td ng-bind="icr.ipsExt" class="word-break-all"></td></tr>
+      <tr><th>Status</th><td ng-bind="icr.status" class="word-break-all"></td></tr>
+      <tr ng-if="(icrAccessRoles.update | intersect : authentication.user.roles) > 0 || (icrAccessRoles.delete | intersect : authentication.user.roles) > 0">
+        <th>Actions</th>
+        <td>
+          <button type="button" class="btn btn-xs1 btn-primary" ng-if="(icrAccessRoles.update | intersect : authentication.user.roles) > 0" ui-sref="icrs.edit({icrId: icr.icrId})" ng-disabled="icr.status==='Closed'" >Edit</button>
+          
+          <button type="button" ng-if="(icrAccessRoles.delete | intersect : authentication.user.roles) > 0" class="btn btn-xs1 btn-primary" ng-click="remove(icr);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>

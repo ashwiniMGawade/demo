@@ -1,0 +1,58 @@
+<section ng-controller="SubtenantsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Subtenant</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="subtenantForm" class="form-horizontal" ng-submit="create(subtenantForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
+                 ng-minlength="3"
+                 ng-maxlength="64"
+                 ng-pattern="/^[a-zA-Z0-9\ -]*$/"
+                 required>
+          <div ng-messages="subtenantForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Subtenant name is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Subtenant name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Subtenant name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Subtenant name can only include alphanumeric characters including space and dash.</p>
+          </div>
+          <p class="help-block">Name to refer to the Subtenant in this portal<br>e.g. Human Resources and Organisation</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+                 ng-minlength="3"
+                 ng-maxlength="8"
+                 ng-pattern="/^[a-z0-9]*$/"
+                 required>
+          <div ng-messages="subtenantForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Subtenant code is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Subtenant code must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Subtenant code should be maximum 8 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters are allowed</p>
+          </div>
+          <p class="help-block">Short name featuring in the Subtenant's {{labels.vfas}} names on the storage system<br>lowercase alphanumeric characters and underscores only<br>e.g. hro</p>
+        </div>
+        <div class="form-group required" show-errors ng-show="isRoot">
+          <label for="tenantId">Tenant</label>
+          <select name="tenantId" ng-model="tenantId" id="tenantId" class="form-control"
+          ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" ng-required="isRoot">
+            <option value="">Please select a tenant</option>
+          </select>
+          <div ng-messages="subtenantForm.tenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
+          </div>
+          <p class="help-block">The Tenant the Subtenant is to be associated with</p>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

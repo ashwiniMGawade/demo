@@ -1,0 +1,30 @@
+'use strict';
+
+angular.module('users').controller('ChangePasswordController', ['$scope', '$http', 'Authentication', 'PasswordValidator', 'Flash', '$sanitize',
+  function ($scope, $http, Authentication, PasswordValidator, Flash, $sanitize) {
+    $scope.user = Authentication.user;
+    $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+
+    // Change user password
+    $scope.changeUserPassword = function (isValid) {
+      $scope.success = $scope.error = null;
+
+      if (!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'passwordForm');
+
+        return false;
+      }
+
+      $http.post('/api/users/password', $scope.passwordDetails).success(function (response) {
+        // If successful show success message and clear form
+        $scope.$broadcast('show-errors-reset', 'passwordForm');
+        $scope.success = true;
+        $scope.passwordDetails = null;
+      }).error(function (response) {        
+        if (angular.element(document).find('flash-message').find('strong').length === 0) {
+          Flash.create('danger', '<strong ng-non-bindable>' + $sanitize(response.message) + '</strong>', 3000, { class: '', id: '' }, true);
+        }
+      });
+    };
+  }
+]);

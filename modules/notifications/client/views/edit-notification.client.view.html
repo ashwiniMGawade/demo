@@ -1,0 +1,116 @@
+<section ng-controller="NotificationsController" ng-init="findOne()" ng-show="notification.notificationId">
+  <div class="page-header">
+    <h1>Notification:{{::notification.summary}}</h1>
+  </div>
+  <div class="col-md-6">
+        <form name="notificationForm" ng-submit="update(notificationForm.$valid)" novalidate class="form-horizontal">
+          <fieldset>
+            <div class="form-group required" show-errors>
+              <label for="summary">Summary</label>
+              <textarea name="summary" ng-model="notification.summary" id="summary" class="form-control" rows="5" placeholder="Summery of the Notification message" ng-bind-html
+                    ng-minlength="3"
+                    ng-maxlength="64"
+                    ng-pattern="/^[a-zA-Z0-9_ -]*$/"
+                    required></textarea>
+              <div ng-messages="notificationForm.summary.$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Summary is required.</p>
+                <p class="help-block error-text" ng-message="minlength">Summary must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="maxlength">Summary should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, underscores and dashes allowed</p>
+              </div>
+            </div>
+
+            <div class="form-group required" show-errors>
+              <label for="message">Message</label>
+              <textarea name="message" ng-model="notification.message" id="message" class="form-control" rows="5" placeholder="Complete notification message" ng-bind-html
+                     ng-minlength="3"
+                     ng-maxlength="1024"
+                     ng-pattern="/^[a-zA-Z0-9_ .,-]*$/"
+                     required></textarea>
+              <div ng-messages="notificationForm.message.$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Message is required.</p>
+                <p class="help-block error-text" ng-message="minlength">Message must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="maxlength">Message should be maximum 1024 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, underscores, dots, commas and dashes allowed</p>
+              </div>
+            </div>
+
+            <div class="form-group" show-errors>
+              <label>Tenant</label>
+              <div>
+                <label>
+                  <input type="checkbox" id="select_all" name="select_all"  ng-checked="notification.tenants.length == 0" value="Select All" ng-disabled="true">
+                  Selected All
+                </label>
+              </div>
+              <select  multiple name="tenantsId" ng-disabled="true" ng-model="selectedTenants"  class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'">
+              </select>
+              <p class="help-block">All tenants the notification is applicable to.<br>Please note that tenants cannot be changed after a notification is created.<br>This limitation is for maintaining tracking accuracy.</p>
+            </div>
+
+
+            <div class="form-group required" show-errors>
+              <label for="category">Category</label>
+              <select class="form-control" name="category" id="category" ng-model="notification.category" required placeholder="">
+                  <option value="">Please select message category</option>
+                  <option ng-repeat="category in validCategoryToAssign | orderBy" value="{{category}}">{{category}}</option>
+              </select>
+              <div ng-messages="notificationForm.category.$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Type is a required field.</p>
+              </div>
+            </div>
+
+            <div class="form-group error-wrap required" ng-class="startDateErrMessage ? 'has-error' : ''" show-errors>
+              <label>Start Date</label>
+              <p class="input-group">
+                <input type="text" name="startDate" class="form-control" datetime-picker="dd MMM yyyy HH:mm" ng-model="startDate" is-open="startDateisOpen" ng-change="checkValidDate(startDate, endDate)"  value = "{{startDate}}"
+                     ng-model-options="{timezone: 'UTC'}" />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="openStartDateCalendar($event, prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+              </p>
+
+              <div role="alert" class="text-danger">
+                <p ng-show="startDateErrMessage" class="help-block" ng-bind="startDateErrMessage"></p>
+              </div>
+              <p class="help-block">The first day this notification is valid and visible to users.</br>
+              The start date and time is considered to be in UTC.<br>
+              Current UTC Time : {{currentUTCTime}}</p>
+            </div>
+
+            <div class="form-group required error-wrap" ng-class="endDateErrMessage ? 'has-error' : ''" show-errors>
+              <label>End Date</label>
+              <p class="input-group">
+                <input type="text" name="endDate" class="form-control" datetime-picker="dd MMM yyyy HH:mm" ng-model="endDate" is-open="endDateisOpen" ng-change="checkValidDate(startDate, endDate)" value="{{endDate}}"
+                     ng-model-options="{timezone: 'UTC'}" />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="openEndDateCalendar($event, prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+              </p>
+
+              <div role="alert" class="text-danger">
+                <p ng-show="endDateErrMessage" class="help-block" ng-bind="endDateErrMessage"></p>
+              </div>
+              <p class="help-block">The last day this notification is valid and visible to users.</br>
+                The end date and time is considered to be in UTC.<br>
+                Current UTC Time : {{currentUTCTime}}</p>
+            </div>
+
+            <div class="form-group show-errors">
+              <label>
+                <input name="sendEmail" type="checkbox" ng-model="notification.sendEmail" id="sendEmail"  ng-disabled="true">
+                Send Email
+              </label>
+              <p class="help-block">If Chceked, An Email is sent to all users associated with each selected Tenant both to announce this newly created notification as well when it is updated.</p>
+            </div>
+
+            <div class="form-group">
+              <input type="submit" value="Update" class="btn btn-primary">
+            </div>
+            <div ng-show="error" class="text-danger">
+              <strong ng-bind="error"></strong>
+            </div>
+          </fieldset>
+        </form>
+  </div>
+</section>

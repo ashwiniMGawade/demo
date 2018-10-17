@@ -1,0 +1,91 @@
+<section ng-show="user.userId">
+  <div class="page-header">
+    <h1>User: <span ng-bind="user.displayName"></span></h1>
+  </div>
+  <div class="row show-grid">
+    <div class="col-md-6">
+      <form name="userForm" ng-submit="update(userForm.$valid)" novalidate>
+        <fieldset>
+          <div class="form-group required" show-errors>
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" class="form-control" ng-model="user.firstName" placeholder="First Name"
+                    ng-maxlength="64"
+                    ng-minlength="2"
+                    ng-pattern="/^[a-zA-Z\ -]*$/"
+                    required ng-bind-html>
+            <div ng-messages="userForm.firstName.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">First name is required.</p>
+              <p class="help-block error-text" ng-message="maxlength">First name should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="minlength">First name must be minimum 2 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only Alphabetical, spaces and dashes allowed</p>
+            </div>
+          </div>
+          <div class="form-group required" show-errors>
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName" class="form-control" ng-model="user.lastName" placeholder="Last Name"
+                    ng-maxlength="64"
+                    ng-minlength="2"
+                    ng-pattern="/^[a-zA-Z\ -]*$/"
+                    required ng-bind-html>
+            <div ng-messages="userForm.lastName.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Last name is required.</p>
+              <p class="help-block error-text" ng-message="maxlength">Last name should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="minlength">Last name must be minimum 2 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only Alphabetical, spaces and dashes allowed</p>
+            </div>
+          </div>
+          <div class="form-group required" show-errors>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" ng-model="user.username" ng-readonly="true" placeholder="Username">
+          </div>
+          <div class="form-group required" show-errors>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" ng-model="user.email" placeholder="Email" required ng-bind-html>
+            <div ng-messages="userForm.email.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Email address is required.</p>
+              <p class="help-block error-text" ng-message="email">Email address is invalid.</p>
+            </div>
+          </div>
+          <div class="form-group" show-errors>
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" name="phone" class="form-control" ng-model="user.phone" placeholder="Phone" ng-bind-html
+                    ng-pattern="/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/">
+            <div ng-messages="userForm.phone.$error" role="alert">
+              <p class="help-block error-text" ng-message="pattern">Phone number is not valid.</p>
+            </div>
+          </div>
+          <div class="form-group required" show-errors ng-if="user.roles !== 'root' && user.roles !== 'partner'">
+              <label class="control-label" for="roles">Role</label>
+              <select ng-model="user.roles" ng-options="role.id as role.name for role in updateUserRoles"
+                      class="form-control" id="roles" name="roles" class="form-control" required></select>
+          </div>
+
+          <div class="form-group" show-errors ng-show="isRoot && user.provider==='local'">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" ng-model="user.password"
+                   placeholder="Password" uib-popover="{{popoverMsg}}" uib-popover-trigger="focus"
+                   autocomplete="new-password"
+                   password-validator>
+            <div ng-messages="userForm.password.$error" role="alert">
+              <div ng-repeat="passwordError in passwordErrors">
+                <p class="help-block error-text" ng-show="userForm.password.$error.requirements">{{passwordError}}</p>
+              </div>
+            </div>
+          </div>          
+
+          <div class="form-group" ng-show="isRoot && user.provider==='local'">
+            <label>Password Requirements</label>
+            <uib-progressbar value="requirementsProgress" type="{{requirementsColor}}"><span style="color:white; white-space:nowrap;">{{requirementsProgress}}%</span></uib-progressbar>
+          </div>
+
+          <div class="form-group">
+            <input type="submit" value="Update" class="btn btn-primary">
+          </div>
+          <div ng-show="error" class="text-danger">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>

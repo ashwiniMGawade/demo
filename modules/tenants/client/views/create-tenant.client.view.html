@@ -1,0 +1,65 @@
+<section ng-controller="TenantsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Tenant</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="tenantForm" class="form-horizontal" ng-submit="create(tenantForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
+                  ng-pattern="/^[a-zA-Z0-9\ -]*$/"
+                  ng-minlength="3"
+                  ng-maxlength="64"
+                 required>
+          <div ng-messages="tenantForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Tenant name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Tenant name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">
+              Tenant name should contain only alphanumeric characters including space and dash.
+            </p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+                 ng-minlength="3"
+                 ng-maxlength="8"
+                 ng-pattern="/^[a-z0-9]*$/"
+                 required>
+          <div ng-messages="tenantForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant code is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Tenant code must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Tenant code should be maximum 8 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters are allowed</p>
+          </div>
+        </div>
+        <div ng-if="annotationSetting.enabled" class="form-group" ng-class="(annotationSetting.enabled && annotationSetting.mandatory) ? 'required' : ''" show-errors>
+          <label for="annotation">Annotation</label>
+          <input name="annotation" type="text" ng-model="$parent.annotation" id="annotation" class="form-control" placeholder="Annotation"
+                 ng-maxlength="32"
+                 ng-pattern="/^[a-zA-Z0-9\-]*$/"
+                 ng-required="annotationSetting.enabled && annotationSetting.mandatory">
+          <div ng-messages="tenantForm.annotation.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant annotation is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Tenant annotation should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only alphanumeric characters and dashes are allowed</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors ng-if="isRoot">
+          <label for="partnerId">Partner</label>
+          <select name="partnerId" ng-model="$parent.partnerId" id="partnerId" class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'">
+            <option value="">Please select a partner</option>
+          </select>         
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

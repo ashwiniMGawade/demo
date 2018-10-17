@@ -1,0 +1,44 @@
+<section ng-controller="SitesController">
+  <div class="page-header">
+    <h1>New Site</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="siteForm" class="form-horizontal" ng-submit="create(siteForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name" required
+            ng-minlength="3"
+            ng-maxlength="64"
+            ng-pattern="/^[a-zA-Z0-9\ -]*$/">
+          <div ng-messages="siteForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Site name is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Site name should have Minimum 3 characters.</p>
+            <p class="help-block error-text" ng-message="maxlength">Site name should have Maximum 64 characters.</p>
+            <p class="help-block error-text" ng-message="pattern">Site name can only include alphanumeric characters including space and dash.</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+            ng-minlength="2"
+            ng-maxlength="4"
+            ng-pattern="/^[a-z0-9]*$/"
+           required>
+          <div ng-messages="siteForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Site code is required.</p>
+             <p class="help-block error-text" ng-message="minlength">Code must be minimum 2 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Code should be maximum 4 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters are allowed</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

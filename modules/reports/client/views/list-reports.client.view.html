@@ -1,0 +1,87 @@
+<section ng-controller="ReportsController" ng-init="search(true)">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Reports</h1>
+      </div>
+    </div>
+  </div>
+  <div class="row info-panel">
+    <form name="reportListForm" class="form-inline container-fluid" ng-submit="search(reportListForm.$valid)"
+          novalidate>
+      <div class="filter-wrap clearfix">
+        <div class="filter-col">
+          <div class="form-group error-wrap required"
+               ng-if="isRoot || isL1ops" show-errors>
+            <label>Tenant</label>
+            <select name="tenant" ng-model="tenant.id" id="tenant" class="form-control"
+                    ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" required>
+              <option value="">Please select a tenant</option>
+            </select>
+            <div class="error" ng-messages="reportListForm.tenant.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Tenant is required.</p>
+            </div>
+          </div>
+        </div>
+        <div class="filter-col">
+          <div class="form-group  error-wrap">
+            <label>Start-Date</label>           
+            <p class="input-group">
+              <input type="text" class="form-control" datetime-picker="mediumDate" ng-model="startDate" is-open="startDateisOpen" ng-change="checkValidDate(startDate, endDate)"  enable-time="false"/>
+              <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="openStartDateCalendar($event, prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span>
+            </p>
+            <div class="error" ng-show="startDateErrMessage" class="text-danger">
+              <p ng-bind="startDateErrMessage"></p>
+            </div>
+          </div>
+          <div class="form-group  error-wrap">
+            <label>End-Date</label>           
+            <p class="input-group">
+              <input type="text" class="form-control" datetime-picker="mediumDate" ng-model="endDate" is-open="endDateisOpen" ng-change="checkValidDate(startDate, endDate)" enable-time="false"/>
+              <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="openEndDateCalendar($event, prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span>
+            </p>
+            <div class="error" ng-show="endDateErrMessage" class="text-danger">
+              <p ng-bind="endDateErrMessage"></p>
+            </div>
+          </div>
+        </div>
+        <div
+          ng-class="{'btn-wrap' : !(isRoot || isPartner), 'container-fluid': isRoot || isPartner}">
+          <button type="submit" class="btn btn-primary" ng-disabled="errMessage">Search</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive" ng-show="reports.length">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="report in pagedItems | orderBy:'-'">
+        <td ng-bind="report"></td>
+        <td>
+          <button type="button" class="btn btn-xs btn-primary" ng-click="download(report)">
+            Download
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <uib-pagination ng-show="reports.length && filterLength>itemsPerPage" boundary-links="false" max-size="16" items-per-page="itemsPerPage" direction-links="true" next-text="»" previous-text="«"
+              total-items="filterLength" ng-model="currentPage" ng-change="pageChanged()"></uib-pagination>
+
+  <div class="alert alert-warning text-center" ng-if="reports && !reports.length">
+    No reports available!!
+  </div>
+</section>

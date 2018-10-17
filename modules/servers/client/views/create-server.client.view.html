@@ -1,0 +1,159 @@
+<section ng-controller="ServersController" ng-init="find()">
+  <div class="page-header">
+    <h1>New {{labels.server.serverName}}</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="serverForm" class="form-horizontal" ng-submit="create(serverForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
+                  ng-maxlength="64"
+                  ng-minlength="3"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required>
+          <div ng-messages="serverForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Server name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Server name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+          </div>
+          <p class="help-block">The Name to refer to the {{labels.server.serverName}} in this portal</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="siteId">Site</label>   
+          <select name="siteId" ng-model="siteId" id="siteId" class="form-control" ng-options="site.siteId as site.name for site in sites | orderBy: 'name'" required ng-change="populateSubscriptions(siteId, tenantId)" ng-disabled="!sites.length">
+            <option value="">Please select a site</option>
+          </select>
+          <div class="loader" ng-show="!sites.length"></div>       
+          <div ng-messages="serverForm.siteId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Site name is required.</p>
+          </div>
+          <p class="help-block">The Site the {{labels.server.serverName}} is to be created in.</p>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="isRoot">
+          <label for="tenantId">Tenant</label>
+          <select name="tenantId" ng-model="$parent.tenantId" id="tenantId" class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" required>
+            <option value="">Please select a tenant</option>
+          </select>
+          <div ng-messages="serverForm.tenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
+          </div>
+          <p class="help-block">The Tenant the {{labels.server.serverName}} is to be associated with.<br>
+            The Tenant's Code will be included in the {{labels.server.serverName}}'s name on the storage system.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label>Subtenant</label>
+          <select name="subtenantId" ng-model="subtenantId" id="subtenantId" class="form-control" ng-options="subtenant.subtenantId as subtenant.name for subtenant in subtenants | orderBy: 'name'" required ng-disabled="(!tenantId && isRoot) || !subtenants.length">
+            <option value="">Please select a subtenant</option>
+          </select>
+          <div class="loader" ng-show="!subtenants.length"></div>
+          <div ng-messages="serverForm.subtenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Subtenant name is required.</p>
+          </div>
+          <p class="help-block">The Subtenant specifies the administrative domain a {{labels.server.serverName}} is to be associated with.<br>
+            The "Default Subtenant" will suffice if a single group of cloud storage administrators are associated with a Tenant.<br>
+            The Subtenant's Code will be included in the {{labels.server.serverName}}'s name on the storage system.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label>Subscription</label>
+          <select name="subscriptionId" ng-model="subscriptionId" id="subscriptionId" class="form-control" ng-options="subscription.subscriptionId as subscription.name for subscription in subscriptions | orderBy: 'name'" required ng-disabled="(!tenantId && isRoot) || !siteId">
+            <option value="">Please select a subscription</option>
+          </select>
+          <div ng-messages="serverForm.subscriptionId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Subscription is required.</p>
+          </div>
+          <p class="help-block">The Subscription this {{labels.server.serverName}} is associated with for billing purposes.<br>
+            The selected Subscription's Code will feature in the Report CSV file for each NetApp Volume contained in this {{labels.server.serverName}}.</p>
+        </div>
+
+        <div class="form-group" show-errors>
+          <label for="vlan">VLAN</label>
+          <input name="vlan" type="text" ng-model="vlan" id="vlan" class="form-control" placeholder="e.g. 100"
+                  ng-pattern="/^(?:[1-9]\d{0,2}|[1-3]\d{3}|40(?:[0-8]\d|9[0-3]))$/">
+          <div ng-messages="serverForm.vlan.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">A valid {{labels.server.serverName}} VLAN can be optionally specified, otherwise the next available VLAN will be used.</p>
+            <p class="help-block error-text" ng-message="pattern">The VLAN is an integer value in the range 1-4093. e.g. 100</p>
+          </div>
+          <p class="help-block">Each {{labels.server.serverName}} requires a dedicated VLAN. A VLAN can be optionally specified, otherwise the next available VLAN will be used. The VLAN is an integer value in the range 1-4093. e.g. 100</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="subnet">Subnet</label>
+          <input name="subnet" type="text" ng-model="subnet" id="subnet" class="form-control" placeholder="e.g. 10.20.30.64/26"
+                  ng-pattern="/^(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.)(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([8-9]|1[0-9]|2[0-6]))$/"
+                  required>
+          <div ng-messages="serverForm.subnet.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">A valid {{labels.server.serverName}} subnet is required.</p>
+            <p class="help-block error-text" ng-message="pattern">The subnet is to be specified in CIDR notation. e.g. 10.20.30.64/26</p>
+          </div>
+          <p class="help-block">A {{labels.server.serverName}} requires a dedicated subnet for full functionality, including potential DR facilities 
+            & migrations. As the {{labels.server.serverName}} has exclusive use of the subnet, a /26 subnet is optimal (/8 - /26 allowed).</p>
+        </div>
+
+        <div class="form-group" show-errors ng-if="serverSettings.gateway.enabled">
+          <label for="gateway">Gateway</label>
+          <input name="gateway" type="text" ng-model="gateway" id="gateway" class="form-control" placeholder="e.g. 10.20.30.65"
+                 ng-pattern="/^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$/">
+          <div ng-messages="serverForm.gateway.$error" role="alert">
+            <p class="help-block error-text" ng-message="pattern">A valid gateway address must reside within the specified subnet</p>
+          </div>
+          <p class="help-block">Optional: Only to be entered if a non-default gateway address is required.<br>
+            By default the 1st IP address of the Subnet is used for Gateway (2nd & 3rd for HSRP)<br>
+            The 4th to 30th IPs in the Subnet are reserved for use by the {{labels.server.serverName}}.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label class="control-label" for="managed">Configuration</label>
+          <select class="form-control" name="managed" id="managed" ng-model="managed" required>
+              <option value="">Please select configuration type</option>
+              <option ng-repeat="(key, value) in validManagedToAssign" value="{{key}}">{{value}}</option>
+          </select>
+          <div ng-messages="serverForm.managed.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Configuration type is a required field.</p>
+          </div>
+
+          <p class="help-block">A {{labels.server.managedBy.customer}}-Configuration allows customised storage management.<br>
+            Inter-Cluster Relationships can be requested to set up SnapMirror relationships<br>
+            with non-DFaaS cDOT storage systems, facilitating DR and migration operations.<br>
+            The additional storage management is the responsibility of the customer.</p>
+          <p class="help-block">A {{labels.server.managedBy.portal}}-Configuration promotes ease-of-management with storage configured<br>
+            according to best practices for versatility, performance & reliability.<br>
+            Storage Groups and Storage Units can be rapidly configured through the Portal.<br>
+            Migration of data is to be performed at the host-level.</p>
+        </div>
+
+        <div class="form-group" ng-class="{'required' : managed == 'Customer', 'has-error': serverForm.password.$error}" show-errors ng-if="managed == 'Customer'">
+          <label for="password">Password</label>  
+          <input name="password" type="password" ng-model="$parent.password" id="password" class="form-control" placeholder="Password"
+                  ng-minlength="8"
+                  ng-maxlength="16"
+                  ng-required="managed == 'Customer'"
+                  ng-pattern="/^(?=.*[0-9])(?=.*[a-zA-Z])\w{8,16}$/"
+                  autocomplete="new-password"
+                  uib-popover="{{popoverMsg}}" uib-popover-trigger="focus">
+          <div ng-messages="serverForm.password.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} password is mandatory.</p>
+            <p class="help-block error-text" ng-message="minlength">{{labels.server.serverName}} password should be minimum 8 char.</p>
+            <p class="help-block error-text" ng-message="maxlength">{{labels.server.serverName}} password can not be more than 16 char.</p>
+            <p class="help-block error-text" ng-message="pattern">Password must contain no special characters, at least a digit and a letter</p>
+          </div>
+          <p class="help-block">A {{labels.server.managedBy.customer}}-Configured {{labels.server.serverName}} requires a password for SSH and OnCommand System Manager.<br>
+            Access is via the Virtual Cluster IP Address</p>
+        </div>            
+
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-xl btn-primary">
+        </div>
+
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

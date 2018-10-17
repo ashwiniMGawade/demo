@@ -1,0 +1,66 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row info-panel">
+      <div class="col-md-4">
+        <h1>Jobs</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="row info-panel">
+    <form name="reportListForm" class="form-inline container-fluid" ng-submit="rowsToDisplay()"
+          novalidate>
+      <div class="filter-wrap clearfix">
+        <div class="filter-col">
+              <div class="form-group  error-wrap">
+                <label>Start Date(UTC)</label>
+                <p class="input-group">
+                  <input type="text" class="form-control" datetime-picker="dd MMM yyyy HH:mm" ng-model="startDate" is-open="startDateisOpen" ng-change="checkValidDate(startDate, endDate)"
+                       ng-model-options="{timezone: 'UTC'}" />
+                  <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="openStartDateCalendar($event, prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  </span>
+                </p>
+                <div class="error" ng-show="startDateErrMessage" class="text-danger">
+                  <p ng-bind="startDateErrMessage"></p>
+                </div>
+              </div>
+              <div class="form-group  error-wrap">
+                <label>End Date(UTC)</label>
+                <p class="input-group">
+                  <input type="text" class="form-control" datetime-picker="dd MMM yyyy HH:mm" ng-model="endDate" is-open="endDateisOpen" ng-change="checkValidDate(startDate, endDate)"
+                       ng-model-options="{timezone: 'UTC'}" />
+                  <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="openEndDateCalendar($event, prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  </span>
+                </p>
+                <div class="error" ng-show="endDateErrMessage" class="text-danger">
+                  <p ng-bind="endDateErrMessage"></p>
+                </div>
+              </div>
+        </div>
+        <button type="submit" class="btn btn-primary" ng-disabled="errMessage">Search</button>
+      </div>
+    </form>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="job in $data">
+        <td ng-bind="job.module" title="'Module'" sortable="'module'" class="capitalize"></td>
+        <td ng-bind="job.operation" title="'Operation'" sortable="'operation'" class="capitalize"></td>
+        <td ng-bind="job.object.code" title="'Object Code'" sortable="'object.code'"></td>
+        <td ng-bind="job.user.username" title="'User'" sortable="'user.username'"></td>
+        <td ng-bind="job.status" title="'Status'" sortable="'status'" class="capitalize"></td>
+        <td ng-if="isRoot" ng-bind="job.tenant.code" title="'Tenant'" sortable="'tenant.code'"></td>
+        <td ng-bind="job.created | date:'medium' : 'UTC'" title="'Created At (UTC)'" sortable="'created'"></td>
+        <td ng-bind="job.updated | date:'medium' : 'UTC'" title="'Updated At (UTC)'" sortable="'updated'"></td>
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="jobs.view({jobId: job.jobId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

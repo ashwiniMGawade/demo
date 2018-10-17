@@ -1,0 +1,49 @@
+<section ng-controller="SubscriptionsController" ng-init="findOne()" ng-show="subscription.subscriptionId">
+  <div class="page-header">
+    <h1>Subscription: <span ng-bind="subscription.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="subscription.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="subscription.code"></td></tr>
+      <tr><th>Partner</th><td ng-bind="subscription.partner.name"></td></tr>
+      <tr><th>Tenant</th><td ng-bind="subscription.tenant.name"></td></tr>
+      <tr ng-if="subscriptionSettings.site.enabled" ><th>Site</th><td ng-bind="subscription.site.name"></td></tr>
+      <tr ng-if="subscriptionSettings.description.enabled" ><th>Description</th><td ng-bind="subscription.description"></td></tr>
+      <tr ng-if="subscriptionSettings.url.enabled" ><th>URL</th><td ng-bind="subscription.url"></td></tr>
+      <tr ng-if="paymentMethod.prePaid">
+        <th>Storage Pack</th>
+        <td>
+          <table ng-if="subscription.storagePack" class="table table-striped">
+            <thead>
+              <tr>
+                <th>Class(Type-Tier)</th>
+                <th>Procured (GB)</th>
+                <th>Avaliable (GB)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="storagepack in subscription.storagePack">
+                <td>{{storagepack.class}}</td>
+                <td>{{storagepack.sizegb.procured}}</td>
+                <td>{{storagepack.sizegb.available}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      
+      <tr ng-if="(subscriptionAccessRoles.update | intersect : authentication.user.roles) > 0  || (subscriptionAccessRoles.delete | intersect : authentication.user.roles) > 0 ">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(subscriptionAccessRoles.update | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ui-sref="subscriptions.edit({subscriptionId: subscription.subscriptionId})">Edit</button>
+
+          <button ng-if="(subscriptionAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ng-click="remove(subscription);">Delete</button>
+        </td>
+      </tr>
+    </table>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+  </div>
+</section>

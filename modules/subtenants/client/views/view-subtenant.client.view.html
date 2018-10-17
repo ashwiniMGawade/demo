@@ -1,0 +1,24 @@
+<section ng-controller="SubtenantsController" ng-init="findOne()" ng-show="subtenant.subtenantId">
+  <div class="page-header">
+    <h1>Subtenant: <span ng-bind="subtenant.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="subtenant.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="subtenant.code"></td></tr>
+      <tr ng-show="isRoot || isL1ops"><th>Tenant</th><td ng-bind="subtenant.tenant.name"></td></tr>
+      <tr><th>Partner</th><td ng-bind="subtenant.partner.name"></td></tr>
+      <tr ng-if="(subtenantAccessRoles.update | intersect : authentication.user.roles) > 0 || (subtenantAccessRoles.delete | intersect : authentication.user.roles) > 0 ">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(subtenantAccessRoles.update | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ui-sref="subtenants.edit({subtenantId: subtenant.subtenantId})">Edit</button>
+
+          <button ng-if="(subtenantAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ng-click="remove(subtenant);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>

@@ -1,0 +1,99 @@
+<div class="container" ng-controller="HeaderController">
+  <div class="navbar-header">
+    <button class="navbar-toggle" type="button" ng-click="toggleCollapsibleMenu()">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a ng-href="{{authentication.user ? 'dashboards' : ''}}" class="navbar-brand">
+      <img alt="NetApp" src="{{logo}}"  class="brand-image">
+    </a>
+  </div>
+  <nav class="navbar-collapse" collapse="!isCollapsed" ng-class="isCollapsed? '': 'collapse'" role="navigation">
+
+    <ul class="nav navbar-nav" ng-if="menu.shouldRender(authentication.user);">
+      <li ng-repeat="(key, item) in menu.items | orderBy: 'position'" ng-if="item.shouldRender(authentication.user);" ng-switch="item.type" ng-class="{active: $state.current.data.parent.includes(item.state), dropdown: item.type === 'dropdown' }" class="{{item.class}}" uib-dropdown="item.type === 'dropdown'">
+
+        <a ng-switch-when="dropdown" class="dropdown-toggle" uib-dropdown-toggle role="button">{{::item.title}}&nbsp;<span class="caret"></span></a>
+        <ul uib-dropdown-menu class="dropdown-menu">
+          <li ng-repeat="subitem in item.items | orderBy: 'position'" ng-if="subitem.shouldRender(authentication.user);" ng-class="{active: $state.current.data.parentstate === subitem.state, dropdownsubmenu:  singleMenus.indexOf(subitem.state) == -1}" ng-click="toggleSubMenu($event, singleMenus.indexOf(subitem.state) == -1);">
+
+          <!--ng-Mouseover="toggleSubMenu($event, singleMenus.indexOf(subitem.state) == -1);"-->
+            <a href="javascript:void(0);"  ng-if="singleMenus.indexOf(subitem.state) == -1">{{subitem.title}}</a>
+            <a ui-sref="{{subitem.state}}" ng-if="singleMenus.indexOf(subitem.state) !== -1">{{subitem.title}}</a>
+
+            <ul class="dropdown-menu sub-dropdown-menu">
+              <li ng-repeat="submenuvalue in subitem.submenu" ng-if="(submenuvalue.roles | intersect : authentication.user.roles) > 0" ng-class="{active: $state.current.name === submenuvalue.state, dropdownsubmenu:  doubleMenus.indexOf(submenuvalue.state) !== -1}" ng-click="toggleChildMenu($event);">
+                <a ui-sref="{{submenuvalue.state}}">{{submenuvalue.name}}</a>
+                <ul class="dropdown-menu sub-dropdown-menu">
+                  <li ng-repeat="childmenuvalue in submenuvalue.submenu" ng-if="(childmenuvalue.roles | intersect : authentication.user.roles) > 0" ng-class="{active: $state.current.name === childmenuvalue.state}" ng-click="toggleChildMenu($event);">
+                    <a ui-sref="{{childmenuvalue.state}}">{{childmenuvalue.name}}</a>                
+                  </li>
+                </ul>               
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <a ng-switch-default ui-sref="{{item.state}}" ng-bind="item.title"></a>
+      </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right" ng-hide="authentication.user">
+      <li ui-sref-active="active" style="text-align:center" ng-hide="true">
+        <a ui-sref="authentication.signin">NetApp internal users <br/><b>Login here</b></a>
+      </li>
+      <li ui-sref-active="active" ng-hide="true">
+        <a href="" style="font-size: 18px;" ng-click="idpLogin();">Sign In</a>
+      </li>
+      <li ui-sref-active="active" ng-hide="false">
+        <a ui-sref="authentication.signin" style="font-size: 18px;">Sign In</a>
+      </li>
+    </ul>   
+    <ul class="nav navbar-nav navbar-right" ng-if="authentication.user" ng-init="startIdle();"> 
+      <li class="dropdown alert-badge" uib-dropdown ng-if="(authentication.user && authentication.user.tenant !== null) && (notificationAccessRoles.list | intersect : authentication.user.roles) > 0 && (notificationAccessRoles.update | intersect : authentication.user.roles) > 0" ng-init="getNotificationUnreadCount()">
+        <a href="javascript:;" class="dropdown-toggle" uib-dropdown-toggle role="button" aria-expanded="false">
+                  <i class="glyphicon glyphicon-bell gi-2x"></i>
+                  <span ng-if="notificationUnreadCount != 0" class="badge bg-red" ng-bind="notificationUnreadCount"></span>
+        </a>
+        <ul id="alert-menu" class="dropdown-menu list-unstyled msg_list" role="menu">
+          <li ng-repeat="am in notificationMessages | orderBy:'acknowledge'" title="Click to mark as read" ng-click="$event.stopPropagation();markAsRead(am)" ng-if="$index < 5" >
+            <a>
+              <span class="thumb-sm pull-left mr clearfix">
+                <i class="glyphicon glyphicon-{{getMessageTypeClass(am.category)}} gi-2x {{getMessageTypeClass(am.category)}}"></i>
+              </span>
+              <span>
+                <span class="time" ng-class="am.acknowledge ? 'read' : 'unread'"> {{am.start | moment: 'fromNow'}}</span>
+                <span ng-show="!am.acknowledge" class="label label-danger new-badge">NEW</span>
+              </span>
+              <span class="message" ng-class="am.acknowledge ? 'read' : 'unread'">
+                {{ am.summary | limitTo: 64 }}{{am.summary.length > 64? '...' : ''}}
+              </span>
+            </a>
+          </li>
+          <a ui-sref="notifications.list" ng-show="notificationMessages.length > 5">
+            <span class="pull-right" style="padding: 5px">
+              <u>
+                  Read More
+              </u>
+            </span>
+          </a>
+        </ul>
+      </li>
+      <li class="dropdown" uib-dropdown>
+        <a class="dropdown-toggle user-header-dropdown-toggle" uib-dropdown-toggle role="button">
+          <img ng-src="{{authentication.user.profileImageURL}}" alt="{{authentication.user.displayName}}" class="header-profile-image" />
+          <span ng-bind="authentication.user.displayName"></span> <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+          <li ui-sref-active="active" ng-show="authentication.user.roles.indexOf('root') > -1">
+             <a ui-sref="settings.password">Change Password</a>
+          </li>
+          <li class="divider" ng-show="authentication.user.roles.indexOf('root') > -1"></li>
+          <li>
+            <a href="/api/auth/signout" target="_self">Signout</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>

@@ -1,0 +1,57 @@
+<section ng-controller="TenantsController" ng-init="findOne()" ng-show="tenant.tenantId">
+  <div class="page-header">
+    <h1>Tenant: <span>{{ ::tenant.name}}</span></h1>
+  </div>
+  <div class="row show-grid">
+    <div class="col-md-6">
+      <form name="tenantForm" class="form-horizontal" ng-submit="update(tenantForm.$valid)" novalidate>
+        <fieldset>
+          <div class="form-group required" show-errors>
+            <label for="name">Name</label>
+            <input name="name" type="text" ng-model="tenant.name" id="name" class="form-control" placeholder="Name"
+                   ng-maxlength="64"
+                   ng-minlength="3"
+                   ng-pattern="/^[a-zA-Z0-9\ -]*$/"
+                   required ng-bind-html>
+            <div ng-messages="tenantForm.name.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
+              <p class="help-block error-text" ng-message="maxlength">Tenant name should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="minlength">Tenant name must be minimum 3 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">
+                Tenant name should contain only alphanumeric characters including space and dash.
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group required" show-errors>
+            <label for="code">Code</label>
+            <input name="code" type="text" ng-model="tenant.code" id="code" class="form-control" placeholder="Code"
+                value="tenant.code" ng-disabled="true">
+          </div>
+
+          <div ng-if="annotationSetting.enabled" class="form-group" ng-class="(annotationSetting.enabled && annotationSetting.mandatory) ? 'required' : ''" show-errors>
+          <label for="annotation">Annotation</label>
+          <input name="annotation" type="text" ng-model="tenant.annotation" id="annotation" class="form-control" placeholder="Annotation"
+                 ng-maxlength="32"
+                 ng-pattern="/^[a-zA-Z0-9\-]*$/"
+                 ng-required="annotationSetting.enabled && annotationSetting.mandatory" ng-bind-html>
+          <div ng-messages="tenantForm.annotation.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant annotation is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Tenant annotation should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and dashes are allowed</p>
+          </div>
+        </div>
+
+          <div class="form-group">
+            <input type="submit" value="Update" class="btn btn-primary">
+          </div>
+          <div ng-show="error" class="text-danger">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="col-md-2">
+    </div>
+  </div>
+</section>

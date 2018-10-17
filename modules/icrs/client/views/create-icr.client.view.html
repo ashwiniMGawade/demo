@@ -1,0 +1,75 @@
+<section ng-controller="IcrsController">
+  <div class="page-header">
+    <h1>New Inter-cluster Relationship</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="icrForm" ng-submit="create(icrForm.$valid)" novalidate class="form-horizontal">
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="message">Message</label>
+          <textarea name="message" ng-model="message" id="message" class="form-control" rows="5" placeholder="Message to be sent along with Inter-cluster Relationship request"
+                 ng-minlength="3"
+                 ng-maxlength="1024"
+                 ng-pattern="/^[a-zA-Z0-9_ .,-]*$/"
+                 required></textarea>
+          <div ng-messages="icrForm.message.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Message is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Message must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Message should be maximum 1024 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, underscores, dots, commas and dashes allowed</p>
+          </div>
+          <p class="help-block">The message provides details to NetApp Managed Services team to initiate configuration of Inter-Cluster Relationship between a Virtual Storage Array {{labels.server.serverName}} and an external Cluster.<br>
+            Contact will be made with the requesting user to complete the configuration. Further details may be added to this field as required.</p>
+        </div>
+        <div class="form-group" ng-class="isRoot ? 'required' : ''" show-errors ng-show="isRoot">
+          <label for="tenantId">Tenant</label>
+          <select name="tenantId" ng-model="tenantId" id="tenantId" class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" ng-required="isRoot">
+            <option value="">Please select a tenant</option>
+          </select>
+          <div ng-messages="icrForm.tenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant is required.</p>
+          </div>
+          <p class="help-block">The Tenant for filtering {{labels.server.serverName}}s.</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="serverId">{{labels.server.serverName}}</label>
+          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required ng-disabled="!tenantId && isRoot">
+            <option value="">Please select a {{labels.server.serverName}}</option>
+          </select>
+          <div ng-messages="icrForm.serverId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} is required.</p>
+          </div>
+          <p class="help-block">The {{labels.server.serverName}} under which context the Inter-Cluster Relationship is to be configured.</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="clusterExt">External Cluster</label>
+          <input name="clusterExt" type="text" ng-model="clusterExt" id="clusterExt" class="form-control" placeholder="External Cluster" ng-maxlength="64"  ng-pattern="/^[a-zA-Z0-9 -_]*$/" required>
+          <div ng-messages="icrForm.clusterExt.$error" role="alert">
+            <p class="help-block error-text" ng-message="maxlength">External Cluster should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">External Cluster should contain only Alphanumeric characters including underscore, space and dash.</p>
+            <p class="help-block error-text" ng-message="required">External Cluster is required.</p>
+          </div>
+          <p class="help-block">The Cluster name of the external cDOT Cluster to which the Inter-Cluster Relationship is to be configured.</p>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="ipsExt">External Inter-Cluster IP Addresses</label>
+          <input name="ipsExt" type="text" ng-model="ipsExt" id="ipsExt" class="form-control" placeholder="External Ip Addresses" ng-maxlength="128" ng-pattern="/^\*$|^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:\s*,\s*(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$/" required>
+          <div ng-messages="icrForm.ipsExt.$error" role="alert">
+            <p class="help-block error-text" ng-message="maxlength">External IP address should be maximum 128 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Invalid External IP addresses</p>
+            <p class="help-block error-text" ng-message="required">External Inter-Cluster IP Addresses required.</p>
+          </div>
+          <p class="help-block"></p>
+          <p class="help-block">The external cDOT Cluster's Inter-Cluster IP Addresses that interface with the {{labels.server.serverName}}.<br>
+              e.g. 10.20.130.11,10.20.130.12,10.20.130.13,10.20.130.14</p>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

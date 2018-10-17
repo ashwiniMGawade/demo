@@ -1,0 +1,149 @@
+<section ng-init="clearFields();find();">
+  <div class="page-header">
+    <h1>New User</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="userForm" class="form-horizontal" ng-submit="create(userForm.$valid)" novalidate autocomplete="off">
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" class="form-control" ng-model="firstName" placeholder="First Name"
+                  ng-maxlength="64"
+                  ng-minlength="2"
+                  ng-pattern="/^[a-zA-Z\ -]*$/"
+                  required>
+          <div ng-messages="userForm.firstName.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">First name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">First name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">First name must be minimum 2 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphabetical, spaces and dashes allowed</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" class="form-control" ng-model="lastName" placeholder="Last Name"
+                  ng-maxlength="64"
+                  ng-minlength="2"
+                  ng-pattern="/^[a-zA-Z\ -]*$/"
+                  required>
+          <div ng-messages="userForm.lastName.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Last name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Last name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Last name must be minimum 2 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphabetical, spaces and dashes allowed</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" class="form-control" ng-model="email" placeholder="Email" required>
+          <div ng-messages="userForm.email.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Email address is required.</p>
+            <p class="help-block error-text" ng-message="email">Email address is invalid.</p>
+          </div>
+        </div>
+
+        <div class="form-group" show-errors>
+          <label for="phone">Phone</label>
+          <input type="text" id="phone" name="phone" class="form-control" ng-model="phone" placeholder="Phone"
+                  ng-pattern="/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/">
+          <div ng-messages="userForm.phone.$error" role="alert">
+            <p class="help-block error-text" ng-message="pattern">Phone number is not valid.</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="roles">Role</label>
+          <select class="form-control" name="roles" id="roles" ng-model="roles" ng-change="populateProvider();" required>
+            <option value="">Please select a role</option>
+            <option ng-repeat="role in validRolesToAssign | orderBy:'name'" value="{{role.id}}">{{role.name}}</option>
+          </select>
+          <div ng-messages="userForm.roles.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Role is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group" ng-class="roles !=='' ? 'required' : ''" show-errors ng-show="roles === 'admin' || roles === 'read' || roles === 'user' || roles === 'partner'">
+          <label for="tenantId">Tenant</label>
+          <select id="tenantId" name="tenantId" class="form-control" ng-model="tenantId"
+                  ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy:'name'"
+                  ng-required="roles === 'admin' || roles === 'read' || roles === 'user' || roles === 'partner'">
+            <option value="">Please select a tenant</option>
+          </select>
+          <div ng-messages="userForm.tenantId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Tenant is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="provider">Provider</label>
+          <select class="form-control" name="provider" id="provider" ng-model="provider" required>
+            <option value="">Please select a provider</option>
+            <option ng-repeat="provider in validProviderToAssign | orderBy:'provider'" value="{{provider}}">{{provider}}</option>
+          </select>
+          <div ng-messages="userForm.provider.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Provider is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors ng-show="provider==='local'">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" class="form-control" ng-model="username"
+                 placeholder="Username"
+                 ng-maxlength="32"
+                 ng-minlength="3"
+                 ng-pattern="/^[a-zA-Z0-9]*$/"
+                 ng-required="provider==='local'">
+          <div ng-messages="userForm.username.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Username is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Username should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Username must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric are allowed</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors ng-show="provider==='local'">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" class="form-control" ng-model="password"
+                 placeholder="Password" uib-popover="{{popoverMsg}}" uib-popover-trigger="focus"
+                 autocomplete="new-password"
+                 password-validator ng-required="provider==='local'">
+          <div ng-messages="userForm.password.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Password is required.</p>
+            <div ng-repeat="passwordError in passwordErrors">
+              <p class="help-block error-text" ng-show="userForm.password.$error.requirements">{{passwordError}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" ng-show="provider==='local'">
+          <label>Password Requirements</label>
+          <uib-progressbar value="requirementsProgress" type="{{requirementsColor}}"><span style="color:white; white-space:nowrap;">{{requirementsProgress}}%</span></uib-progressbar>
+        </div>
+        
+        <div class="form-group required" show-errors ng-show="provider && provider!=='local'">
+          <label for="providerCode">Provider Code</label>
+          <input type="text" id="providerCode" name="providerCode" class="form-control" ng-model="providerCode"
+                 placeholder="ProviderCode"
+                 ng-maxlength="256"
+                 ng-minlength="3"
+                 ng-pattern="/^[a-zA-Z0-9_\-\\.@]*$/"
+                 ng-required="provider!=='local'">
+          <div ng-messages="userForm.providerCode.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Provider Code is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Provider Code should be maximum 256 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Provider Code must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only alphanumeric, dot, dash, underscore & @ are allowed</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-center text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

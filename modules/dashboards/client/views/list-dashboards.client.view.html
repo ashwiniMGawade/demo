@@ -1,0 +1,85 @@
+<section ng-init="refreshGraphs()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>{{labels.app.title}}</h2>
+      </div>
+    </div>
+  </div>
+  <div ng-show="!(isRoot || isPartner)">
+    <div class="row graphmenu" >
+      <div style="width:350px; float : left;">
+        <div class="form-group dashboardradio">
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="tenant">All</label>
+          <!--label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="top5">Top 5</label-->
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="custom">Custom</label>
+        </div>
+        <div class="form-group dashboardradio">
+          <label class="radio-inline"><input type="radio" name="from" ng-model="from" value="y">Year</label>
+          <label class="radio-inline"><input type="radio" name="from" ng-model="from" value="mon">Month</label>
+          <label class="radio-inline"><input type="radio" name="from" ng-model="from" value="w">Week</label>
+          <label class="radio-inline"><input type="radio" name="from" ng-model="from" value="d">Day</label>
+          <label class="radio-inline"><input type="radio" name="from" ng-model="from" value="h">Hour</label>
+        </div>
+      </div>
+      <div style="width:650px; float : left;">
+        <div class="row" ng-if="scope=='custom'">
+          <div class="form-group graphdropdown">
+            <label for="siteId">Site</label>
+            <select name="siteId" ng-model="siteId" id="siteId" class="form-control selectlist"
+            ng-options="site.siteId as site.name for site in sites | orderBy: 'name'"
+            required ng-change="populatevFas(siteId, subtenantId)">
+            <option value="">Select one</option>
+            </select>
+          </div>
+          <div class="form-group graphdropdown">
+            <label for="subtenantId">Subtenant</label>
+            <select name="subtenantId" ng-model="subtenantId" id="subtenantId" class="form-control selectlist"
+            ng-options="subtenant.subtenantId as subtenant.name for subtenant in subtenants | orderBy: 'name'"
+            required ng-change="populatevFas(siteId, subtenantId)">
+            <option value="">Select one</option>
+          </select>
+          </div>
+          <div class="form-group graphdropdown">
+            <label for="serverId">{{labels.server.serverName}}</label>
+            <select name="serverId" ng-model="custom.serverId" id="serverId" class="form-control selectlist"
+            ng-options="server.serverId as server.name for server in servers | orderBy: 'name'"
+            required ng-change="populateSG(custom.serverId)" ng-disabled="servers.length===0">
+            <option value="">Select one</option>
+            </select>
+          </div>
+          <div class="form-group graphdropdown">
+            <label for="storagegroupId">Storage Group</label>
+            <select name="storagegroupId" ng-model="custom.storagegroupId" id="storagegroupId" class="form-control selectlist"
+            ng-options="storagegroup.storagegroupId as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'"
+            required ng-disabled="storagegroups.length===0">
+            <option value="">Select one</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="width:100px; float:left;">
+        <div class="form-group dashboardrefresh">
+          <button type="button" class="btn btn-xl btn-primary form-control" ng-click="refreshGraphs()">Refresh</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 graph" id="iops" >
+        <img src='/modules/core/client/img/loaders/loader.gif'>
+      </div>
+      <div class="col-md-6 graph" id="capacity" >
+        <img src='/modules/core/client/img/loaders/loader.gif'>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 graph" id="throughput">
+        <img src='/modules/core/client/img/loaders/loader.gif'>
+      </div>
+      <div class="col-md-6 graph" id="latency">
+        <img src='/modules/core/client/img/loaders/loader.gif'>
+      </div>
+    </div>
+  </div>
+</section>

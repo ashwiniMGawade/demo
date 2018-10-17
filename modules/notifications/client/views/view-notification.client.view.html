@@ -1,0 +1,37 @@
+<section ng-controller="NotificationsController" ng-init="findOne()" ng-show="notification.notificationId">
+  <div class="page-header">
+    <h1>Notification: <span ng-bind="notification.summary" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Summary</th><td ng-bind="notification.summary" class="word-break-all capitalize"></td></tr>
+      <tr><th>Message</th><td ng-bind="notification.message" class="word-break-all"></td></tr>
+      <tr><th>Start Date</th><td ng-bind="notification.start | date:'medium' : 'UTC'" ></td></tr>
+      <tr><th>End Date</th><td ng-bind="notification.end | date:'medium' : 'UTC'" ></td></tr>
+      <tr><th>Category</th><td ng-bind="notification.category" ></td></tr>
+      <tr><th>Send Email</th><td ng-bind="notification.sendEmail"></td></tr>
+      <tr ng-if="isRoot || isL1ops"><th>Tenant(s)</th><td>
+        <ul class="circle"  ng-show = "notification.tenants.length">
+          <li ng-repeat="tenant in notification.tenants">{{tenant.name}} </li>
+        </ul>
+        <span ng-show="!notification.tenants.length">All</span>
+      </td></tr>
+      <tr><th>Read by User(s)</th><td>
+        <ul class="circle" ng-show = "notification.users.length">
+          <li ng-repeat="user in notification.users">{{user.username}} </li>
+        </ul>
+        <span ng-show="!notification.users.length">None</span>
+      </td></tr>
+      <tr ng-if="(notificationAccessRoles.delete | intersect : authentication.user.roles)> 0 || (notificationAccessRoles.update | intersect : authentication.user.roles)> 0">
+        <th>Actions</th>
+        <td>       
+          <button type="button" ng-if="(notificationAccessRoles.update | intersect : authentication.user.roles)> 0" class="btn btn-xs1 btn-primary" ui-sref="notifications.edit({notificationId: notification.notificationId})">Edit</button>         
+          <button type="button" ng-if="(notificationAccessRoles.delete | intersect : authentication.user.roles) > 0" class="btn btn-xs1 btn-primary" ng-click="remove(notification);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>

@@ -1,0 +1,205 @@
+<section ng-controller="ServersController" ng-init="findOne();" ng-show="server.serverId">
+  <div class="page-header">
+    <h1>{{labels.server.serverName}}: <span>{{ ::server.name }}</span></h1>
+  </div>
+
+  <form name="serverForm" class="form-horizontal" ng-submit="update(serverForm.$valid)" novalidate>
+    <div ng-show="server.managed=='Portal'" class="row show-grid" >
+      <div class="form-group col-md-2">
+        <label for="nfs">NFS</label>
+        <input name="nfs" type="checkbox" ng-model="nfs" id="nfs" ng-disabled="server.nfs" class="form-control checkbox-left">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="cifs">CIFS</label>
+        <input name="cifs" type="checkbox" ng-model="cifs" id="cifs" ng-disabled="server.cifs" class="form-control checkbox-left">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="iscsi">iSCSI</label>
+        <input name="iscsi" type="checkbox" ng-model="iscsi" id="iscsi" ng-disabled="server.iscsi" class="form-control checkbox-left">
+      </div>
+    </div>
+
+    <div class="row show-grid">
+      <div class="col-md-6">
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="server.name" id="name" class="form-control"
+                  ng-maxlength="64"
+                  ng-minlength="3"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required placeholder="Name" ng-bind-html>
+          <div ng-messages="serverForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="minlength">First name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">First name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+          </div>
+          <p class="help-block">Name to refer to the {{labels.server.serverName}} with in this portal</p>
+       </div>
+
+        <div class="form-group required" show-errors>
+          <label>Subscription</label>
+          <select name="subscriptionId" ng-model="subscriptionId" id="subscriptionId" class="form-control" ng-options="subscription.subscriptionId as subscription.name for subscription in subscriptions | orderBy: 'name'" required>
+            <option value="">Select Subscription</option>
+          </select>
+          <div ng-messages="serverForm.subscriptionId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Subscription is required.</p>
+          </div>
+          <p class="help-block">The Subscription this {{labels.server.serverName}} is associated with for billing purposes.<br>The selected Subscription's Code will feature in the Report CSV file for each NetApp Volume contained in this {{labels.server.serverName}}.</p>
+        </div>
+
+        <div class="form-group" ng-class="managed == 'Customer' ? 'required' : ''"  show-errors ng-show="server.managed == 'Customer'">
+          <label for="password">Password</label>
+          <input name="password" type="password" ng-model="server.password" id="password" class="form-control"
+                  ng-minlength="8"
+                  ng-maxlength="16"
+                  autocomplete="new-password"
+                  ng-pattern="/^(?=.*[0-9])(?=.*[a-zA-Z])\w{8,}$/" placeholder="Password">
+          <div ng-messages="serverForm.password.$error" role="alert" ng-bind-html>
+            <p class="help-block error-text" ng-message="minlength">{{labels.server.serverName}} password should be minimum 8 char.</p>
+            <p class="help-block error-text" ng-message="maxlength">{{labels.server.serverName}} password can not be more than 16 char.</p>
+            <p class="help-block error-text" ng-message="pattern">Password must contain no special characters, at least a digit and a letter</p>
+          </div>
+          <p class="help-block">This replaces the existing {{labels.server.serverName}} Password.</p>
+        </div>
+
+        <div ng-hide="!cifs">
+          <div class="form-group required" show-errors>
+            <label for="cifsServername">CIFS Server Name</label>
+            <input name="cifsServername" type="text" ng-model="server.cifsServername" id="cifsServername" class="form-control"
+                   ng-readonly="server.cifs"
+                   ng-minlength="2"
+                   ng-maxlength="15"
+                   ng-pattern="/^[a-z0-9-]*$/"
+                   ng-required="cifs" placeholder="CIFS Server Name" ng-bind-html>
+            <div ng-messages="serverForm.cifsServername.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">CIFS Server Name is required.</p>
+              <p class="help-block error-text" ng-message="minlength">CIFS Server Name must be minimum 2 characters long.</p>
+              <p class="help-block error-text" ng-message="maxlength">CIFS Server Name should be maximum 15 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and dashes are allowed</p>
+            </div>
+            <p class="help-block">The Hostname component of the FQDN this {{labels.server.serverName}} is registered with in DNS.<br>The Computer Account name in Active Directory is to be the same.<br>e.g. dfaassrv01</p>
+          </div>
+
+          <div class="form-group required" show-errors>
+            <label for="cifsDomain">CIFS Domain</label>
+            <input name="cifsDomain" type="text" ng-model="server.cifsDomain" id="cifsDomain" class="form-control"
+                    ng-readonly="server.cifs"
+                    ng-minlength="2"
+                    ng-maxlength="64"
+                    ng-pattern="/^[a-z0-9.-]*$/"
+                    ng-required="cifs" placeholder="CIFS Domain" ng-bind-html>
+            <div ng-messages="serverForm.cifsDomain.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">CIFS Domain is required.</p>
+              <p class="help-block error-text" ng-message="minlength">CIFS Domain must be minimum 2 characters long.</p>
+              <p class="help-block error-text" ng-message="maxlength">CIFS Domain should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters, dashes and dots are allowed</p>
+            </div>
+            <p class="help-block">The Active Directory Domain this {{labels.server.serverName}} is to join.<br>Typically in FQDN format, this allows for resolution to the Domain Controllers.<br>It is common (but not necessary) for the DNS Domain's FQDN to be the same.<br>e.g. reskit.com.au</p>
+          </div>
+
+          <div class="form-group required" show-errors>
+            <label for="cifsDnsDomain">CIFS DNS Domain</label>
+            <input name="cifsDnsDomain" type="text" ng-model="server.cifsDnsDomain" id="cifsDnsDomain" class="form-control"
+                   ng-readonly="server.cifs"
+                   ng-minlength="2"
+                   ng-maxlength="64"
+                   ng-pattern="/^[a-z0-9-.]*$/"
+                   ng-required="cifs" placeholder="CIFS DNS Domain" ng-bind-html>
+            <div ng-messages="serverForm.cifsDnsDomain.$error" role="alert">
+              <p class="help-block error-text" ng-message="minlength">CIFS DNS Domain must be minimum 2 characters long.</p>
+              <p class="help-block error-text" ng-message="maxlength">CIFS DNS Domain should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="required">CIFS DNS Domain is required.</p>
+              <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters, dashes and dots are allowed</p>
+            </div>
+            <p class="help-block">The Suffix component of the FQDN this {{labels.server.serverName}} is registered with in DNS.<br>The Active Directory Domain's FQDN is typically the same.<br>e.g. reskit.com.au</p>
+          </div>
+
+          <div class="form-group required" show-errors>
+            <label for="cifsDnsServers">CIFS DNS Servers</label>
+            <input name="cifsDnsServers" type="text" ng-model="server.cifsDnsServers" id="cifsDnsServers" class="form-control"
+                   ng-readonly="server.cifs"
+                   ng-maxlength="64"
+                   ng-pattern="/^[0-9.,]*$/"
+                   ng-required="cifs" placeholder="CIFS DNS Servers">
+            <div ng-messages="serverForm.cifsDnsServers.$error" role="alert" ng-bind-html>
+              <p class="help-block error-text" ng-message="required">CIFS DNS Servers is required (one or more).</p>
+              <p class="help-block error-text" ng-message="maxlength">CIFS DNS Servers should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only IP Addresses and commas are allowed (no spaces).</p>
+            </div>
+            <p class="help-block">Comma-Separated list of DNS Server IP addresses.<br>
+              These servers must be able to resolve the Domain's FQDN</p>
+          </div>
+
+          <div class="form-group" show-errors>
+            <label for="cifsOu">CIFS OU</label>
+            <input name="cifsOu" type="text" ng-model="server.cifsOu" id="cifsOu" class="form-control" ng-readonly="server.cifs" placeholder="CIFS OU" ng-bind-html>
+            <p class="help-block">Optional: If the CIFS Username in Active Directory has no permission to create a<br>
+              Computer Account in the default Computers OU, a CIFS OU must be specified.<br>
+              The CIFS Username must have permission to create the Computer Account in this OU.<br>
+              e.g. ou=servers,dc=reskit,dc=com,dc=au</p>
+          </div>
+
+          <div class="form-group">
+            <label for="cifsSite">CIFS Site</label>
+            <input name="cifsSite" type="text" ng-model="server.cifsSite" id="cifsSite" class="form-control" ng-readonly="server.cifs" placeholder="CIFS Site" ng-bind-html>
+            <p class="help-block">Optional: The Active Directory Site this {{labels.server.serverName}} is to be a Member Server in.<br>
+              It is highly advisable to ensure this {{labels.server.serverName}}s subnet is present in one AD Site.</p>
+          </div>
+
+          <div ng-hide="server.cifs">
+            <div class="form-group" ng-class="cifs && !server.cifs ? 'required' : ''" show-errors>
+              <label for="cifsUsername">CIFS Username</label>
+              <input name="cifsUsername" type="text" ng-model="server.cifsUsername" id="cifsUsername" class="form-control" ng-required="cifs && !server.cifs" placeholder="CIFS Username" ng-bind-html>
+              <div ng-messages="serverForm.cifsUsername.$error" role="alert">
+                <p class="help-block error-text" ng-message="required">CIFS Username is required.</p>
+              </div>
+              <p class="help-block">The Active Directory User to join the Domain with.<br>
+                Note: If a Computer Account has been pre-created in your Active Directory,<br>
+                the Username is to have sufficient permissions to access the object and join the Domain.</p>
+            </div>
+
+            <div class="form-group"  ng-class="cifs && !server.cifs ? 'required' : ''" show-errors>
+              <label for="cifsPassword">CIFS Password</label>
+              <input name="cifsPassword" type="password" ng-model="server.cifsPassword" id="cifsPassword" class="form-control" ng-required="cifs && !server.cifs" placeholder="CIFS Password">
+              <div ng-messages="serverForm.cifsPassword.$error" role="alert" ng-bind-html>
+                <p class="help-block error-text" ng-message="required">CIFS Password is required.</p>
+              </div>
+              <p class="help-block">The Active Directory User's Password to join the Domain with.<br>
+                Note: The password is not saved on the storage system.</p>
+            </div>
+          </div>
+        </div>
+
+        <div ng-hide="!iscsi">
+          <div class="form-group" show-errors>
+            <label for="iscsiAlias">iSCSI Alias</label>
+            <input name="iscsiAlias" type="text" ng-model="server.iscsiAlias" id="iscsiAlias" class="form-control"
+                   ng-readonly="server.iscsi"
+                   ng-minlength="3"
+                   ng-maxlength="32"
+                   ng-pattern="/^[a-z0-9.-]*$/" placeholder="iSCSI Alias" ng-bind-html>
+            <div ng-messages="serverForm.iscsiAlias.$error" role="alert">
+              <p class="help-block error-text" ng-message="minlength">ISCSI Alias must be minimum 2 characters long.</p>
+              <p class="help-block error-text" ng-message="maxlength">ISCSI Alias should be maximum 64 characters long.</p>
+              <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters, dots & dashes are allowed.</p>
+            </div>
+            <p class="help-block">Optional: An iSCSI Alias provides clarity for iSCSI client connecting to the {{labels.server.serverName}}.<br>
+              Using your server naming convention is good practice.<br>
+              e.g. dfaassrv01</p>
+            <p class="help-block">Note: The iSCSI Nodename will be the {{labels.server.serverName}} code prefixed with "iqn.1992-08.com.netapp:".<br>
+              i.e. iqn.1992-08.com.netapp:dfaas_tenant_subten_001</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="submit" value="Update" class="btn btn-xl btn-primary">
+        </div>
+      </div>
+    </div>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+   </fieldset>
+  </form>
+</section>

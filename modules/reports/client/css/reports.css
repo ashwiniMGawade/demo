@@ -1,0 +1,54 @@
+.filter-wrap{
+    border: 1px solid #eee;
+    padding:20px 10px;
+    border-radius: 4px;
+    margin: 20px 0;
+    /*overflow: hidden;*/
+}
+.filter-wrap .filter-col{
+    float:left;
+    padding:0 10px 24px;
+}
+.filter-wrap .btn-wrap{
+    float:left;
+}
+.filter-wrap .filter-col .form-group{
+    padding:0 10px 0 0;
+}
+.filter-wrap > .form-group{
+    padding-right:20px;
+}
+.filter-wrap label{
+    padding-right:10px;
+}
+
+.filter-wrap .container-fluid{
+    text-align: center;
+    clear:both;
+}
+.error-wrap {
+    position: relative;
+}
+.error-wrap .error{
+    position: absolute;
+    bottom:-20px;
+    left:0;
+    right:0;
+    font-size: 14px;
+    color:#a94442;
+    height:20px;
+    font-weight: normal;
+
+}
+.error-wrap .error p{
+    margin:0;
+    color:#a94442;
+    /*text-align: right;*/
+    /*padding:2px 20px 0 10px;*/
+}
+@media (max-width: 1024px){
+    .filter-wrap .container-fluid{
+        text-align: left;
+
+    }
+}

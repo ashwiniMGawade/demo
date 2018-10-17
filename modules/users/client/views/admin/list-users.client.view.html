@@ -1,0 +1,31 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Users</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html />
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="user in $data">
+        <td ng-bind="user.firstName" class="capitalize breakword" title="'First Name'" sortable="'firstName'"></td>
+        <td ng-bind="user.lastName" class="capitalize breakword" title="'Last Name'" sortable="'lastName'"></td>
+        <td ng-bind="user.username" title="'Username'" sortable="'username'" class="breakword"></td>
+        <td ng-bind="user.email" title="'Email'" sortable="'email'"></td>
+        <td ng-bind="user.roles" class="capitalize" title="'Roles'" sortable="'roles'"></td>
+        <td ng-bind="user.tenant.name" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
+        
+        <td ng-if="(userAccessRoles.update | intersect : authentication.user.roles) > 0 " ><button type="button" class="btn btn-xs btn-primary" ui-sref="admin.user-edit({userId: user.userId})">Edit</button></td>
+
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="admin.user({userId: user.userId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

@@ -1,0 +1,25 @@
+<section ng-controller="TenantsController" ng-init="findOne()" ng-show="tenant.tenantId">
+  <div class="page-header">
+    <h1>Tenant: <span ng-bind="tenant.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="tenant.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="tenant.code"></td></tr>
+      <tr ng-if="annotationSetting.enabled"><th>Annotation</th><td ng-bind="tenant.annotation"></td></tr>
+      <tr><th>Partner</th><td ng-bind="tenant.partner.name"></td></tr>
+      <tr ng-if="(tenantAccessRoles.update | intersect : authentication.user.roles) > 0 || (tenantAccessRoles.delete | intersect : authentication.user.roles) > 0 ">
+        <th>Actions</th>
+        <td>
+          <!--button type="button" class="btn btn-xs btn-primary" ng-click="exportcsv(tenant);">Export</button-->
+          <button  ng-if="(tenantAccessRoles.update | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ui-sref="tenants.edit({tenantId: tenant.tenantId})">Edit</button>
+
+          <button ng-if="(tenantAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="btn btn-xs1 btn-primary" ng-click="remove(tenant);">Delete</button>
+        </td>
+      </tr>
+    </table>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+  </div>
+</section>
