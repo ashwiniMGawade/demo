@@ -40,6 +40,7 @@ var settings =  {
     'root': {  // role name
       'site'        : 'CLRUD',
       'pod'         : 'CLRUD',
+      'cluster'     : 'CLRUD',
       'tenant'      : 'CLRUD',
       'subtenant'   : 'CLRUD',
       'user'        : 'CLRUD',
@@ -55,6 +56,7 @@ var settings =  {
      'l1ops': {  // role name
       'site'        : 'LR',
       'pod'         : 'LR',
+      'cluster'     : 'LR',
       'tenant'      : 'LR',
       'subtenant'   : 'LR',
       'user'        : 'LR',
@@ -70,6 +72,7 @@ var settings =  {
     'partner': {  // role name
       'site'        : 'LR',
       'pod'         : '',
+      'cluster'     : '',
       'tenant'      : 'CLRUD',
       'subtenant'   : 'LR',
       'user'        : 'CLRUD',
@@ -85,6 +88,7 @@ var settings =  {
     'admin': {  // role name
       'site'        : 'LR',
       'pod'         : '',
+      'cluster'     : '',
       'tenant'      : 'LR',
       'subtenant'   : 'CLRUD',
       'user'        : 'LRU',
@@ -100,6 +104,7 @@ var settings =  {
     'user': {  // role name
       'site'        : 'LR',
       'pod'         : '',
+      'cluster'     : '',
       'tenant'      : 'LR',
       'subtenant'   : 'LR',
       'user'        : 'LR',
@@ -115,6 +120,7 @@ var settings =  {
     'read': {  // role name
       'site'        : 'LR',
       'pod'         : '',
+      'cluster'     : '',
       'tenant'      : 'LR',
       'subtenant'   : 'LR',
       'user'        : 'LR',

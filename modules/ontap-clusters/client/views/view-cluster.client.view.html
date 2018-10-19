@@ -1,0 +1,24 @@
+<section ng-controller="ClusterssController" ng-init="findOne()" ng-show="cluster.clusterId">
+  <div class="page-header">
+    <h1>Cluster: <span ng-bind="cluster.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="cluster.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="cluster.code"></td></tr>
+      <tr><th>Site</th><td ng-bind="cluster.site.name"></td></tr>
+      <tr><th>Available VLANs</th><td ng-bind="cluster.vlansAvailable" class="word-break-all"></td></tr>
+      <tr><th>Used VLANs</th><td ng-bind="cluster.vlansUsed" class="word-break-all"></td></tr>
+      <tr ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0 || (clusterAccessRoles.delete | intersect : authentication.user.roles) > 0">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ui-sref="clusters.edit({clusterId: cluster.clusterId})">Edit</button>
+          <button ng-if="(clusterAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ng-click="remove(cluster);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>
