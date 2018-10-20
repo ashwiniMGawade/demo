@@ -20,25 +20,13 @@ exports.create = function (req, res) {
   var cluster = new Cluster();
   cluster.user = req.user;
   cluster.name = req.body.name;
-  cluster.code = req.body.code;
-
-  mongoose.model('Site').findById(req.body.siteId).exec(function (err, site) {
-    if (err) {
-      logger.info('Cluster Create: Invalid Site ID');
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else if(!site) {
-      logger.info('Cluster Create: Invalid Site ID');
-      return res.status(400).send({
-        message: 'Invalid Site ID'
-      });
-    } else {
-      cluster.site = mongoose.Types.ObjectId(site._id);
-    }
+  cluster.key = req.body.key;
+  cluster.management_ip = req.body.management_ip;
+  cluster.provisioning_state = req.body.provisioning_state;
+  cluster.rest_uri = req.body.rest_uri;
 
 
-    cluster.save(function (err) {
+  cluster.save(function (err) {
       logger.info('Cluster cluster.save(): Entered');
       if (err) {
         return res.status(400).send({
@@ -53,7 +41,6 @@ exports.create = function (req, res) {
         res.json(cluster);
       }
     });
-  });
 };
 
 /**
@@ -70,9 +57,25 @@ exports.update = function (req, res) {
   var cluster = req.cluster;
 
   cluster.name = _.isUndefined(req.body.name) ? cluster.name : req.body.name;
-  cluster.vlansAvailable = _.isUndefined(req.body.vlansAvailable) ? cluster.vlansAvailable : req.body.vlansAvailable.toString().split(',');
+  cluster.management_ip = req.body.management_ip;
+  cluster.provisioning_state = req.body.provisioning_state;
+  cluster.rest_uri = req.body.rest_uri;
 
-  // Update used VLANs.
+   cluster.save(function (err) {
+      logger.info('Cluster cluster.save(): Entered');
+      if (err) {
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(err)
+        });
+      } else {
+        logger.info('Cluster cluster.save(): Calling Job.create()...');
+        logger.info('Cluster cluster.save(): req: ' + util.inspect(req, {showHidden: false, depth: null}));
+        Job.create(req, 'cluster', function(err, createJobRes) {
+          createJobRes.update('Completed', 'Cluster Saved', cluster);
+        });
+        res.json(cluster);
+      }
+    });
   
 };
 
@@ -82,33 +85,33 @@ exports.update = function (req, res) {
 exports.delete = function (req, res) {
   var cluster = req.cluster;
 
-  //check for vFASS dependancy
-  Server.find({ 'cluster' : mongoose.Types.ObjectId(cluster._id) }).exec(function (err, servers) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      if(servers.length > 0) {
-        return res.status(400).send({
-          message: 'Can\'t perform Delete: Please ensure all associated vFASS are deleted'
-        });
-      } else {
-        cluster.remove(function (err) {
-          if (err) {
-            return res.status(400).send({
-              message: errorHandler.getErrorMessage(err)
-            });
-          } else {
-            Job.create(req, 'cluster', function(err, deleteJobRes) {
-              deleteJobRes.update('Completed', 'Cluster Deleted', cluster);
-            });
-            res.json({});
-          }
-        });
-      }
-    }
-  });
+  //check for POD dependancy
+  // Server.find({ 'cluster' : mongoose.Types.ObjectId(cluster._id) }).exec(function (err, servers) {
+  //   if (err) {
+  //     return res.status(400).send({
+  //       message: errorHandler.getErrorMessage(err)
+  //     });
+  //   } else {
+  //     if(servers.length > 0) {
+  //       return res.status(400).send({
+  //         message: 'Can\'t perform Delete: Please ensure all associated vFASS are deleted'
+  //       });
+  //     } else {
+  //       cluster.remove(function (err) {
+  //         if (err) {
+  //           return res.status(400).send({
+  //             message: errorHandler.getErrorMessage(err)
+  //           });
+  //         } else {
+  //           Job.create(req, 'cluster', function(err, deleteJobRes) {
+  //             deleteJobRes.update('Completed', 'Cluster Deleted', cluster);
+  //           });
+  //           res.json({});
+  //         }
+  //       });
+  //     }
+  //   }
+  // });
 };
 
 /**
@@ -119,7 +122,7 @@ exports.list = function (req, res) {
   res.header('Expires', '-1');
   res.header('Pragma', 'no-cache');
 
-  Cluster.find().populate('site','name code').exec(function (err, clusters) {
+  Cluster.find().exec(function (err, clusters) {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
@@ -141,7 +144,7 @@ exports.clusterByID = function (req, res, next, id) {
     });
   }
 
-  Cluster.findById(id).populate('site','name code').exec(function (err, cluster) {
+  Cluster.findById(id).exec(function (err, cluster) {
     if (err) {
       return next(err);
     } else if (!cluster) {

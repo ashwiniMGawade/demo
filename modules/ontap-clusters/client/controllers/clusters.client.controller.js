@@ -4,7 +4,6 @@
 angular.module('clusters').controller('ClustersController', ['$scope', '$stateParams', '$location', 'Authentication', 'Clusters', 'Sites', 'modalService', 'Flash', '$sanitize',
   function ($scope, $stateParams, $location, Authentication, Clusters, Sites, modalService, Flash, $sanitize) {
     $scope.authentication = Authentication;
-    $scope.site = Sites;
     $scope.clusterAccessRoles = featuresSettings.roles.cluster;
     
     var flashTimeout = 3000;
@@ -33,8 +32,10 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
       // Create new cluster object
       var cluster = new Clusters({
         name: $sanitize(this.name),
-        code: $sanitize(this.code),
-        siteId: $sanitize(this.siteId)
+        key: $sanitize(this.key),
+        management_ip: $sanitize(this.management_ip),
+        provisioning_state: $sanitize(this.provisioning_state),
+        rest_uri: $sanitize(this.rest_uri)
       });
 
       // Redirect after save
@@ -44,8 +45,10 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
 
         // Clear form fields
         $scope.name = '';
-        $scope.code = '';
-        $scope.siteId = '';
+        $scope.key = '';
+        $scope.management_ip = '';
+        $scope.provisioning_state = '';
+        $scope.rest_uri = '';
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.message); 
       });
@@ -100,7 +103,6 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
     // Find a list of clusters
     $scope.find = function () {
       $scope.clusters = Clusters.query();
-      $scope.sites = Sites.query();
     };
 
     // Find existing cluster

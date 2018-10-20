@@ -40,7 +40,7 @@ var ClusterSchema = new Schema({
     type: String,
     default: 'open',
     enum: {
-            values: ['Open', 'Closed'],
+            values: ['open', 'closed'],
             message: '`{VALUE}` not a valid value for Provisioning State'
           }
   }, 
@@ -68,8 +68,8 @@ ClusterSchema.methods.toJSON = function() {
   return obj;
 };
 
-ClusterSchema.statics.findByCode = function (code, callback) {
-  return this.find({ code: code }, callback);
+ClusterSchema.statics.findByKey = function (key, callback) {
+  return this.find({ key: key }, callback);
 };
 
 mongoose.model('ontap_clusters', ClusterSchema);

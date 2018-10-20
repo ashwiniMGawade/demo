@@ -20,25 +20,43 @@
           </div>
         </div>
         <div class="form-group required" show-errors>
-          <label for="code">Code</label>
-          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+          <label for="key">Key</label>
+          <input name="key" type="text" ng-model="key" id="key" class="form-control" placeholder="Key"
           ng-minlength="3"
           ng-maxlength="32"
           ng-pattern="/^[a-z0-9]*$/" required>
-          <div ng-messages="clusterForm.code.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Cluster code is required.</p>
-            <p class="help-block error-text" ng-message="minlength">Code must be minimum 3 characters long.</p>
-            <p class="help-block error-text" ng-message="maxlength">Code should be maximum 32 characters long.</p>
+          <div ng-messages="clusterForm.key.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Cluster key is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Key must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Key should be maximum 32 characters long.</p>
             <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters are allowed</p>
           </div>
         </div>
+        <div class="form-group" show-errors >
+          <label for="management_ip">Management IP</label>
+          <input name="management_ip" type="text" ng-model="management_ip" id="management_ip" class="form-control" placeholder="e.g. 10.20.30.65"
+                 ng-pattern="/^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$/">
+          <div ng-messages="clusterForm.management_ip.$error" role="alert">
+            <p class="help-block error-text" ng-message="pattern">A valid Management IP address is required</p>
+          </div>          
+        </div>
         <div class="form-group required" show-errors>
-          <label for="siteId">Site</label>
-          <select name="siteId" ng-model="siteId" id="siteId" class="form-control" ng-options="site.siteId as site.name for site in sites | orderBy: 'name'" required>
-            <option value="">Please select a site</option>
+          <label for="provisioning_state">Provisioning State</label>   
+          <select name="provisioning_state" ng-model="provisioning_state" id="provisioning_state" class="form-control"  required >
+            <option value="">Please select a Provisioning State</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
           </select>
-          <div ng-messages="clusterForm.siteId.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Site name is required.</p>
+           
+          <div ng-messages="clusterForm.provisioning_state.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Provisioning State is required.</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="rest_uri">REST URI</label>   
+          <input name="rest_uri" type="text" ng-model="rest_uri" id="rest_uri" class="form-control" placeholder="http://sample.com">           
+          <div ng-messages="clusterForm.rest_uri.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">REST URI is required.</p>
           </div>
         </div>
         <div class="form-group">
