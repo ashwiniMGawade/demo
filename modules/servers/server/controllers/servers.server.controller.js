@@ -64,6 +64,7 @@ var sendServerResponse = function(res, server) {
 exports.create = function (req, res) {
   var serverCreateJob;
   var dbWfa = require('./servers.server.wfa.db.read');
+  var fetchInfo = require('./servers.server.wfa.fetchInfo');
   var clientWfa = require('./servers.server.wfa.svm.create');
   var server = new Server();
 
@@ -129,11 +130,13 @@ exports.create = function (req, res) {
       logger.info('SVM Create: Subscription.findById(): subscription: ' + util.inspect(subscription, {showHidden: false, depth: null}));
 
       // Get Pod Code and Cluster
-      dbWfa.getAdminVserver(site.code, subscription.code, function (err, adminVserver) {
+      //dbWfa.getAdminVserver(site.code, subscription.code, function (err, adminVserver) {
+      fetchInfo.getAdminVserver(site.id, site.code, subscription.code, function (err, adminVserver) {
         if(err) {
           logger.error('SVM Create: Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err); 
           return respondError(res, 400, 'Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err);
         } else {
+          console.log("after fetch info adminvserver details", adminVserver);
           // Get Pod
           Pod.findByCode(adminVserver.podCode, function (err, podResults) {
             if (podResults.length === 0) {
