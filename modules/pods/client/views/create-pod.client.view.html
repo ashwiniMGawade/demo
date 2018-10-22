@@ -41,6 +41,16 @@
             <p class="help-block error-text" ng-message="required">Site name is required.</p>
           </div>
         </div>
+        <div class="form-group required" ng-if="clusters.length > 0">
+          <label for="cluster_keys">Clusters</label>
+          <div class="input-group" ng-repeat="cluster in clusters" show-errors>
+            <input type="checkbox" ng-model="selectedClusters[cluster.clusterId]"  ng-required="!someSelected" ng-change="checkboxChanged()" name="cluster.key" value="cluster.id"> {{cluster.name}}
+          </div>
+
+          <div ng-if="!someSelected && touched" role="alert">
+            <p class="has-error help-block red">Cluster is required.</p>
+          </div>
+        </div>
         <div class="form-group">
           <input type="submit" value="Create" class="btn btn-primary">
         </div>

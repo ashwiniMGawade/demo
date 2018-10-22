@@ -1,11 +1,17 @@
 'use strict';
 
 // Pods controller
-angular.module('pods').controller('PodsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Pods', 'Sites', 'modalService', 'Flash', '$sanitize',
-  function ($scope, $stateParams, $location, Authentication, Pods, Sites, modalService, Flash, $sanitize) {
+angular.module('pods').controller('PodsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Pods', 'Sites', 'Clusters', 'modalService', 'Flash', '$sanitize',
+  function ($scope, $stateParams, $location, Authentication, Pods, Sites, Clusters, modalService, Flash, $sanitize) {
     $scope.authentication = Authentication;
     $scope.site = Sites;
+    $scope.clusters = Clusters.query();
     $scope.podAccessRoles = featuresSettings.roles.pod;
+
+    $scope.someSelected = false;
+    $scope.selectedClusters = {};
+    $scope.touched = false;
+
     
     var flashTimeout = 3000;
     
@@ -20,9 +26,27 @@ angular.module('pods').controller('PodsController', ['$scope', '$stateParams', '
       }
     }
 
+    var calculateSomeSelected = function() {
+      $scope.touched = true;
+      $scope.someSelected = Object.keys($scope.selectedClusters).some(function (key) {
+        return $scope.selectedClusters[key];
+      });
+    };
+
+    $scope.checkboxChanged = calculateSomeSelected;
+
     // Create new Pod
     $scope.create = function (isValid) {
       $scope.error = null;
+      $scope.touched = true;
+      var clusts = [];
+
+      const keys = Object.keys($scope.selectedClusters)
+      for (const key of keys) {
+        if ($scope.selectedClusters[key] == true) {
+          clusts.push(key);
+        }
+      }
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'podForm');
@@ -30,12 +54,16 @@ angular.module('pods').controller('PodsController', ['$scope', '$stateParams', '
         return false;
       }
 
+      
+
       // Create new Pod object
       var pod = new Pods({
         name: $sanitize(this.name),
         code: $sanitize(this.code),
-        siteId: $sanitize(this.siteId)
+        siteId: $sanitize(this.siteId),
+        cluster_keys: clusts
       });
+
 
       // Redirect after save
       pod.$create(function (response) {
@@ -46,6 +74,7 @@ angular.module('pods').controller('PodsController', ['$scope', '$stateParams', '
         $scope.name = '';
         $scope.code = '';
         $scope.siteId = '';
+        $scope.cluster_keys = {};
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.message); 
       });

@@ -7,6 +7,13 @@
       <tr><th>Name</th><td ng-bind="pod.name" class="capitalize"></td></tr>
       <tr><th>Code</th><td ng-bind="pod.code"></td></tr>
       <tr><th>Site</th><td ng-bind="pod.site.name"></td></tr>
+      <tr><th>Clusters</th>
+        <td  title="'Clusters'"  class="word-break-all"> 
+          <li ng-repeat="cluster in pod.cluster_keys">
+            {{cluster.name}}
+          </li>
+        </td>
+      </tr>
       <tr><th>Available VLANs</th><td ng-bind="pod.vlansAvailable" class="word-break-all"></td></tr>
       <tr><th>Used VLANs</th><td ng-bind="pod.vlansUsed" class="word-break-all"></td></tr>
       <tr ng-if="(podAccessRoles.update | intersect : authentication.user.roles) > 0 || (podAccessRoles.delete | intersect : authentication.user.roles) > 0">

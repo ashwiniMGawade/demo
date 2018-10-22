@@ -7,7 +7,7 @@ var _ = require('lodash'),
   path = require('path'),
   mongoose = require('mongoose'),
   Cluster = mongoose.model('ontap_clusters'),
-  Server = mongoose.model('Server'),
+  Pod = mongoose.model('Pod'),
   Job = mongoose.model('Job'),
   logger = require(path.resolve('./config/lib/log')),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
@@ -86,32 +86,32 @@ exports.delete = function (req, res) {
   var cluster = req.cluster;
 
   //check for POD dependancy
-  // Server.find({ 'cluster' : mongoose.Types.ObjectId(cluster._id) }).exec(function (err, servers) {
-  //   if (err) {
-  //     return res.status(400).send({
-  //       message: errorHandler.getErrorMessage(err)
-  //     });
-  //   } else {
-  //     if(servers.length > 0) {
-  //       return res.status(400).send({
-  //         message: 'Can\'t perform Delete: Please ensure all associated vFASS are deleted'
-  //       });
-  //     } else {
-  //       cluster.remove(function (err) {
-  //         if (err) {
-  //           return res.status(400).send({
-  //             message: errorHandler.getErrorMessage(err)
-  //           });
-  //         } else {
-  //           Job.create(req, 'cluster', function(err, deleteJobRes) {
-  //             deleteJobRes.update('Completed', 'Cluster Deleted', cluster);
-  //           });
-  //           res.json({});
-  //         }
-  //       });
-  //     }
-  //   }
-  // });
+  Pod.find({ 'cluster_keys' : mongoose.Types.ObjectId(cluster._id) }).exec(function (err, clusters) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      if(clusters.length > 0) {
+        return res.status(400).send({
+          message: 'Can\'t perform Delete: Please ensure all associated clusters are deleted'
+        });
+      } else {
+        cluster.remove(function (err) {
+          if (err) {
+            return res.status(400).send({
+              message: errorHandler.getErrorMessage(err)
+            });
+          } else {
+            Job.create(req, 'cluster', function(err, deleteJobRes) {
+              deleteJobRes.update('Completed', 'Cluster Deleted', cluster);
+            });
+            res.json({});
+          }
+        });
+      }
+    }
+  });
 };
 
 /**

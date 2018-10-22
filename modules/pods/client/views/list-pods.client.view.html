@@ -15,6 +15,11 @@
         <td ng-bind="pod.name" class="capitalize breakword" title="'Name'" sortable="'name'"></td>
         <td ng-bind="pod.code" title="'Code'" sortable="'code'" class="breakword"></td>
         <td ng-bind="pod.site.name" title="'Site'" sortable="'site.name'" class="breakword"></td>
+        <td  title="'Clusters'"  class="breakword"> 
+          <li ng-repeat="cluster in pod.cluster_keys">
+            {{cluster.name}}
+          </li>
+        </td>
         <td ng-if="(podAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="pods.edit({podId: pod.podId})">Edit</button></td>
         <td><button type="button" class="btn btn-xs btn-primary" ui-sref="pods.view({podId: pod.podId})">Details</button></td>
       </tr>

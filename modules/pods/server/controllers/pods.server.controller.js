@@ -22,6 +22,7 @@ exports.create = function (req, res) {
   pod.user = req.user;
   pod.name = req.body.name;
   pod.code = req.body.code;
+  pod.cluster_keys = req.body.cluster_keys;
 
   mongoose.model('Site').findById(req.body.siteId).exec(function (err, site) {
     if (err) {
@@ -147,8 +148,9 @@ exports.list = function (req, res) {
   res.header('Expires', '-1');
   res.header('Pragma', 'no-cache');
 
-  Pod.find().populate('site','name code').exec(function (err, pods) {
+  let q = Pod.find().populate('site','name code').populate('cluster_keys', 'name key').exec(function (err, pods) {
     if (err) {
+      console.log(err, q);
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
@@ -169,7 +171,7 @@ exports.podByID = function (req, res, next, id) {
     });
   }
 
-  Pod.findById(id).populate('site','name code').exec(function (err, pod) {
+  Pod.findById(id).populate('site','name code').populate('cluster_keys', 'name key').exec(function (err, pod) {
     if (err) {
       return next(err);
     } else if (!pod) {
