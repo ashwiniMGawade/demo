@@ -435,9 +435,8 @@ exports.read = function (req, res) {
   var dbWfa = require('./servers.server.wfa.db.read');
   var server = req.server.toObject();
 
-  server.iopsTotal = '0';
-  server.volumesCapacityTotal = '0';
-  server.volumesUsedTotal = '0';
+  server.iopsTotal = 0;
+  server.volumesCapacityTotal = 0;
 
   server.serverId = server._id;
 
@@ -469,31 +468,53 @@ exports.read = function (req, res) {
   delete server._id;
   delete server.__v;
 
-  dbWfa.svmRead(req.server.code, function (err, svm) {
-    if (err) {
-      logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
-    } else {
-      server.volumesName = svm.volumesName;
-      server.volumesCapacity = svm.volumesCapacity;
-      server.volumesUsed = svm.volumesUsed;
-      server.volumesTier = svm.volumesTier;
+  // Storageunit.find({server:server.serverId})
+  // .exec(function(err, storageunits){
+  //   if (err) {
+  //     logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
+  //   } else {
+  //     console.log("storageunits", storageunits);
+  //     if (storageunits.length ==0) {
+  //       server.volumesCapacityTotal = 0;
+  //       server.iopsTotal = 0;
+  //     } else {
+  //       _.each(storageunits, function(su){
+  //         if (su.status == 'Operational') {
+  //           server.volumesCapacityTotal += su.sizegb;
+  //         }          
+  //       });
+  //     }
+  //     logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
+  //     sendServerResponse(res, server);
+  //   }
+  // });
 
-      if (svm.iopsTotal) {
-        server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
-      }
+  // dbWfa.svmRead(req.server.code, function (err, svm) {
+  //   if (err) {
+  //     logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
+  //   } else {
+  //     console.log(svm);
+  //     server.volumesName = svm.volumesName;
+  //     server.volumesCapacity = svm.volumesCapacity;
+  //     server.volumesUsed = svm.volumesUsed;
+  //     server.volumesTier = svm.volumesTier;
 
-      if (svm.volumesCapacity) {
-        server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
-      }
+  //     if (svm.iopsTotal) {
+  //       server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
+  //     }
 
-      if (svm.volumesUsed) {
-        server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
-      }
-    }
+  //     if (svm.volumesCapacity) {
+  //       server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
+  //     }
 
-    logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
-    sendServerResponse(res, server);
-  });
+  //     if (svm.volumesUsed) {
+  //       server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
+  //     }
+  //   }
+
+  //   logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
+  //   sendServerResponse(res, server);
+  // });
 };
 
 /**

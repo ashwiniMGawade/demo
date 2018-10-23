@@ -10,6 +10,7 @@ var mysql = require('mysql2'),
 //Keeping this until all works well (to be removed when Event Emitter error does not reoccur)
 //require('events').EventEmitter.defaultMaxListeners = Infinity;
 
+console.log(config.wfa.sql);
 var connectionPool = mysql.createPool(config.wfa.sql);
 
 exports.getAdminVserver = function (siteCode, subscriptionCode, res) {

@@ -27,18 +27,20 @@ var ClusterSchema = new Schema({
     required: 'Cluster key required',
     minlength: [ 3, 'key: Minimum 3 char required'],
     maxlength: [ 32, 'key: Maximum 32 char allowed'],
-    match: [ /^[a-z0-9]*$/ , 'Cluster key can only include lowercase alphanumeric characters']
+    match: [ /^[a-z0-9\-]*$/ , 'Cluster key can only include lowercase alphanumeric characters including dash']
   },
   management_ip: {
     type: String,
     default: '',
     trim: true,
+    required: 'Management IP is required',
     match: [ /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/ ,
              'Management IP should be a valid IP']
   },
   provisioning_state: {
     type: String,
-    default: 'open',
+    default: 'closed',
+    required: 'Provisioning state is required',
     enum: {
             values: ['open', 'closed'],
             message: '`{VALUE}` not a valid value for Provisioning State'

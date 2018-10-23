@@ -23,7 +23,7 @@ exports.create = function (req, res) {
   cluster.key = req.body.key;
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
-  cluster.rest_uri = req.body.rest_uri;
+  cluster.rest_uri = req.body.rest_uri || '';
 
 
   cluster.save(function (err) {
@@ -94,7 +94,7 @@ exports.delete = function (req, res) {
     } else {
       if(clusters.length > 0) {
         return res.status(400).send({
-          message: 'Can\'t perform Delete: Please ensure all associated clusters are deleted'
+          message: 'Can\'t perform Delete: Please ensure all associated clusters are deleted from the pods'
         });
       } else {
         cluster.remove(function (err) {
