@@ -136,7 +136,7 @@ exports.create = function (req, res) {
           logger.error('SVM Create: Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err); 
           return respondError(res, 400, 'Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err);
         } else {
-          console.log("after fetch info adminvserver details", adminVserver);
+          logger.info("after fetch info adminvserver details", adminVserver);
           // Get Pod
           Pod.findByCode(adminVserver.podCode, function (err, podResults) {
             if (podResults.length === 0) {
@@ -195,7 +195,6 @@ exports.create = function (req, res) {
                   if(server.subnet.split('/')[0]!==cidrSubnet.networkAddress){
                     return respondError(res, 400, "Valid IP for subnet after masking is "+cidrSubnet.networkAddress);
                   }
-            
                   //Validating the gateway is in subnet
                   if(server.gateway){
                     if(!cidrSubnet.contains(server.gateway)){
@@ -280,11 +279,12 @@ exports.create = function (req, res) {
                                 logger.info('SVM Create: pod.save() failed: ' + err);
                               } else {
                                 logger.info('SVM Create: pod.save() succeeded.');
+                                server.pod = pod;
+                                console.log(adminVserver, "before calling createsvm");
+                                createSvm(adminVserver.clusterName);
                               }
                             });
-                            server.pod = pod;
-                
-                            createSvm(adminVserver.clusterName);
+                            
                           }
                         });
                       }
@@ -301,6 +301,7 @@ exports.create = function (req, res) {
 
 
   function createSvm(clusterName) {
+    console.log("called create svm");
     var jobId;
     var args = {
       vlan: server.vlan,
@@ -319,20 +320,16 @@ exports.create = function (req, res) {
         logger.info('SVM Create: Failed to create SVM, Error: ' + err);
         server.status = 'Contact Support';
         serverCreateJob.update('Failed', 'Failed to create SVM, Error: ' + err, server);
-        server.save(function (err) {
-          if (err) {
-            logger.info('SVM Create: Failed to Save, Error: ' + err);
-          }
-        });
+        saveServer(server);
       } else {
         jobId = resWfa.jobId;
         logger.info('SVM Create: Response from WFA: ' + util.inspect(resWfa, {showHidden: false, depth: null}));
-        untilCreated(jobId);
+        untilCreated(jobId, clusterName);
       }
     });
   }
 
-  function untilCreated(jobId) {
+  function untilCreated(jobId, clusterName) {
     var args = {
       jobId: jobId
     };
@@ -342,33 +339,25 @@ exports.create = function (req, res) {
         logger.info('SVM Create: Failed to obtain status, Error: ' + err);
         server.status = 'Contact Support';
         serverCreateJob.update('Failed', 'Failed to Obtain Status, Error: ' + err, server);
-        server.save(function (err) {
-          if (err) {
-            logger.info('SVM Create: Failed to Save, Error: ' + err);
-          }
-        });
+        saveServer(server);
       } else {
         if (resWfa.jobStatus === 'FAILED') {
           logger.info('SVM Create: Failed to create, Job ID: ' + jobId);
           server.status = 'Contact Support';
           serverCreateJob.update('Failed', 'Recieved Failed Status from WFA, Error: ' + err, server);
-          server.save(function (err) {
-            if (err) {
-              logger.info('SVM Create: Failed to Save, Error: ' + err);
-            }
-          });
-          getOutputs(jobId);
+          saveServer(server);
+          getOutputs(jobId, null);
         } else if (resWfa.jobStatus !== 'COMPLETED') {
           logger.info('SVM Create: Not completed yet, polling again in 30 seconds, Job ID: ' + jobId);
-          setTimeout(function () { untilCreated(jobId); }, config.wfa.refreshRate);
+          setTimeout(function () { untilCreated(jobId, clusterName); }, config.wfa.refreshRate);
         } else {
-          getOutputs(jobId);
+          getOutputs(jobId, clusterName);
         }
       }
     });
   }
 
-  function getOutputs(jobId) {
+  function getOutputs(jobId, clusterName) {
     var args = {
       jobId: jobId
     };
@@ -378,11 +367,7 @@ exports.create = function (req, res) {
         logger.info('SVM Create: Failed to obtain output, Error: ' + err);
         server.status = 'Contact Support';
         serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
-        server.save(function (err) {
-          if (err) {
-            logger.info('SVM Create: Failed to Save, Error: ' + err);
-          }
-        });
+        saveServer(server);
       } else {
         if (resWfa) {
           if (server.managed === 'Customer') {
@@ -392,25 +377,52 @@ exports.create = function (req, res) {
           server.ipMgmt = resWfa.ipMgmt;
           server.code = resWfa.code;
           server.status = 'Operational';
-          server.save(function (err) {
+
+          // get vserver_uuid, cluster_uuid, storage_vm_key from the mysql db read
+          dbWfa.getUUIDs(server.code, clusterName, function(err, resDB) {
             if (err) {
-              logger.info('SVM Create: Failed to Save, Error: ' + err);
-            }else{
-              server.populate('tenant','name code', function (err, serverPopulated) {
-                serverCreateJob.update('Completed', 'Server moved to Operational', server);
-              });
+              logger.info('SVM Create: Failed to obtain output related UUID, Error: ' + err);
+              server.status = 'Contact Support';
+              serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
+              saveServer(server);
+            } else {
+              if (resDB) {
+                server.ontap_cluster_uuid = resDB.ontap_cluster_uuid;
+                server.ontap_vserver_uuid = resDB.ontap_vserver_uuid;
+                server.ontap_vserver_key = resDB.ontap_vserver_key;
+
+                server.save(function (err) {
+                  if (err) {
+                    logger.info('SVM Create: Failed to Save, Error: ' + err);
+                  }else{
+                    server.populate('tenant','name code', function (err, serverPopulated) {
+                      serverCreateJob.update('Completed', 'Server moved to Operational', server);
+                    });
+                  }
+                });
+              } else {
+                logger.info('SVM Create: No output parameters: Response from db: '+ resWfa);
+                server.status = 'Contact Support';
+                serverCreateJob.update('Failed', 'No Output parameters recieved from DB' , server);
+                saveServer(server);
+              }
             }
           });
+         
         } else {
           logger.info('SVM Create: No output parameters: Response from WFA: '+ resWfa);
           server.status = 'Contact Support';
           serverCreateJob.update('Failed', 'No Output parameters recieved' , server);
-          server.save(function (err) {
-            if (err) {
-              logger.info('SVM Create: Failed to Save, Error: ' + err);
-            }
-          });
+          saveServer(server);
         }
+      }
+    });
+  }
+
+  function saveServer(server) {
+    server.save(function (err) {
+      if (err) {
+        logger.info('SVM Create: Failed to Save, Error: ' + err);
       }
     });
   }

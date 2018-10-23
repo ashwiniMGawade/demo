@@ -28,28 +28,32 @@ exports.getAdminVserver = function (siteId, siteCode, subscriptionCode, res) {
 
   //get all pods present for selected site
 
+  var podFound = false;
+
   Pod.find({site: mongoose.Types.ObjectId(siteId)})
   .populate('cluster_keys', 'name key provisioning_state')
   .exec(function (err, pods) {
     if (err) {
+      console.log(err);
       logger.error('SVM Create: Failed to retrieve Pods related to site from Mongo - Site id: \"' + siteId + '\".');
-      return respondError(res, 400, 'Failed to retrieve Pods related to site from Mongo - Site id: \"' + siteId + '\".');
+      res('Failed to retrieve Pods related to site from Mongo - Site id: \"' + siteId + '\".', adminVserver);
     } else {
        _.forEach(pods, function(value, key) {
           if (value.cluster_keys && value.cluster_keys.length > 0){
             _.forEach(value.cluster_keys, function(cluster) {
               if (cluster.provisioning_state == 'open') {
-                adminVserver.clusterName = cluster.key;
-                adminVserver.state = cluster.state;
+                adminVserver.clusterName = cluster.name;
+                adminVserver.state = cluster.provisioning_state;
                 adminVserver.siteCode = siteCode;
                 adminVserver.podCode = value.code;
+                podFound = true;
                 res(null, adminVserver);
               }
             });            
           }
         });
 
-       res("can not find pod", adminVserver);
+      if(!podFound) res("can not find pod", adminVserver);
     }
   });  
 };
