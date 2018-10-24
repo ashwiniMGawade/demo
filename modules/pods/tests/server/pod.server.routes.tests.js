@@ -10,6 +10,7 @@ var should = require('should'),
   Site = mongoose.model('Site'),
   Subscription = mongoose.model('Subscription'),
   Server = mongoose.model('Server'),
+  Cluster = mongoose.model('ontap_clusters'),
   Tenant = mongoose.model('Tenant'),
   Subtenant = mongoose.model('Subtenant'),
   express = require(path.resolve('./config/lib/express'));
@@ -17,7 +18,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var app, agent, credentials, user, pod, site, _tenant, subscription, credentialsAdmin, userAdmin;
+var app, agent, credentials, user, pod, site, _tenant, cluster, subscription, credentialsAdmin, userAdmin;
 
 /**
  * Pod routes tests
@@ -26,7 +27,7 @@ describe('Pod CRUD tests', function () {
 
   before(function (done) {
     // Get application
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
 
     done();
@@ -81,6 +82,14 @@ describe('Pod CRUD tests', function () {
       code: 'a121'
     });
 
+    cluster = new Cluster({
+      "name": "aaa",
+      "key": "aaa",
+      "management_ip": "10.20.30.40",
+      "provisioning_state": "open",
+      "rest_uri": "http://sample.com"
+    });
+
     subscription = new Subscription({
       name: 'test subscription',
       code: 'testsub',
@@ -103,14 +112,18 @@ describe('Pod CRUD tests', function () {
           should.not.exist(err);
           site.save(function (err) {
             should.not.exist(err);
-            pod = {
-              name: 'Pod name',
-              code: 'testpod',
-              siteId: mongoose.Types.ObjectId(site._id),
-              vlansAvailable: 12,
-              user: mongoose.Types.ObjectId(user._id)
-            };
-            done();
+            cluster.save(function(err) {
+              should.not.exist(err);
+              pod = {
+                name: 'Pod name',
+                code: 'testpod',
+                siteId: mongoose.Types.ObjectId(site._id),
+                vlansAvailable: 12,
+                user: mongoose.Types.ObjectId(user._id),
+                cluster_keys:[mongoose.Types.ObjectId(cluster._id)]
+              };
+              done();
+            });            
           });
         });
       });
@@ -128,7 +141,7 @@ describe('Pod CRUD tests', function () {
         .end(function (signinErr, signinRes) {
           // Handle signin error
           if (signinErr) {
-            return done(signinErr);
+            done(signinErr);
           }
 
           // Get the userId
@@ -141,7 +154,7 @@ describe('Pod CRUD tests', function () {
             .end(function (podSaveErr, podSaveRes) {
               // Handle pod save error
               if (podSaveErr) {
-                return done(podSaveErr);
+                done(podSaveErr);
               }
 
               // Get a list of pods
@@ -149,7 +162,7 @@ describe('Pod CRUD tests', function () {
                 .end(function (podsGetErr, podsGetRes) {
                   // Handle pod save error
                   if (podsGetErr) {
-                    return done(podsGetErr);
+                    done(podsGetErr);
                   }
 
                   // Get pods list
@@ -178,7 +191,7 @@ describe('Pod CRUD tests', function () {
         .end(function (signinErr, signinRes) {
           // Handle signin error
           if (signinErr) {
-            return done(signinErr);
+            done(signinErr);
           }
 
           // Get the userId
@@ -191,7 +204,7 @@ describe('Pod CRUD tests', function () {
             .end(function (podSaveErr, podSaveRes) {
               // Handle pod save error
               if (podSaveErr) {
-                return done(podSaveErr);
+                done(podSaveErr);
               }
 
               // Get a list of pods
@@ -199,7 +212,7 @@ describe('Pod CRUD tests', function () {
                 .end(function (podsGetErr, podsGetRes) {
                   // Handle pod save error
                   if (podsGetErr) {
-                    return done(podsGetErr);
+                    done(podsGetErr);
                   }
 
                   // Get pods list
@@ -227,7 +240,7 @@ describe('Pod CRUD tests', function () {
         .end(function (signinErr, signinRes) {
           // Handle signin error
           if (signinErr) {
-            return done(signinErr);
+            done(signinErr);
           }
 
           // Get the userId
@@ -240,7 +253,7 @@ describe('Pod CRUD tests', function () {
             .end(function (podSaveErr, podSaveRes) {
               // Handle pod save error
               if (podSaveErr) {
-                return done(podSaveErr);
+                done(podSaveErr);
               }
               done(podSaveErr);
             });
@@ -271,7 +284,7 @@ describe('Pod CRUD tests', function () {
         .end(function (signinErr, signinRes) {
           // Handle signin error
           if (signinErr) {
-            return done(signinErr);
+            done(signinErr);
           }
 
           // Get the userId
@@ -292,6 +305,141 @@ describe('Pod CRUD tests', function () {
     });
   });
 
+  it('should not be able to save an pod if no cluster is provided', function (done) {
+    // Invalidate title field
+    pod.cluster_keys = '';
+
+    user.roles = ['root'];
+    user.save(function (err) {
+      should.not.exist(err);
+      agent.post('/api/auth/signin')
+        .send(credentials)
+        .expect(200)
+        .end(function (signinErr, signinRes) {
+          // Handle signin error
+          if (signinErr) {
+            done(signinErr);
+          }
+
+          // Get the userId
+          var userId = user.id;
+
+          // Save a new pod
+          agent.post('/api/pods')
+            .send(pod)
+            .expect(400)
+            .end(function (podSaveErr, podSaveRes) {
+              // Set message assertion
+              (podSaveRes.body.message).should.match('At least one Cluster need to be specified');
+
+              // Handle pod save error
+              done(podSaveErr);
+            });
+        });
+    });
+  });
+
+  it('should not be able to save an pod if invalid cluster is provided', function (done) {
+    // Invalidate title field
+    pod.cluster_keys = ['abc'];
+
+    user.roles = ['root'];
+    user.save(function (err) {
+      should.not.exist(err);
+      agent.post('/api/auth/signin')
+        .send(credentials)
+        .expect(200)
+        .end(function (signinErr, signinRes) {
+          // Handle signin error
+          if (signinErr) {
+            done(signinErr);
+          }
+
+          // Get the userId
+          var userId = user.id;
+
+          // Save a new pod
+          agent.post('/api/pods')
+            .send(pod)
+            .expect(400)
+            .end(function (podSaveErr, podSaveRes) {
+              // Set message assertion
+              (podSaveRes.body.message).should.match('Invalid Cluster Details');
+
+              // Handle pod save error
+              done(podSaveErr);
+            });
+        });
+    });
+  });
+
+  it('should not be able to save an pod if one of the provided cluster is invalid', function (done) {
+    // Invalidate title field
+    pod.cluster_keys = ['abc', pod.cluster_keys[0]];
+
+    user.roles = ['root'];
+    user.save(function (err) {
+      should.not.exist(err);
+      agent.post('/api/auth/signin')
+        .send(credentials)
+        .expect(200)
+        .end(function (signinErr, signinRes) {
+          // Handle signin error
+          if (signinErr) {
+            done(signinErr);
+          }
+
+          // Get the userId
+          var userId = user.id;
+
+          // Save a new pod
+          agent.post('/api/pods')
+            .send(pod)
+            .expect(400)
+            .end(function (podSaveErr, podSaveRes) {
+              // Set message assertion
+              (podSaveRes.body.message).should.match('Invalid Cluster Details');
+
+              // Handle pod save error
+              done(podSaveErr);
+            });
+        });
+    });
+  });
+
+  it('should not be able to save an pod if one of the provided cluster is different object', function (done) {
+    // Invalidate title field
+    pod.cluster_keys = [user.id, pod.cluster_keys[0]];
+
+    user.roles = ['root'];
+    user.save(function (err) {
+      should.not.exist(err);
+      agent.post('/api/auth/signin')
+        .send(credentials)
+        .expect(200)
+        .end(function (signinErr, signinRes) {
+          // Handle signin error
+          if (signinErr) {
+            done(signinErr);
+          }
+
+          // Get the userId
+          var userId = user.id;
+
+          // Save a new pod
+          agent.post('/api/pods')
+            .send(pod)
+            .expect(400)
+            .end(function (podSaveErr, podSaveRes) {
+              // Set message assertion
+              (podSaveRes.body.message).should.match('Invalid Cluster details, some of the clusters not found');
+
+              // Handle pod save error
+              done(podSaveErr);
+            });
+        });
+    });
+  });
   it('should be able to update an pod if signed in', function (done) {
     agent.post('/api/auth/signin')
       .send(credentials)
@@ -299,7 +447,7 @@ describe('Pod CRUD tests', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // Get the userId
@@ -312,7 +460,7 @@ describe('Pod CRUD tests', function () {
           .end(function (podSaveErr, podSaveRes) {
             // Handle pod save error
             if (podSaveErr) {
-              return done(podSaveErr);
+              done(podSaveErr);
             }
 
             // Update pod title
@@ -327,7 +475,7 @@ describe('Pod CRUD tests', function () {
               .end(function (podUpdateErr, podUpdateRes) {
                 // Handle pod update error
                 if (podUpdateErr) {
-                  return done(podUpdateErr);
+                  done(podUpdateErr);
                 }
                 console.log(podUpdateRes.body);
                 // Set assertions
@@ -352,7 +500,7 @@ describe('Pod CRUD tests', function () {
         .expect(401)
         .end(function (err, res) {
           if (err) {
-            return done(err);
+            done(err);
           }
 
           // Call the assertion callback
@@ -368,7 +516,7 @@ describe('Pod CRUD tests', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         // test is not a valid mongoose Id
         request(app).get('/api/pods/test')
@@ -389,7 +537,7 @@ describe('Pod CRUD tests', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // Get the userId
@@ -402,7 +550,7 @@ describe('Pod CRUD tests', function () {
           .end(function (podSaveErr, podSaveRes) {
             // Handle pod save error
             if (podSaveErr) {
-              return done(podSaveErr);
+              done(podSaveErr);
             }
 
             // Delete an existing pod
@@ -412,7 +560,7 @@ describe('Pod CRUD tests', function () {
               .end(function (podDeleteErr, podDeleteRes) {
                 // Handle pod error error
                 if (podDeleteErr) {
-                  return done(podDeleteErr);
+                  done(podDeleteErr);
                 }
                 // Call the assertion callback
                 done();
@@ -428,7 +576,7 @@ describe('Pod CRUD tests', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // Save a new pod
@@ -438,7 +586,7 @@ describe('Pod CRUD tests', function () {
           .end(function (podSaveErr, podSaveRes) {
             // Handle pod save error
             if (podSaveErr) {
-              return done(podSaveErr);
+              done(podSaveErr);
             }
 
             var subtenant = new Subtenant({
@@ -471,7 +619,7 @@ describe('Pod CRUD tests', function () {
                     .expect(400)
                     .end(function (podDeleteErr, podDeleteRes) {
                       if (podDeleteErr) {
-                        return done(podDeleteErr);
+                        done(podDeleteErr);
                       }
                       // Set assertions
                       (podDeleteRes.body.message).should.equal('Can\'t perform Delete: Please ensure all associated vFASS are deleted');
@@ -511,10 +659,12 @@ describe('Pod CRUD tests', function () {
 
   afterEach(function (done) {
     User.remove().exec(function () {
-      Pod.remove().exec(function(){
-        Site.remove().exec(function(){
-          Subscription.remove().exec(function(){
-            Tenant.remove().exec(done);
+      Cluster.remove().exec(function(){
+        Pod.remove().exec(function(){
+          Site.remove().exec(function(){
+            Subscription.remove().exec(function(){
+              Tenant.remove().exec(done);
+            });
           });
         });
       });

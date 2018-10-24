@@ -42,7 +42,7 @@ describe('Pod Model Unit Tests:', function () {
   describe('Method Save', function () {
     it('should be able to save without problems', function (done) {
       this.timeout(10000);
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.not.exist(err);
         done();
       });
@@ -51,7 +51,7 @@ describe('Pod Model Unit Tests:', function () {
     it('should be able to show an error when try to save without name', function (done) {
       pod.name = '';
 
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.exist(err);
         done();
       });
@@ -60,7 +60,7 @@ describe('Pod Model Unit Tests:', function () {
     it('should be able to show an error when try to save without code', function (done) {
       pod.code = '';
 
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.exist(err);
         done();
       });
@@ -69,7 +69,7 @@ describe('Pod Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. 123a', function (done) {
       pod.code = '';
 
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.exist(err);
         done();
       });
@@ -78,7 +78,7 @@ describe('Pod Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. 123a', function (done) {
       pod.code = '';
 
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.exist(err);
         done();
       });
@@ -87,7 +87,7 @@ describe('Pod Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. Asdda', function (done) {
       pod.code = '';
 
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.exist(err);
         done();
       });
@@ -96,7 +96,7 @@ describe('Pod Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. asdd@a', function (done) {
       pod.code = '';
 
-      return pod.save(function (err) {
+      pod.save(function (err) {
         should.exist(err);
         done();
       });
