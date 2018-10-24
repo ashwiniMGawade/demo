@@ -10,7 +10,7 @@ var mysql = require('mysql2'),
 //Keeping this until all works well (to be removed when Event Emitter error does not reoccur)
 //require('events').EventEmitter.defaultMaxListeners = Infinity;
 
-console.log(config.wfa.sql);
+
 var connectionPool = mysql.createPool(config.wfa.sql);
 
 exports.getAdminVserver = function (siteCode, subscriptionCode, res) {
@@ -163,13 +163,16 @@ exports.getUUIDs = function(serverCode, clusterName, res) {
         ' cluster.primary_address = ? or  cluster.name = ?)';
 
   logger.info('Server getUUIDs(): MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
+  logger.info("query params for sql:");
+  logger.info( [serverCode, clusterName, clusterName]);
 
   connectionPool.getConnection(function(err, connection) {
     if(err){
       logger.error('Server getUUIDs(): MySQL Read: Connection Error: ' + err);
       res(err, adminVserver);
     }else{
-      connection.query(args, [serverCode, clusterName], function (err, result) {
+      connection.query(args, [serverCode, clusterName, clusterName], function (err, result) {
+        logger.info("sql query = " + this.sql);
         logger.info('Server getUUIDs(): MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
         if (err) {
           logger.info('Server getUUIDs(): MySQL Read: Error: ' + err);
@@ -180,8 +183,8 @@ exports.getUUIDs = function(serverCode, clusterName, res) {
           adminVserver.ontap_vserver_key = result[0].storage_vm_key;
           res(null, adminVserver);
         } else {
-          logger.info('Server getUUIDs(): MySQL Read: No Records found');
-          res("Server Read: No records found", adminVserver);
+          console.log("in else");
+          res(null, false);
         }
         connection.release();
       });

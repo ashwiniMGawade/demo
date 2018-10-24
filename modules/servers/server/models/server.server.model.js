@@ -197,6 +197,18 @@ var ServerSchema = new Schema({
     trim: true,
     match: [ /^[a-z0-9.-]*$/ , 'iSCSI Alias can only include alphanumeric (lowercase) characters, dashes and dots' ]
   },
+  ontap_cluster_uuid: {
+    type: String,
+    default: null
+  },
+  ontap_vserver_uuid: {
+    type: String,
+    default: null
+  },
+  ontap_vserver_key: {
+    type: String,
+    default: null
+  },
   user: {
     type: Schema.ObjectId,
     ref: 'User'

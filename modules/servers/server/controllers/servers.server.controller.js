@@ -357,6 +357,36 @@ exports.create = function (req, res) {
     });
   }
 
+  function getUUIDs(server, clusterName) {
+    dbWfa.getUUIDs(server.code, clusterName, function(err, resDB) {
+      if (err) {
+        logger.info('SVM Create: Failed to obtain output related UUID, Error: ' + err);
+        server.status = 'Contact Support';
+        serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
+        saveServer(server);
+      } else {
+        if (resDB) {
+          server.ontap_cluster_uuid = resDB.ontap_cluster_uuid;
+          server.ontap_vserver_uuid = resDB.ontap_vserver_uuid;
+          server.ontap_vserver_key = resDB.ontap_vserver_key;
+
+          server.save(function (err) {
+            if (err) {
+              logger.info('SVM Create: Failed to Save, Error: ' + err);
+            }else{
+              server.populate('tenant','name code', function (err, serverPopulated) {
+                serverCreateJob.update('Completed', 'Server moved to Operational', server);
+              });
+            }
+          });
+        } else {
+           logger.info('SVM Create: No output parameters: Response from db: '+ resDB);
+           setTimeout(function () { getUUIDs(server, clusterName); }, config.wfa.refreshRate);          
+        }
+      }
+    });
+  }
+
   function getOutputs(jobId, clusterName) {
     var args = {
       jobId: jobId
@@ -379,36 +409,9 @@ exports.create = function (req, res) {
           server.status = 'Operational';
 
           // get vserver_uuid, cluster_uuid, storage_vm_key from the mysql db read
-          dbWfa.getUUIDs(server.code, clusterName, function(err, resDB) {
-            if (err) {
-              logger.info('SVM Create: Failed to obtain output related UUID, Error: ' + err);
-              server.status = 'Contact Support';
-              serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
-              saveServer(server);
-            } else {
-              if (resDB) {
-                server.ontap_cluster_uuid = resDB.ontap_cluster_uuid;
-                server.ontap_vserver_uuid = resDB.ontap_vserver_uuid;
-                server.ontap_vserver_key = resDB.ontap_vserver_key;
 
-                server.save(function (err) {
-                  if (err) {
-                    logger.info('SVM Create: Failed to Save, Error: ' + err);
-                  }else{
-                    server.populate('tenant','name code', function (err, serverPopulated) {
-                      serverCreateJob.update('Completed', 'Server moved to Operational', server);
-                    });
-                  }
-                });
-              } else {
-                logger.info('SVM Create: No output parameters: Response from db: '+ resWfa);
-                server.status = 'Contact Support';
-                serverCreateJob.update('Failed', 'No Output parameters recieved from DB' , server);
-                saveServer(server);
-              }
-            }
-          });
-         
+          getUUIDs(server, clusterName);
+                   
         } else {
           logger.info('SVM Create: No output parameters: Response from WFA: '+ resWfa);
           server.status = 'Contact Support';
@@ -489,32 +492,32 @@ exports.read = function (req, res) {
   //   }
   // });
 
-  // dbWfa.svmRead(req.server.code, function (err, svm) {
-  //   if (err) {
-  //     logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
-  //   } else {
-  //     console.log(svm);
-  //     server.volumesName = svm.volumesName;
-  //     server.volumesCapacity = svm.volumesCapacity;
-  //     server.volumesUsed = svm.volumesUsed;
-  //     server.volumesTier = svm.volumesTier;
+  dbWfa.svmRead(req.server.code, function (err, svm) {
+    if (err) {
+      logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
+    } else {
+      console.log(svm);
+      server.volumesName = svm.volumesName;
+      server.volumesCapacity = svm.volumesCapacity;
+      server.volumesUsed = svm.volumesUsed;
+      server.volumesTier = svm.volumesTier;
 
-  //     if (svm.iopsTotal) {
-  //       server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
-  //     }
+      if (svm.iopsTotal) {
+        server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
+      }
 
-  //     if (svm.volumesCapacity) {
-  //       server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
-  //     }
+      if (svm.volumesCapacity) {
+        server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
+      }
 
-  //     if (svm.volumesUsed) {
-  //       server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
-  //     }
-  //   }
+      if (svm.volumesUsed) {
+        server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
+      }
+    }
 
-  //   logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
-  //   sendServerResponse(res, server);
-  // });
+    logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
+    sendServerResponse(res, server);
+  });
 };
 
 /**
