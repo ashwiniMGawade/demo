@@ -496,7 +496,6 @@ exports.read = function (req, res) {
     if (err) {
       logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
     } else {
-      console.log(svm);
       server.volumesName = svm.volumesName;
       server.volumesCapacity = svm.volumesCapacity;
       server.volumesUsed = svm.volumesUsed;

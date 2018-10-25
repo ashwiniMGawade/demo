@@ -183,7 +183,6 @@ exports.getUUIDs = function(serverCode, clusterName, res) {
           adminVserver.ontap_vserver_key = result[0].storage_vm_key;
           res(null, adminVserver);
         } else {
-          console.log("in else");
           res(null, false);
         }
         connection.release();
