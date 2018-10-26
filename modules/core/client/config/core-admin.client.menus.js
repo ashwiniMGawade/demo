@@ -31,6 +31,15 @@ angular.module('core.admin').run(['Menus',
       roles: roles,
       position:1
     });
+
+    // Add the Data protection dropdown item
+    Menus.addMenuItem('topbar', {
+      title: 'Data Protection',
+      state: 'dataProtection',
+      type: 'dropdown',
+      roles: ['root', 'partner'],
+      position:2
+    });
    
     // Add the reports menu item
     Menus.addMenuItem('topbar', {
@@ -41,7 +50,7 @@ angular.module('core.admin').run(['Menus',
       position:3
     });
 
-    // Add the dropdown list item
+    
    
   }
 ]);

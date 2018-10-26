@@ -1,0 +1,101 @@
+<section ng-controller="ReplicasController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Replica</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="replicaForm" class="form-horizontal" ng-submit="create(replicaForm.$valid)" novalidate>
+      <fieldset>
+       
+        <div class="form-group required" show-errors>
+          <label for="sourceVolumeId">Source Volume</label>
+          <select name="sourceVolumeId" ng-model="sourceVolumeId" id="sourceVolumeId" class="form-control" ng-options="storagegroup.storagegroupId as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required>
+            <option value="">Please select a Source Volume</option>
+          </select>
+          <div ng-messages="replicaForm.sourceVolumeId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Source Volume is required.</p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="destinationServerId">Destination Server Id</label>
+          <select name="destinationServerId" ng-model="destinationServerId" id="destinationServerId" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required>
+            <option value="">Please select a Destination Server</option>
+          </select>
+          <div ng-messages="replicaForm.destinationServerId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Destination Server is required.</p>
+          </div>
+        </div>
+        <div class="row show-grid">
+          <label for="policy schedule">Replica schedule:</label>
+            <div class="form-group row" ng-if="monthsArray.length > 0">
+              <div><label for="month">Month</label></div>
+              <div class="input-group col-md-3 col-xs-4 col-s-4"  ng-repeat="monthName in monthsArray" show-errors style="display:inline-grid;">
+                <input type="checkbox" ng-model="selectedMonths[monthName]" name="selectedMonths" value="{{monthName}}" > 
+                <span class="capitalize breakword">{{monthName.slice(0, 3)}}</span>
+              </div>
+
+              <!-- <div ng-if="!someSelected && touched" role="alert">
+                <p class="has-error help-block red">Cluster is required.</p>
+              </div> -->
+            </div>
+            <div class="form-group row" ng-if="weeksArray.length > 0">
+              <div><label for="dayOfWeek">Day of the week</label></div>
+              <div class="input-group col-md-3 col-xs-4 col-s-4"  ng-repeat="dayOfWeek in weeksArray" show-errors style="display:inline-grid;">
+                <input type="checkbox" ng-model="selectedDaysOfWeek[dayOfWeek]" name="selectedDaysOfWeek" value="{{dayOfWeek}}" > 
+                <span class="capitalize breakword">{{dayOfWeek.slice(0, 3)}}</span>
+              </div>
+
+              <!-- <div ng-if="!someSelected && touched" role="alert">
+                <p class="has-error help-block red">Cluster is required.</p>
+              </div> -->
+            </div>
+            <div class="form-group" show-errors>
+              <label for="day">Day</label>
+              <input name="day" type="text" ng-model="day" id="day" class="form-control"
+                      placeholder="Day"
+                      ng-pattern="/^(?!.*(\b(?:[1-9]|[1-2]\d|3[0-1])\b).*\b\1\b)(?:[1-9]|[1-2]\d|3[0-1])(?:,(?:[1-9]|[1-2]\d|3[0-1]))*$/"
+                      >
+
+              <div ng-messages="replicaForm.day.$error" role="alert">
+                <!-- <p class="help-block error-text" ng-message="required">Name is required.</p> -->
+                
+                <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 1, 31 are allowed, each number should occure only once</p>
+              </div>
+              <p class="help-block">Please enter coma separated string of numbers between 1 to 31, each number should occure ocly once</p>
+            </div>
+            <div class="form-group" show-errors>
+              <label for="hour">Hour</label>
+              <input name="hour" type="text" ng-model="hour" id="hour" class="form-control"
+                      placeholder="Hour"
+                      ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
+                      >
+
+              <div ng-messages="replicaForm.hour.$error" role="alert">
+                <!-- <p class="help-block error-text" ng-message="required">Name is required.</p> -->
+                
+                <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed, each number should occure only once</p>
+              </div>
+              <p class="help-block">Please enter coma separated string of numbers between 0 to 23, each number should occure ocly once</p>
+            </div>
+            <div class="form-group" show-errors>
+              <label for="minute">Minute</label>
+              <input name="minute" type="number" ng-model="minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
+              <div ng-messages="replicaForm.minute.$error" role="alert">
+                <!-- <p class="help-block error-text" ng-message="required">Storage Size in GB is required.</p> -->
+                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+              </div>              
+            </div>
+        </div>
+
+        <div class="form-group">
+          <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>      
+    </form>
+  </div>
+</section>

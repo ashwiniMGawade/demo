@@ -1,0 +1,31 @@
+<section ng-controller="PodsController" ng-init="findOne()" ng-show="pod.podId">
+  <div class="page-header">
+    <h1>Replica: <span ng-bind="pod.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="pod.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="pod.code"></td></tr>
+      <tr><th>Site</th><td ng-bind="pod.site.name"></td></tr>
+      <tr><th>Clusters</th>
+        <td  title="'Clusters'"  class="word-break-all"> 
+          <li ng-repeat="cluster in pod.cluster_keys">
+            {{cluster.name}}
+          </li>
+        </td>
+      </tr>
+      <tr><th>Available VLANs</th><td ng-bind="pod.vlansAvailable" class="word-break-all"></td></tr>
+      <tr><th>Used VLANs</th><td ng-bind="pod.vlansUsed" class="word-break-all"></td></tr>
+      <tr ng-if="(podAccessRoles.update | intersect : authentication.user.roles) > 0 || (podAccessRoles.delete | intersect : authentication.user.roles) > 0">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(podAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ui-sref="pods.edit({podId: pod.podId})">Edit</button>
+          <button ng-if="(podAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ng-click="remove(pod);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>
