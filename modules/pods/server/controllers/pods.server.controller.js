@@ -69,7 +69,6 @@ exports.create = function (req, res) {
                 });
               } else {
                 logger.info('Pod pod.save(): Calling Job.create()...');
-                logger.info('Pod pod.save(): req: ' + util.inspect(req, {showHidden: false, depth: null}));
                 Job.create(req, 'pod', function(err, createJobRes) {
                   createJobRes.update('Completed', 'Pod Saved', pod);
                 });

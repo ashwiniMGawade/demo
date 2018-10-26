@@ -24,9 +24,9 @@
             <p class="help-block error-text" ng-message="required">Destination Server is required.</p>
           </div>
         </div>
-        <div class="row show-grid">
-          <label for="policy schedule">Replica schedule:</label>
-            <div class="form-group row" ng-if="monthsArray.length > 0">
+        <div class="row show-grid mLeft0">
+          <label for="policySchedule">Replica schedule:</label>
+            <div class="form-group" ng-if="monthsArray.length > 0">
               <div><label for="month">Month</label></div>
               <div class="input-group col-md-3 col-xs-4 col-s-4"  ng-repeat="monthName in monthsArray" show-errors style="display:inline-grid;">
                 <input type="checkbox" ng-model="selectedMonths[monthName]" name="selectedMonths" value="{{monthName}}" > 
@@ -37,7 +37,7 @@
                 <p class="has-error help-block red">Cluster is required.</p>
               </div> -->
             </div>
-            <div class="form-group row" ng-if="weeksArray.length > 0">
+            <div class="form-group" ng-if="weeksArray.length > 0">
               <div><label for="dayOfWeek">Day of the week</label></div>
               <div class="input-group col-md-3 col-xs-4 col-s-4"  ng-repeat="dayOfWeek in weeksArray" show-errors style="display:inline-grid;">
                 <input type="checkbox" ng-model="selectedDaysOfWeek[dayOfWeek]" name="selectedDaysOfWeek" value="{{dayOfWeek}}" > 

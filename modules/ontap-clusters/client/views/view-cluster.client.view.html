@@ -8,7 +8,7 @@
       <tr><th>Key</th><td ng-bind="cluster.key"></td></tr>
       <tr><th>Management IP</th><td ng-bind="cluster.management_ip"></td></tr>
       <tr><th>Provisioning State</th><td ng-bind="cluster.provisioning_state" class="word-break-all"></td></tr>
-      <tr><th>REST URI</th><td ng-bind="cluster.rest_uri" class="word-break-all"></td></tr>
+      <!-- <tr><th>REST URI</th><td ng-bind="cluster.rest_uri" class="word-break-all"></td></tr> -->
       <tr ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0 || (clusterAccessRoles.delete | intersect : authentication.user.roles) > 0">
         <th>Actions</th>
         <td>
