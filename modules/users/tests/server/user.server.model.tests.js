@@ -761,7 +761,7 @@ describe('User Model Unit Tests:', function () {
 
       var _user1 = new User(user1);
       _user1.username='su';
-      return _user1.save(function (err) {
+      _user1.save(function (err) {
         should.exist(err);
         err.errors.username.message.should.be.equal('Username can only include alphanumeric(lowercase) & must be 3-32 characters');
         done();
@@ -773,7 +773,7 @@ describe('User Model Unit Tests:', function () {
 
       var _user1 = new User(user1);
       _user1.username='suasdfasdfasdfasdfasdfasdfsadfasfdasdfsadfasdfasdfdfgdgdfsgsdgsdfgsdfgsdfgsdffgssdafasdfasdfd';
-      return _user1.save(function (err) {
+      _user1.save(function (err) {
         should.exist(err);
         err.errors.username.message.should.be.equal('Username can only include alphanumeric(lowercase) & must be 3-32 characters');
         done();
@@ -785,7 +785,7 @@ describe('User Model Unit Tests:', function () {
 
       var _user1 = new User(user1);
       _user1.firstName='suasdfasdfasdfasdfasdfasdfsadfasfdasdfsadfasdfasdfdfgdgdfsgsdgsdfgsdfgsdfgsdffgssdafasdfasdfd';
-      return _user1.save(function (err) {
+      _user1.save(function (err) {
         should.exist(err);
         err.errors.firstName.message.should.be.equal('First name is longer than the maximum allowed length (64).');
         done();
@@ -797,7 +797,7 @@ describe('User Model Unit Tests:', function () {
 
       var _user1 = new User(user1);
       _user1.lastName='suasdfasdfasdfasdfasdfasdfsadfasfdasdfsadfasdfasdfdfgdgdfsgsdgsdfgsdfgsdfgsdffgssdafasdfasdfd';
-      return _user1.save(function (err) {
+      _user1.save(function (err) {
         should.exist(err);
         err.errors.lastName.message.should.be.equal('Last name is longer than the maximum allowed length (64).');
         done();
