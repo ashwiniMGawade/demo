@@ -56,7 +56,7 @@ describe('Tenant Model Unit Tests:', function () {
   describe('Method Save', function () {
     it('should be able to save & delete without problems', function (done) {
       this.timeout(10000);
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.not.exist(err);
         tenant.remove(function (err) {
           should.not.exist(err);
@@ -67,7 +67,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without tenant code', function (done) {
       tenant.code = '';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -75,7 +75,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without tenant name', function (done) {
       tenant.name = '';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -97,7 +97,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save tenant code less than 3 char', function (done) {
       tenant.code = 'TT';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -105,7 +105,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save tenant code more than 8 char', function (done) {
       tenant.code = 'TTTTTTTTT';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -113,7 +113,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save tenant name more than 64 char', function (done) {
       tenant.name = 'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -121,7 +121,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save tenant name less than 3 char', function (done) {
       tenant.name = 'TT';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -129,7 +129,7 @@ describe('Tenant Model Unit Tests:', function () {
    
     it('should be able to show an error when try to save tenant annotation more than 32 char', function (done) {
       tenant.annotation = 'test121145test121145test121145test121145test121145test121145test121145test121145test121145test121145test121145test121145test121145test121145';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -138,7 +138,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save tenant name with disallowed special chars', function (done) {
       tenant.name = '@TTs';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -147,7 +147,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save tenant code with disallowed special chars', function (done) {
       tenant.code = '@!s';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -155,7 +155,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save Invalid tenant code ie: 123:', function (done) {
       tenant.code = '123:';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -163,7 +163,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save Invalid tenant code ie: a123A', function (done) {
       tenant.code = 'a123A';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -171,7 +171,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save Invalid tenant code ie: a123@', function (done) {
       tenant.annotation = 'a123@';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -179,7 +179,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save Invalid tenant annotation ie: @test', function (done) {
       tenant.code = '@test';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -208,7 +208,7 @@ describe('Tenant Model Unit Tests:', function () {
     it('should be able to show an error when try to save Invalid partner id: ie. test', function (done) {
       this.timeout(10000);
       tenant.partner = 'test';
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -217,7 +217,7 @@ describe('Tenant Model Unit Tests:', function () {
     it('should be able to show an error when try to save Invalid partner id', function (done) {
       this.timeout(10000);
       tenant.partner = mongoose.Types.ObjectId(user._id);
-      return tenant.save(function (err) {
+      tenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -225,7 +225,7 @@ describe('Tenant Model Unit Tests:', function () {
 
     it('should be able to save with valid partner id', function (done) {    
       this.timeout(10000);  
-      return tenant2.save(function (err) {
+      tenant2.save(function (err) {
         should.not.exist(err);
         tenant.partner = mongoose.Types.ObjectId(tenant2._id);
         tenant.save(function(err) {
