@@ -10,6 +10,7 @@ var mysql = require('mysql2'),
 //Keeping this until all works well (to be removed when Event Emitter error does not reoccur)
 //require('events').EventEmitter.defaultMaxListeners = Infinity;
 
+
 var connectionPool = mysql.createPool(config.wfa.sql);
 
 exports.getAdminVserver = function (siteCode, subscriptionCode, res) {
@@ -139,3 +140,53 @@ exports.svmRead = function (req, res) {
     }
   });
 };
+
+exports.getUUIDs = function(serverCode, clusterName, res) {
+  logger.error('Server getUUIDs: MySQL Read: Retrieving Admin Vserver for vserver_uuid, cluster_uuid, storage_vm_key: \"' + serverCode + '\" and subscriptionCode \"' + clusterName + '\".');
+
+  var adminVserver = {
+    ontap_cluster_uuid : '',
+    ontap_vserver_uuid : '',
+    ontap_vserver_key  : ''
+  };
+
+
+  var args = ' SELECT ' +
+    'vserver.uuid as "vserver_uuid", ' +
+    'cluster.uuid as "cluster_uuid", ' +
+    'concat(cluster.uuid,":type=vserver,uuid=",vserver.uuid) as "storage_vm_key" ' +
+    'FROM vserver , cluster ' +
+    'WHERE ' +
+        'vserver.cluster_id = cluster.id ' +
+        'AND vserver.name = ? ' +       
+        'AND ( ' + 
+        ' cluster.primary_address = ? or  cluster.name = ?)';
+
+  logger.info('Server getUUIDs(): MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
+  logger.info("query params for sql:");
+  logger.info( [serverCode, clusterName, clusterName]);
+
+  connectionPool.getConnection(function(err, connection) {
+    if(err){
+      logger.error('Server getUUIDs(): MySQL Read: Connection Error: ' + err);
+      res(err, adminVserver);
+    }else{
+      connection.query(args, [serverCode, clusterName, clusterName], function (err, result) {
+        logger.info("sql query = " + this.sql);
+        logger.info('Server getUUIDs(): MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
+        if (err) {
+          logger.info('Server getUUIDs(): MySQL Read: Error: ' + err);
+          res(err, adminVserver);
+        } else if (result.length > 0) {
+          adminVserver.ontap_cluster_uuid = result[0].cluster_uuid;
+          adminVserver.ontap_vserver_uuid = result[0].vserver_uuid;
+          adminVserver.ontap_vserver_key = result[0].storage_vm_key;
+          res(null, adminVserver);
+        } else {
+          res(null, false);
+        }
+        connection.release();
+      });
+    }
+  });
+}

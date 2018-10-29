@@ -7,6 +7,7 @@ var _ = require('lodash'),
   path = require('path'),
   mongoose = require('mongoose'),
   Pod = mongoose.model('Pod'),
+  Cluster = mongoose.model('ontap_clusters'),
   Server = mongoose.model('Server'),
   Job = mongoose.model('Job'),
   logger = require(path.resolve('./config/lib/log')),
@@ -22,6 +23,7 @@ exports.create = function (req, res) {
   pod.user = req.user;
   pod.name = req.body.name;
   pod.code = req.body.code;
+  
 
   mongoose.model('Site').findById(req.body.siteId).exec(function (err, site) {
     if (err) {
@@ -38,22 +40,46 @@ exports.create = function (req, res) {
       pod.site = mongoose.Types.ObjectId(site._id);
     }
 
-
-    pod.save(function (err) {
-      logger.info('Pod pod.save(): Entered');
-      if (err) {
-        return res.status(400).send({
-          message: errorHandler.getErrorMessage(err)
-        });
-      } else {
-        logger.info('Pod pod.save(): Calling Job.create()...');
-        logger.info('Pod pod.save(): req: ' + util.inspect(req, {showHidden: false, depth: null}));
-        Job.create(req, 'pod', function(err, createJobRes) {
-          createJobRes.update('Completed', 'Pod Saved', pod);
-        });
-        res.json(pod);
-      }
-    });
+    //verify the cluster keys
+    if(req.body.cluster_keys.length == 0) {
+      logger.info('Pod Create: Invalid Site ID');
+      return res.status(400).send({
+        message: 'At least one Cluster need to be specified'
+      });
+    } else {
+      Cluster.find({ '_id' : {$in : req.body.cluster_keys}}).exec(function(err, clusters) {
+        if (err || !clusters) {
+          logger.info('Pod Create: Invalid Cluster details');
+          return res.status(400).send({
+            message: "Invalid Cluster Details"
+          });
+        } else {
+          if(clusters.length != req.body.cluster_keys.length) {
+            logger.info('Pod Create: Invalid Cluster details with different length');
+            return res.status(400).send({
+              message: "Invalid Cluster details, some of the clusters not found"
+            });
+          } else {
+            pod.cluster_keys = req.body.cluster_keys;
+            pod.save(function (err) {
+              logger.info('Pod pod.save(): Entered');
+              if (err) {
+                return res.status(400).send({
+                  message: errorHandler.getErrorMessage(err)
+                });
+              } else {
+                logger.info('Pod pod.save(): Calling Job.create()...');
+                Job.create(req, 'pod', function(err, createJobRes) {
+                  createJobRes.update('Completed', 'Pod Saved', pod);
+                });
+                res.json(pod);
+              }
+            });
+          }
+        }
+      })
+    }
+    
   });
 };
 
@@ -147,8 +173,9 @@ exports.list = function (req, res) {
   res.header('Expires', '-1');
   res.header('Pragma', 'no-cache');
 
-  Pod.find().populate('site','name code').exec(function (err, pods) {
+  let q = Pod.find().populate('site','name code').populate('cluster_keys', 'name key').exec(function (err, pods) {
     if (err) {
+      console.log(err, q);
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
@@ -169,7 +196,7 @@ exports.podByID = function (req, res, next, id) {
     });
   }
 
-  Pod.findById(id).populate('site','name code').exec(function (err, pod) {
+  Pod.findById(id).populate('site','name code').populate('cluster_keys', 'name key').exec(function (err, pod) {
     if (err) {
       return next(err);
     } else if (!pod) {

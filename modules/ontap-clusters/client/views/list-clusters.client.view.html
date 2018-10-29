@@ -1,0 +1,28 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Clusters</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()"  ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="cluster in $data">
+        <td ng-bind="cluster.name" class="capitalize breakword" title="'Name'" sortable="'name'"></td>
+        <td ng-bind="cluster.key" title="'Key'" sortable="'key'" class="breakword"></td>
+        <td ng-bind="cluster.management_ip" title="'Management IP'" sortable="'management_ip'" class="breakword"></td>
+        <td ng-bind="cluster.provisioning_state" title="'Provisioning State'" sortable="'provisioning_state'" class="breakword capitalize"></td>
+        <!-- <td ng-bind="cluster.rest_uri" title="'REST URI'" sortable="'rest_uri'" class="breakword"></td> -->
+        <td ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="clusters.edit({clusterId: cluster.clusterId})">Edit</button></td>
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="clusters.view({clusterId: cluster.clusterId})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

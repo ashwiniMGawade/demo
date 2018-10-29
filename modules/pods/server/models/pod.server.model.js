@@ -41,6 +41,10 @@ var PodSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'Site'
   },
+  cluster_keys: [{
+    type: Schema.ObjectId,
+    ref: 'ontap_clusters'
+  }],
   user: {
     type: Schema.ObjectId,
     ref: 'User'

@@ -64,6 +64,7 @@ var sendServerResponse = function(res, server) {
 exports.create = function (req, res) {
   var serverCreateJob;
   var dbWfa = require('./servers.server.wfa.db.read');
+  var fetchInfo = require('./servers.server.fetchInfo');
   var clientWfa = require('./servers.server.wfa.svm.create');
   var server = new Server();
 
@@ -129,11 +130,13 @@ exports.create = function (req, res) {
       logger.info('SVM Create: Subscription.findById(): subscription: ' + util.inspect(subscription, {showHidden: false, depth: null}));
 
       // Get Pod Code and Cluster
-      dbWfa.getAdminVserver(site.code, subscription.code, function (err, adminVserver) {
+      //dbWfa.getAdminVserver(site.code, subscription.code, function (err, adminVserver) {
+      fetchInfo.getAdminVserver(site.id, site.code, subscription.code, function (err, adminVserver) {
         if(err) {
           logger.error('SVM Create: Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err); 
           return respondError(res, 400, 'Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err);
         } else {
+          logger.info("after fetch info adminvserver details", adminVserver);
           // Get Pod
           Pod.findByCode(adminVserver.podCode, function (err, podResults) {
             if (podResults.length === 0) {
@@ -192,7 +195,6 @@ exports.create = function (req, res) {
                   if(server.subnet.split('/')[0]!==cidrSubnet.networkAddress){
                     return respondError(res, 400, "Valid IP for subnet after masking is "+cidrSubnet.networkAddress);
                   }
-            
                   //Validating the gateway is in subnet
                   if(server.gateway){
                     if(!cidrSubnet.contains(server.gateway)){
@@ -277,11 +279,12 @@ exports.create = function (req, res) {
                                 logger.info('SVM Create: pod.save() failed: ' + err);
                               } else {
                                 logger.info('SVM Create: pod.save() succeeded.');
+                                server.pod = pod;
+                                console.log(adminVserver, "before calling createsvm");
+                                createSvm(adminVserver.clusterName);
                               }
                             });
-                            server.pod = pod;
-                
-                            createSvm(adminVserver.clusterName);
+                            
                           }
                         });
                       }
@@ -298,6 +301,7 @@ exports.create = function (req, res) {
 
 
   function createSvm(clusterName) {
+    console.log("called create svm");
     var jobId;
     var args = {
       vlan: server.vlan,
@@ -316,20 +320,16 @@ exports.create = function (req, res) {
         logger.info('SVM Create: Failed to create SVM, Error: ' + err);
         server.status = 'Contact Support';
         serverCreateJob.update('Failed', 'Failed to create SVM, Error: ' + err, server);
-        server.save(function (err) {
-          if (err) {
-            logger.info('SVM Create: Failed to Save, Error: ' + err);
-          }
-        });
+        saveServer(server);
       } else {
         jobId = resWfa.jobId;
         logger.info('SVM Create: Response from WFA: ' + util.inspect(resWfa, {showHidden: false, depth: null}));
-        untilCreated(jobId);
+        untilCreated(jobId, clusterName);
       }
     });
   }
 
-  function untilCreated(jobId) {
+  function untilCreated(jobId, clusterName) {
     var args = {
       jobId: jobId
     };
@@ -339,56 +339,37 @@ exports.create = function (req, res) {
         logger.info('SVM Create: Failed to obtain status, Error: ' + err);
         server.status = 'Contact Support';
         serverCreateJob.update('Failed', 'Failed to Obtain Status, Error: ' + err, server);
-        server.save(function (err) {
-          if (err) {
-            logger.info('SVM Create: Failed to Save, Error: ' + err);
-          }
-        });
+        saveServer(server);
       } else {
         if (resWfa.jobStatus === 'FAILED') {
           logger.info('SVM Create: Failed to create, Job ID: ' + jobId);
           server.status = 'Contact Support';
           serverCreateJob.update('Failed', 'Recieved Failed Status from WFA, Error: ' + err, server);
-          server.save(function (err) {
-            if (err) {
-              logger.info('SVM Create: Failed to Save, Error: ' + err);
-            }
-          });
-          getOutputs(jobId);
+          saveServer(server);
+          getOutputs(jobId, null);
         } else if (resWfa.jobStatus !== 'COMPLETED') {
           logger.info('SVM Create: Not completed yet, polling again in 30 seconds, Job ID: ' + jobId);
-          setTimeout(function () { untilCreated(jobId); }, config.wfa.refreshRate);
+          setTimeout(function () { untilCreated(jobId, clusterName); }, config.wfa.refreshRate);
         } else {
-          getOutputs(jobId);
+          getOutputs(jobId, clusterName);
         }
       }
     });
   }
 
-  function getOutputs(jobId) {
-    var args = {
-      jobId: jobId
-    };
-
-    clientWfa.svmCreateOut(args, function (err, resWfa) {
+  function getUUIDs(server, clusterName) {
+    dbWfa.getUUIDs(server.code, clusterName, function(err, resDB) {
       if (err) {
-        logger.info('SVM Create: Failed to obtain output, Error: ' + err);
+        logger.info('SVM Create: Failed to obtain output related UUID, Error: ' + err);
         server.status = 'Contact Support';
         serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
-        server.save(function (err) {
-          if (err) {
-            logger.info('SVM Create: Failed to Save, Error: ' + err);
-          }
-        });
+        saveServer(server);
       } else {
-        if (resWfa) {
-          if (server.managed === 'Customer') {
-            server.ipVirtClus = resWfa.ipVirtClus;
-          }
+        if (resDB) {
+          server.ontap_cluster_uuid = resDB.ontap_cluster_uuid;
+          server.ontap_vserver_uuid = resDB.ontap_vserver_uuid;
+          server.ontap_vserver_key = resDB.ontap_vserver_key;
 
-          server.ipMgmt = resWfa.ipMgmt;
-          server.code = resWfa.code;
-          server.status = 'Operational';
           server.save(function (err) {
             if (err) {
               logger.info('SVM Create: Failed to Save, Error: ' + err);
@@ -399,15 +380,52 @@ exports.create = function (req, res) {
             }
           });
         } else {
+           logger.info('SVM Create: No output parameters: Response from db: '+ resDB);
+           setTimeout(function () { getUUIDs(server, clusterName); }, config.wfa.refreshRate);          
+        }
+      }
+    });
+  }
+
+  function getOutputs(jobId, clusterName) {
+    var args = {
+      jobId: jobId
+    };
+
+    clientWfa.svmCreateOut(args, function (err, resWfa) {
+      if (err) {
+        logger.info('SVM Create: Failed to obtain output, Error: ' + err);
+        server.status = 'Contact Support';
+        serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
+        saveServer(server);
+      } else {
+        if (resWfa) {
+          if (server.managed === 'Customer') {
+            server.ipVirtClus = resWfa.ipVirtClus;
+          }
+
+          server.ipMgmt = resWfa.ipMgmt;
+          server.code = resWfa.code;
+          server.status = 'Operational';
+
+          // get vserver_uuid, cluster_uuid, storage_vm_key from the mysql db read
+
+          getUUIDs(server, clusterName);
+                   
+        } else {
           logger.info('SVM Create: No output parameters: Response from WFA: '+ resWfa);
           server.status = 'Contact Support';
           serverCreateJob.update('Failed', 'No Output parameters recieved' , server);
-          server.save(function (err) {
-            if (err) {
-              logger.info('SVM Create: Failed to Save, Error: ' + err);
-            }
-          });
+          saveServer(server);
         }
+      }
+    });
+  }
+
+  function saveServer(server) {
+    server.save(function (err) {
+      if (err) {
+        logger.info('SVM Create: Failed to Save, Error: ' + err);
       }
     });
   }
@@ -420,9 +438,13 @@ exports.read = function (req, res) {
   var dbWfa = require('./servers.server.wfa.db.read');
   var server = req.server.toObject();
 
-  server.iopsTotal = '0';
-  server.volumesCapacityTotal = '0';
-  server.volumesUsedTotal = '0';
+  server.iopsTotal = {
+    "standard": 0,
+    "premium": 0,
+    "performance":0
+  };
+
+  server.volumesCapacityTotal = 0;
 
   server.serverId = server._id;
 
@@ -454,31 +476,64 @@ exports.read = function (req, res) {
   delete server._id;
   delete server.__v;
 
-  dbWfa.svmRead(req.server.code, function (err, svm) {
+  Storageunit.find({server:server.serverId})
+  .populate('storagegroup')
+  .exec(function(err, storageunits){
     if (err) {
       logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
     } else {
-      server.volumesName = svm.volumesName;
-      server.volumesCapacity = svm.volumesCapacity;
-      server.volumesUsed = svm.volumesUsed;
-      server.volumesTier = svm.volumesTier;
-
-      if (svm.iopsTotal) {
-        server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
+      console.log("storageunits", storageunits);
+      if (storageunits.length ==0) {
+        server.volumesCapacityTotal = 0;
+      } else {
+        _.each(storageunits, function(su){
+          //for now ignoring the status of the storageunit
+         // if (su.status == 'Operational') {
+            server.volumesCapacityTotal += su.sizegb;
+            server.iopsTotal[su.storagegroup.tier] = server.iopsTotal[su.storagegroup.tier] + su.sizegb;
+          //}          
+        });
+        server.iopsTotal = calculateIopsFromSuSize(server.iopsTotal);
       }
-
-      if (svm.volumesCapacity) {
-        server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
-      }
-
-      if (svm.volumesUsed) {
-        server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
-      }
+      logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
+      sendServerResponse(res, server);
     }
-
-    logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
-    sendServerResponse(res, server);
   });
+
+
+  function calculateIopsFromSuSize(iops_object) {
+    iops_object['standard'] = iops_object['standard'] * 128/ 1000;
+    iops_object['premium'] = iops_object['premium'] * 1536/ 1000;
+    iops_object['performance'] = iops_object['performance'] * 6144/ 1000;
+    console.log("iops object", iops_object);
+    return iops_object;
+  }
+
+  // dbWfa.svmRead(req.server.code, function (err, svm) {
+  //   if (err) {
+  //     logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
+  //   } else {
+  //     server.volumesName = svm.volumesName;
+  //     server.volumesCapacity = svm.volumesCapacity;
+  //     server.volumesUsed = svm.volumesUsed;
+  //     server.volumesTier = svm.volumesTier;
+
+  //     if (svm.iopsTotal) {
+  //       server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
+  //     }
+
+  //     if (svm.volumesCapacity) {
+  //       server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
+  //     }
+
+  //     if (svm.volumesUsed) {
+  //       server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
+  //     }
+  //   }
+
+  //   logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
+  //   sendServerResponse(res, server);
+  // });
 };
 
 /**

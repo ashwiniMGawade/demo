@@ -1,0 +1,11 @@
+.word-break-all {
+    word-break: break-all;
+}
+
+.mLeft0 {
+	margin-left: 0;
+}
+
+.row.show-grid label[for="policySchedule"]{
+	margin-left: -15px;
+}

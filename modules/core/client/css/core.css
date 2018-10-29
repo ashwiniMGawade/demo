@@ -594,6 +594,9 @@ ul.messages {
    margin-top :25px;
    float : left;
 }
+.red {
+  color: #a94442
+}
 
 .form-group.required label:after, .star:after{
   color: #e32;
