@@ -68,7 +68,7 @@ describe('Subtenant Model Unit Tests:', function () {
   describe('Method Save', function () {
     it('should be able to save & delete without problems', function (done) {
       this.timeout(20000);
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.not.exist(err);
         subtenant.remove(function (err) {
           should.not.exist(err);
@@ -79,7 +79,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without subtenant code', function (done) {
       subtenant.code = '';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -87,7 +87,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without subtenant name', function (done) {
       subtenant.name = '';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -95,7 +95,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without tenant name', function (done) {
       subtenant.tenant = '';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -115,7 +115,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save subtenant code less than 3 char', function (done) {
       subtenant.code = 'TT';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -123,7 +123,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save invalid subtenant code ie. 123:', function (done) {
       subtenant.code = '123:';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -131,7 +131,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save invalid subtenant code ie. a123A', function (done) {
       subtenant.code = 'a123A';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -139,7 +139,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save invalid subtenant code ie. a123@', function (done) {
       subtenant.code = 'a123@';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -147,7 +147,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save subtenant code more than 8 char', function (done) {
       subtenant.code = 'TTTTTTTTT';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
@@ -155,7 +155,7 @@ describe('Subtenant Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save subtenant name more than 64 char', function (done) {
       subtenant.name = 'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT';
-      return subtenant.save(function (err) {
+      subtenant.save(function (err) {
         should.exist(err);
         done();
       });
