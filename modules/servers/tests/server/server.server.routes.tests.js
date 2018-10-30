@@ -9,6 +9,7 @@ var _ = require('lodash'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
   Pod = mongoose.model('Pod'),
+  Cluster = mongoose.model('ontap_clusters'),
   Tenant = mongoose.model('Tenant'),
   Site = mongoose.model('Site'),
   Icr = mongoose.model('Icr'),
@@ -22,7 +23,7 @@ var _ = require('lodash'),
 /**
  * Globals
  */
-var app, agent, credentials, user, server, site, pod, subtenant;
+var app, agent, credentials, user, server, site, pod, subtenant, cluster;
 var couchdbvFasCreate, couchdbvFasReadStatus, subscription, userRoot, credentialsRoot, icr;
 var partnerTenant, tenant1, tenant2, server1, server2, subscription2, subtenant2;
 
@@ -33,7 +34,7 @@ describe('Server CRUD tests', function () {
   before(function (done) {
     // Get application
     this.timeout(10000);
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
 
     partnerTenant = new Tenant({
@@ -77,6 +78,15 @@ describe('Server CRUD tests', function () {
     subtenant2 = new Subtenant({
       name: 'Subtenant Name2',
       code: 'testsub2'
+    });
+
+    cluster = new Cluster({
+      name: 'Cluster Title',
+      key: 'cluster',
+      management_ip:"10.20.30.40",
+      provisioning_state:"open",
+      rest_uri:"http://sample.com",
+      user: user
     });
 
     partnerTenant.save(function(err){
@@ -279,60 +289,64 @@ describe('Server CRUD tests', function () {
         site.user = mongoose.Types.ObjectId(user._id);
         site.save(function(err) {
           should.not.exist(err);
-          pod.site = site;
-          pod.save(function(err) {
+          cluster.save(function(err) {
             should.not.exist(err);
-            subscription.site = site;
-            subscription.tenant = tenant1;
-            subscription.save(function(err) {
+            pod.site = site;
+            pod.cluster_keys = [mongoose.Types.ObjectId(cluster._id)];
+            pod.save(function(err) {
               should.not.exist(err);
-              subscription2.site = site;
-              subscription2.tenant = tenant2;
-              subscription2.save(function(err){
+              subscription.site = site;
+              subscription.tenant = tenant1;
+              subscription.save(function(err) {
                 should.not.exist(err);
-                server = {
-                  name: 'Test Server',
-                  siteId: mongoose.Types.ObjectId(site._id),
-                  site: site,
-                  subtenantId: mongoose.Types.ObjectId(subtenant._id),
-                  subtenant: subtenant,
-                  subnet: '10.20.30.64/26',
-                  user:mongoose.Types.ObjectId(user._id),
-                  managed: 'Portal',
-                  gateway:'10.20.30.122',
-                  code:'code',
-                  subscriptionId:mongoose.Types.ObjectId(subscription._id),
-                  subscription:subscription
-                };
-                server1 = new Server({
-                  name: 'Test Server1',
-                  site: site,
-                  subtenant: subtenant,
-                  subnet: '10.20.30.64/26',
-                  managed: 'Portal',
-                  gateway:'10.20.30.122',
-                  code:'code',
-                  tenant: tenant1,
-                  subscription:subscription,
-                  status: 'Operational'
-                });
-                server2 = new Server({
-                  name: 'Test Server2',
-                  site: site,
-                  subtenant: subtenant2,
-                  subnet: '10.20.30.64/26',
-                  managed: 'Portal',
-                  gateway:'10.20.30.122',
-                  code:'code',
-                  tenant: tenant2,
-                  subscription:subscription2,
-                  status: 'Operational'
-                });
-                server1.save(function(err){
+                subscription2.site = site;
+                subscription2.tenant = tenant2;
+                subscription2.save(function(err){
                   should.not.exist(err);
-                  server2.save(function(err){
+                  server = {
+                    name: 'Test Server',
+                    siteId: mongoose.Types.ObjectId(site._id),
+                    site: site,
+                    subtenantId: mongoose.Types.ObjectId(subtenant._id),
+                    subtenant: subtenant,
+                    subnet: '10.20.30.64/26',
+                    user:mongoose.Types.ObjectId(user._id),
+                    managed: 'Portal',
+                    gateway:'10.20.30.122',
+                    code:'code',
+                    subscriptionId:mongoose.Types.ObjectId(subscription._id),
+                    subscription:subscription
+                  };
+                  server1 = new Server({
+                    name: 'Test Server1',
+                    site: site,
+                    subtenant: subtenant,
+                    subnet: '10.20.30.64/26',
+                    managed: 'Portal',
+                    gateway:'10.20.30.122',
+                    code:'code',
+                    tenant: tenant1,
+                    subscription:subscription,
+                    status: 'Operational'
+                  });
+                  server2 = new Server({
+                    name: 'Test Server2',
+                    site: site,
+                    subtenant: subtenant2,
+                    subnet: '10.20.30.64/26',
+                    managed: 'Portal',
+                    gateway:'10.20.30.122',
+                    code:'code',
+                    tenant: tenant2,
+                    subscription:subscription2,
+                    status: 'Operational'
+                  });
+                  server1.save(function(err){
                     should.not.exist(err);
-                      done();
+                    server2.save(function(err){
+                      should.not.exist(err);
+                        done();
+                    });
                   });
                 });
               });

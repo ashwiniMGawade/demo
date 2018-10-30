@@ -42,7 +42,7 @@ exports.getAdminVserver = function (siteId, siteCode, subscriptionCode, res) {
           if (value.cluster_keys && value.cluster_keys.length > 0){
             _.forEach(value.cluster_keys, function(cluster) {
               if (cluster.provisioning_state == 'open') {
-                adminVserver.clusterName = cluster.name;
+                adminVserver.clusterName = cluster.key;
                 adminVserver.state = cluster.provisioning_state;
                 adminVserver.siteCode = siteCode;
                 adminVserver.podCode = value.code;

@@ -5,9 +5,7 @@ var defaultEnvConfig = require('./default');
 module.exports = {
   db: {
     uri: process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/mean-test',
-    options: {},
-    // Enable mongoose debug mode
-    debug: process.env.MONGODB_DEBUG || false
+    options: {}
   },
   log: {
     // logging with Morgan - https://github.com/expressjs/morgan
@@ -114,5 +112,30 @@ module.exports = {
         }
       }]
     }]
-  }
+  },
+  coverage: process.env.COVERAGE || false,
+  wfa: {
+    sgCreateJob: 'http://wfatestportal.com/sgCreate/jobs',
+    sgDeleteJob: 'http://wfatestportal.com/sgDelete/jobs',
+    sgUpdateJob: 'http://wfatestportal.com/sgUpdate/jobs',
+    suCreateJob: 'http://wfatestportal.com/suCreate/jobs',
+    suUpdateJob: 'http://wfatestportal.com/suUpdate/jobs',
+    suDeleteJob: 'http://wfatestportal.com/suDelete/jobs',
+    vFasCreateJob: 'http://wfatestportal.com/vFasCreate/jobs',
+    vFasUpdateJob: 'http://wfatestportal.com/vFasUpdate/jobs',
+    vFasDeleteJob: 'http://wfatestportal.com/vFasDelete/jobs',
+    sql: {
+      connectionLimit : 5,
+      host: '10.128.113.180',
+      user: 'testuser',
+      password: 'Qwerty1234%',
+      database: 'cm_storage_test'
+    },
+  },
+  APIservice : {
+    'authorization' : 'Basic YWRtaW46TmV0YXBwITEyMw==',
+    'serverDetails' : 'https://apiservicetestportal.com/api/1.0/ontap/storage-vms',
+    'volumeDetails' : 'https://apiservicetestportal.com/api/1.0/ontap/volumes',
+    'snapshotBaseUrl' : 'https://apiservicetestportal.com/api/1.0/ontap/snapshots'
+  },
 };
