@@ -35,7 +35,7 @@ describe('Storageunit CRUD tests', function () {
 
   before(function (done) {
     // Get application
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
 
     done();
@@ -158,7 +158,7 @@ describe('Storageunit CRUD tests', function () {
     storagegroup1 = new Storagegroup({
       name: 'Test Storage one',
       code: 'testcode1',
-      tier: 'ultra',
+      tier: 'standard',
       snapshotPolicy: '7daily1810',
       status: 'Operational'
     });
@@ -166,7 +166,7 @@ describe('Storageunit CRUD tests', function () {
     storagegroup2 = new Storagegroup({
       name: 'Test Storage two',
       code: 'testcode2',
-      tier: 'ultra',
+      tier: 'standard',
       snapshotPolicy: '7daily1810',
       status: 'Operational'
     });

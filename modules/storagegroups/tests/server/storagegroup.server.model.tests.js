@@ -118,7 +118,7 @@ describe('Storagegroup Model Unit Tests:', function () {
                     name: 'Test Storage group',
                     code: 'testsg',
                     server:server,
-                    tier:'ultra',
+                    tier:'standard',
                     snapshotPolicy:'7daily1810',
                     user:user
                   });
@@ -137,9 +137,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should not be able to save the storagegroup if invalid server is provided', function (done) {
       this.timeout(20000);
       storagegroup.server = user._id;
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.server.message.should.be.equal('Invalid Server ID');
         done();
       });
@@ -152,9 +151,8 @@ describe('Storagegroup Model Unit Tests:', function () {
       	user.tenant = tenant1._id;
       	user.save(function(err){
         	should.not.exist(err);
-          return storagegroup.save(function (err) {
+          storagegroup.save(function (err) {
 	          should.exist(err);
-	          err.message.should.be.equal('Storagegroup validation failed');
 	          err.errors.server.message.should.be.equal('Invalid Server ID');
             tenant1.remove();
 	          done();
@@ -165,7 +163,7 @@ describe('Storagegroup Model Unit Tests:', function () {
 
     it('should be able to save & delete without problems', function (done) {
       this.timeout(10000);
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.not.exist(err);
         storagegroup.remove(function (err) {
           should.not.exist(err);
@@ -177,7 +175,7 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to save & delete without problems with valid sanpshot policy Eg: 12hourly-7daily1810-5weekly-1monthly', function (done) {
       this.timeout(10000);
       storagegroup.snapshotPolicy = '12hourly-7daily1810-5weekly-1monthly';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.not.exist(err);
         storagegroup.remove(function (err) {
           should.not.exist(err);
@@ -189,7 +187,7 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to save & delete without problems with valid sanpshot policy Eg: 12hourly-7daily1810-1monthly', function (done) {
       this.timeout(10000);
       storagegroup.snapshotPolicy = '12hourly-7daily1810-1monthly';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.not.exist(err);
         storagegroup.remove(function (err) {
           should.not.exist(err);
@@ -201,7 +199,7 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to save & delete without problems with valid sanpshot policy Eg: 7daily0210', function (done) {
       this.timeout(10000);
       storagegroup.snapshotPolicy = '7daily0210';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.not.exist(err);
         storagegroup.remove(function (err) {
           should.not.exist(err);
@@ -212,7 +210,7 @@ describe('Storagegroup Model Unit Tests:', function () {
 
     it('should auto populate Tenant, subtenant', function (done) {
       this.timeout(10000);
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.not.exist(err);
         should.exist(storagegroup.tenant);
         should.exist(storagegroup.subtenant);
@@ -226,9 +224,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save without storagegroup name', function (done) {
       this.timeout(10000);
       storagegroup.name = '';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.name.message.should.be.equal('Storage Group name required');
         done();
       });
@@ -237,9 +234,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save without storagegroup code', function (done) {
       this.timeout(10000);
       storagegroup.code = '';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.code.message.should.be.equal('Storage Group code required');
         done();
       });
@@ -248,9 +244,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save without storagegroup tier', function (done) {
       this.timeout(10000);
       storagegroup.tier = null;
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.tier.message.should.be.equal('Storage Group Tier required');
         done();
       });
@@ -259,9 +254,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save without storagegroup snapshotPolicy', function (done) {
       this.timeout(10000);
       storagegroup.snapshotPolicy = null;
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.snapshotPolicy.message.should.be.equal('Storage Group Snapshot Policy is required');
         done();
       });
@@ -270,9 +264,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when storage unit code includes other than alphanumeric and underscoree.g: Storage Group%', function (done) {
       this.timeout(10000);
       storagegroup.code='Storage Group+@%';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.code.message.should.be.equal('Storage Group code can only include alphanumeric(lowercase) & underscore (First Char must be alphabetical)');
         done();
       });
@@ -281,9 +274,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when storage unit name includes other than alphanumeric, space and dash.g: Storage Group%', function (done) {
       this.timeout(10000);
       storagegroup.name='Storageun+@it%';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.name.message.should.be.equal('Storage Group name can only include alphanumeric, space & dash');
         done();
       });
@@ -292,9 +284,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save with storagegroup name less than 3 chars', function (done) {
       this.timeout(10000);
       storagegroup.name = "te";
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.name.message.should.be.equal('Minimum 3 char required');
         done();
       });
@@ -303,9 +294,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save with storagegroup code less than 3 chars', function (done) {
       this.timeout(10000);
       storagegroup.code = "te";
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.code.message.should.be.equal('Minimum 3 char required');
         done();
       });
@@ -314,9 +304,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save with storagegroup code greater than 32 chars', function (done) {
       this.timeout(10000);
       storagegroup.code = "tesdfsdfsfsfdssfefdssdfddddddddddddddddd";
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.code.message.should.be.equal('Maximum 32 char allowed');
         done();
       });
@@ -326,9 +315,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save with storagegroup tier other than allowed value', function (done) {
       this.timeout(10000);
       storagegroup.tier = 'test';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.tier.message.should.be.equal('`test` not a valid value for Tier');
         done();
       });
@@ -337,9 +325,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save with storagegroup snapshotPolicy other than allowed value', function (done) {
       this.timeout(10000);
       storagegroup.snapshotPolicy = 'test';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.snapshotPolicy.message.should.be.equal('Invalid SnapshotPolicy');
         done();
       });
@@ -348,9 +335,8 @@ describe('Storagegroup Model Unit Tests:', function () {
     it('should be able to show error when try to save with storagegroup status other than allowed value', function (done) {
       this.timeout(10000);
       storagegroup.status = 'test';
-      return storagegroup.save(function (err) {
+      storagegroup.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storagegroup validation failed');
         err.errors.status.message.should.be.equal('`test` not a valid value for Status');
         done();
       });
