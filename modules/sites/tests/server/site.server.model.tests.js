@@ -42,7 +42,7 @@ describe('Site Model Unit Tests:', function () {
   describe('Method Save', function () {
     it('should be able to save without problems', function (done) {
       this.timeout(10000);
-      return site.save(function (err) {
+      site.save(function (err) {
         should.not.exist(err);
         done();
       });
@@ -51,7 +51,7 @@ describe('Site Model Unit Tests:', function () {
     it('should be able to show an error when try to save without name', function (done) {
       site.name = '';
 
-      return site.save(function (err) {
+      site.save(function (err) {
         should.exist(err);
         done();
       });
@@ -60,7 +60,7 @@ describe('Site Model Unit Tests:', function () {
     it('should be able to show an error when try to save without code', function (done) {
       site.code = '';
 
-      return site.save(function (err) {
+      site.save(function (err) {
         should.exist(err);
         done();
       });
@@ -69,7 +69,7 @@ describe('Site Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. 1234a', function (done) {
       site.code = '1234a';
 
-      return site.save(function (err) {
+      site.save(function (err) {
         should.exist(err);
         done();
       });
@@ -78,7 +78,7 @@ describe('Site Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. 123_', function (done) {
       site.code = '123_';
 
-      return site.save(function (err) {
+      site.save(function (err) {
         should.exist(err);
         done();
       });
@@ -87,7 +87,7 @@ describe('Site Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. Asdd', function (done) {
       site.code = 'Asdd';
 
-      return site.save(function (err) {
+      site.save(function (err) {
         should.exist(err);
         done();
       });
@@ -96,7 +96,7 @@ describe('Site Model Unit Tests:', function () {
     it('should be able to show an error when try to save with invalid code ie. ad@a', function (done) {
       site.code = 'ad@a';
 
-      return site.save(function (err) {
+      site.save(function (err) {
         should.exist(err);
         done();
       });

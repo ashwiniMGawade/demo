@@ -112,7 +112,7 @@ describe('Storage Unit Model Unit Tests:', function () {
                     name: 'Test Storage group',
                     code: 'testsg',
                     server:server,
-                    tier:'ultra',
+                    tier:'standard',
                     snapshotPolicy:'7daily1810',
                     status:'Operational'
                   });
@@ -160,7 +160,6 @@ describe('Storage Unit Model Unit Tests:', function () {
         should.not.exist(err);
         storageunit.save(function (err) {
           should.exist(err);
-          err.message.should.be.equal('Storageunit validation failed');
           err.errors.storagegroup.message.should.be.equal('Storagegroup\'s Server is not enabled for specified Protocol');
           done();
         });
@@ -172,7 +171,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.storagegroup = server._id;
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.storagegroup.message.should.be.equal('Invalid Storagegroup ID');
         done();
       });
@@ -183,7 +181,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.acl = "1.1.1";
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.acl.message.should.be.equal('Invalid ACL');
         done();
       });
@@ -195,7 +192,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.acl = "12.122.123.121,";
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.acl.message.should.be.equal('Invalid ACL');
         done();
       });
@@ -207,7 +203,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.acl = "12.122.123.121/45";
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.acl.message.should.be.equal('Invalid ACL');
         done();
       });
@@ -285,7 +280,6 @@ describe('Storage Unit Model Unit Tests:', function () {
           should.not.exist(err);
           storageunit.save(function (err) {
             should.exist(err);
-            err.message.should.be.equal('Storageunit validation failed');
             err.errors.storagegroup.message.should.be.equal('Storage Group needs to be Operational');
             done();
           });
@@ -346,7 +340,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.name = '';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.name.message.should.be.equal('Storage Unit name required');
         done();
       });
@@ -357,7 +350,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.code = '';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.code.message.should.be.equal('Storage Unit code required');
         done();
       });
@@ -368,7 +360,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.sizegb = null;
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.sizegb.message.should.be.equal('Storage Unit size required');
         done();
       });
@@ -379,7 +370,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.sizegb = 111.11;
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.sizegb.message.should.be.equal('111.11 is not an integer value for size');
         done();
       });
@@ -390,7 +380,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.protocol = null;
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.protocol.message.should.be.equal('Storage Unit protocol required');
         done();
       });
@@ -401,7 +390,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.code='Storageunit+@%';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.code.message.should.be.equal('Storage Unit code can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)');
         done();
       });
@@ -412,7 +400,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.code='su';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.code.message.should.be.equal('Storage unit code, Minimum 3 char required');
         done();
       });
@@ -423,7 +410,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.code='suasdfasdfasdfasdfasdfasdfsadfasfdasdfsadfasdfasdfsdafasdfasdfd';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.code.message.should.be.equal('Storage unit code, Maximum 32 char allowed');
         done();
       });
@@ -434,7 +420,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.name='Storageun+@it%';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.name.message.should.be.equal('Name can only include dash, space and alphanumeric characters');
         done();
       });
@@ -445,7 +430,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.name='su';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.name.message.should.be.equal('Storage unit name, Minimum 3 char required');
         done();
       });
@@ -456,7 +440,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.name='suasdfasdfasdfasdfasdfasdfsadfasfdasdfsadfasdfasdfdfgdgdfsgsdgsdfgsdfgsdfgsdffgssdafasdfasdfd';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.name.message.should.be.equal('Storage unit name, Maximum 64 char allowed');
         done();
       });
@@ -467,7 +450,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.sizegb = 98;
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.sizegb.message.should.be.equal('Storage Unit Size should be greater than or equal to 100');
         done();
       });
@@ -478,7 +460,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.sizegb = 16385;
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.sizegb.message.should.be.equal('Storage Unit Size should be lesser than or equal to 16384');
         done();
       });
@@ -490,7 +471,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.protocol = 'test';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.protocol.message.should.be.equal('`test` not a valid value for protocol');
         done();
       });
@@ -502,7 +482,6 @@ describe('Storage Unit Model Unit Tests:', function () {
       storageunit.protocol = 'iscsi';
       storageunit.save(function (err) {
         should.exist(err);
-        err.message.should.be.equal('Storageunit validation failed');
         err.errors.lunOs.message.should.be.equal('`test` not a valid value for lunOS');
         done();
       });

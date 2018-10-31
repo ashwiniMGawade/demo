@@ -128,7 +128,7 @@ describe('Server Model Unit Tests:', function () {
   describe('Method Save', function () {
     it('should be able to save & delete without problems', function (done) {
       this.timeout(10000);
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         server.remove(function (err) {
           should.not.exist(err);
@@ -139,7 +139,7 @@ describe('Server Model Unit Tests:', function () {
 
     it('should auto populate Tenant & vLans during save', function (done) {
       this.timeout(10000);
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         should.exist(server.tenant);
         should.exist(server.vlan);
@@ -153,7 +153,7 @@ describe('Server Model Unit Tests:', function () {
     it('should give error when vlan is non-integer value', function (done) {
       this.timeout(10000);
       server.vlan = 11.11;
-      return server.save(function (err) {
+      server.save(function (err) {
         console.log(err);
         should.exist(err);
         done();
@@ -163,7 +163,7 @@ describe('Server Model Unit Tests:', function () {
     it('should save server when vlan is integer value', function (done) {
       this.timeout(10000);
       server.vlan = 11;
-      return server.save(function (err) {
+      server.save(function (err) {
         console.log(err);
         console.log(server.vlan);
         should.not.exist(err);
@@ -174,7 +174,7 @@ describe('Server Model Unit Tests:', function () {
     it('should give error when ipVirtClus is Invalid IP', function (done) {
       this.timeout(10000);
       server.ipVirtClus = 11.11;
-      return server.save(function (err) {
+      server.save(function (err) {
         console.log(err);
         should.exist(err);
         done();
@@ -184,7 +184,7 @@ describe('Server Model Unit Tests:', function () {
     it('should save server when ipVirtClus is valid IP', function (done) {
       this.timeout(10000);
       server.ipVirtClus = '11.11.11.11';
-      return server.save(function (err) {
+      server.save(function (err) {
         console.log(err);
         console.log(server.vlan);
         should.not.exist(err);
@@ -195,7 +195,7 @@ describe('Server Model Unit Tests:', function () {
     it('should give error when ipMgmt is Invalid IP', function (done) {
       this.timeout(10000);
       server.ipVirtClus = 11.11;
-      return server.save(function (err) {
+      server.save(function (err) {
         console.log(err);
         should.exist(err);
         done();
@@ -205,7 +205,7 @@ describe('Server Model Unit Tests:', function () {
     it('should save server when ipMgmt is valid IP', function (done) {
       this.timeout(10000);
       server.ipMgmt = ' 11.11.11.11';
-      return server.save(function (err) {
+      server.save(function (err) {
         console.log(err);
         console.log(server.vlan);
         should.not.exist(err);
@@ -215,7 +215,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save without server name', function (done) {
       this.timeout(10000);
       server.name='';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -224,7 +224,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server name includes other than alphanumeric, space & dash - e.g: Server%', function (done) {
       this.timeout(10000);
       server.name='Server%';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -233,7 +233,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server name includes other than alphanumeric, space & dash - e.g: Se*(-)', function (done) {
       this.timeout(10000);
       server.name='Se*(-)';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -242,7 +242,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server name includes other than alphanumeric, space & dash - e.g: Ser+@1', function (done) {
       this.timeout(10000);
       server.name='Ser+@1';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -251,7 +251,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to save when server name includes only alphanumeric, space & dash - e.g: Server Name-1', function (done) {
       this.timeout(10000);
       server.name='Server Name-1';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         server.remove(function (err) {
           should.not.exist(err);
@@ -263,7 +263,7 @@ describe('Server Model Unit Tests:', function () {
     it('should not be able to save when server name is already present for the given tenant', function (done) {
       this.timeout(10000);
       server.name='Server Name-1';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         var server1 = new Server({
           name: server.name,
@@ -288,7 +288,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save without site', function (done) {
       this.timeout(10000);
       server.site='';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -297,7 +297,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save with invalid site', function (done) {
       this.timeout(10000);
       server.site= user._id;
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -306,7 +306,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save without subtenant', function (done) {
       this.timeout(10000);
       server.subtenant='';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -315,7 +315,7 @@ describe('Server Model Unit Tests:', function () {
      it('should be able to show error when try to save with invalid subtenant', function (done) {
       this.timeout(10000);
       server.subtenant= user._id;
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -324,7 +324,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save without subnet', function (done) {
       this.timeout(10000);
       server.subnet='';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -333,7 +333,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save without subscription', function (done) {
       this.timeout(10000);
       server.subscription= '';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -342,7 +342,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when try to save with invalid subscription', function (done) {
       this.timeout(10000);
       server.subscription= user._id;
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -387,7 +387,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 0.10.10.9', function (done) {
       this.timeout(10000);
       server.subnet='0.10.10.9';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -396,7 +396,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 10.10.10.1144/26', function (done) {
       this.timeout(10000);
       server.subnet='10.10.10.1144/24';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -405,7 +405,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 254.255.10.64/28', function (done) {
       this.timeout(10000);
       server.subnet='254.255.10.64/28';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -414,7 +414,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 128-128-0-64/26', function (done) {
       this.timeout(10000);
       server.subnet='128-128-0-64/26';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -423,7 +423,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 128-128-0-64/26', function (done) {
       this.timeout(10000);
       server.subnet='128-128-0-64/26';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -432,7 +432,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 192.168.1.1/29', function (done) {
       this.timeout(10000);
       server.subnet='192.168.1.1/29';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -441,7 +441,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 19216812131/26', function (done) {
       this.timeout(10000);
       server.subnet='19216812131/26';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -450,7 +450,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server subnet is not in CIDR notation - e.g: 192.168.1.64', function (done) {
       this.timeout(10000);
       server.subnet='192.168.1.64';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -459,7 +459,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server managed is other than Portal or Customer - e.g: Client', function (done) {
       this.timeout(10000);
       server.managed='Client';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -468,7 +468,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server managed is other than Portal or Customer - e.g: Partner', function (done) {
       this.timeout(10000);
       server.managed='Partner';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -477,7 +477,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server status is other than Creating, Updating, Operational, Deleting, Contact Support - e.g: Created', function (done) {
       this.timeout(10000);
       server.managed='Created';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -486,7 +486,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server status is other than Creating, Updating, Operational, Deleting, Contact Support - e.g: Working', function (done) {
       this.timeout(10000);
       server.managed='Working';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -495,7 +495,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when server status is other than Creating, Updating, Operational, Deleting, Contact Support - e.g: Error', function (done) {
       this.timeout(10000);
       server.managed='Error';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -504,7 +504,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when cifsServerName includes other than alphanumeric & dash - e.g: cifs^$', function (done) {
       this.timeout(10000);
       server.cifsServername='cifs^$';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -513,7 +513,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when cifsServerName includes other than alphanumeric & dash - e.g: cifs-~+', function (done) {
       this.timeout(10000);
       server.cifsServername='cifs-~+';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -522,7 +522,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when cifsServerName includes other than alphanumeric & dash - e.g: cifs server1', function (done) {
       this.timeout(10000);
       server.cifsServername='cifs server1';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -531,7 +531,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to save when cifsServerName includes only alphanumeric(lowecase) & dash - e.g: cifs-servername', function (done) {
       this.timeout(10000);
       server.cifsServername='cifs-servername';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         server.remove(function (err) {
           should.not.exist(err);
@@ -543,7 +543,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when cifsDomain includes other than alphanumeric(lowecase), dot & dash - e.g: domain#`}`', function (done) {
       this.timeout(10000);
       server.cifsDomain='domain#`}';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -552,7 +552,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when cifsDomain includes other than alphanumeric(lowecase), dot & dash - e.g: (*domain name)', function (done) {
       this.timeout(10000);
       server.cifsDomain='(*domain name)';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -561,7 +561,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when cifsDomain includes other than alphanumeric(lowecase), dot & dash - e.g: cifs domain1', function (done) {
       this.timeout(10000);
       server.cifsDomain='cifs domain1';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -570,7 +570,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to save when cifsDomain includes only alphanumeric(lowecase), dot & dash - e.g: Cifs.domain-name', function (done) {
       this.timeout(10000);
       server.cifsDomain='cifs.domain-name';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         server.remove(function (err) {
           should.not.exist(err);
@@ -582,7 +582,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when iscsiAlias includes other than alphanumeric (lowercase) characters, dashes and dots - e.g: alias><;`', function (done) {
       this.timeout(10000);
       server.iscsiAlias='alias><;';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -591,7 +591,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when iscsiAlias includes other than alphanumeric (lowercase) characters, dashes and dots - e.g: alias name', function (done) {
       this.timeout(10000);
       server.iscsiAlias='alias name';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -600,7 +600,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when iscsiAlias includes other than alphanumeric (lowercase) characters, dashes and dots - e.g: alias_name|name', function (done) {
       this.timeout(10000);
       server.iscsiAlias='alias_name|name';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -609,7 +609,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to show error when iscsiAlias name less than 3 chars', function (done) {
       this.timeout(10000);
       server.iscsiAlias='al';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.exist(err);
         done();
       });
@@ -618,7 +618,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to save when iscsiAlias includes only alphanumeric (lowercase) characters, dashes and dots - e.g: iscsi-alias', function (done) {
       this.timeout(10000);
       server.iscsiAlias='iscsi-alias';
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         server.remove(function (err) {
           should.not.exist(err);
@@ -630,7 +630,7 @@ describe('Server Model Unit Tests:', function () {
     it('should be able to save when iscsiAlias field leave blank', function (done) {
       this.timeout(10000);
       server.iscsiAlias= null;
-      return server.save(function (err) {
+      server.save(function (err) {
         should.not.exist(err);
         server.remove(function (err) {
           should.not.exist(err);

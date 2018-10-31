@@ -92,7 +92,7 @@ describe('Subscription Model Unit Tests:', function () {
   describe('Method Save', function () {
     it('should be able to save & delete without problems', function (done) {
       this.timeout(10000);
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.not.exist(err);
         subscription.remove(function (err) {
           should.not.exist(err);
@@ -102,7 +102,7 @@ describe('Subscription Model Unit Tests:', function () {
     });
 
     it('should be able to save with same names in different tenant', function (done) {
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.not.exist(err);
         subscription1.save(function(err){
           should.not.exist(err);
@@ -113,7 +113,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with same names within a tenant', function (done) {
       subscription1.tenant = tenant._id;
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.not.exist(err);
         subscription1.save(function(err){
           should.exist(err);
@@ -124,7 +124,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with same code within a tenant', function (done) {
       subscription1.tenant = tenant;
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.not.exist(err);
         subscription1.code = subscription.code;
         subscription1.title = 'testtitle';
@@ -137,7 +137,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save name with invalid char', function (done) {
       subscription.name = 'sub_name';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -145,7 +145,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save name with less than 3 char', function (done) {
       subscription.name = 'su';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -153,7 +153,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save name with more than 32 char', function (done) {
       subscription.name = 'susdfdsfsdfsdgfsdfsdfsdfsdfsdfsdfdsfdsfdsfds';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -161,7 +161,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without code', function (done) {
       subscription.code = '';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -169,7 +169,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save code with invalid char ie.CaptialCode()', function (done) {
       subscription.code = 'CaptialCode()';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -177,7 +177,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save code with invalid char ie.123:', function (done) {
       subscription.code = '123:';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -185,7 +185,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save code with invalid char ie.a123A', function (done) {
       subscription.code = 'a123A';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -194,7 +194,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save code with less than 3 char', function (done) {
       subscription.code = 'as';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -202,7 +202,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save code with more than 16 char', function (done) {
       subscription.code = 'asdsadasdascvcvdsads';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -210,7 +210,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without a tenant', function (done) {
       subscription.tenant = null;
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -218,7 +218,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with a invalid tenant', function (done) {
       subscription.tenant = 'test';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -226,7 +226,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with a invalid site', function (done) {
       subscription.site = 'test';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -234,7 +234,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with a invalid partner', function (done) {
       subscription.partner = 'test';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -242,7 +242,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error or pass when try to save without a site based on feature settings', function (done) {
       subscription.site = null;
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         //if setting is enabled and mandatory error should exit
         if (featuresSettings.subscription.site.enabled && featuresSettings.subscription.site.mandatory) {
           should.exist(err);
@@ -255,7 +255,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error or pass when try to save without a description based on feature settings', function (done) {
       subscription.description = '';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         //if setting is enabled and mandatory error should exit
         if (featuresSettings.subscription.description.enabled && featuresSettings.subscription.description.mandatory) {
           should.exist(err);
@@ -268,7 +268,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error or pass when try to save without a url based on feature settings', function (done) {
       subscription.url = '';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         //if setting is enabled and mandatory error should exit
         if (featuresSettings.subscription.url.enabled && featuresSettings.subscription.url.mandatory) {
           should.exist(err);
@@ -281,7 +281,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error or pass when try to save without a subscription pack based on feature settings payment method', function (done) {
       subscription.storagePack = [];
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         //if setting is enabled and mandatory error should exit
         if (featuresSettings.paymentMethod.prePaid) {
           should.exist(err);
@@ -296,7 +296,7 @@ describe('Subscription Model Unit Tests:', function () {
     if (featuresSettings.paymentMethod.prePaid) {
       it('should be able to show an error when try to save with invalid a storage pack ie. {"class" : "test", "sizegb" : {"procured" : 1}}', function (done) {
         subscription.storagePack = [{"class" : "test", "sizegb" : {"procured" : 1}}];
-        return subscription.save(function (err) {  
+        subscription.save(function (err) {  
           //error saying test is not valid value for class
           should.exist(err);              
           done();
@@ -305,7 +305,7 @@ describe('Subscription Model Unit Tests:', function () {
 
       it('should be able to show an error when try to save with invalid a storage pack ie. {"class" : "ontap-capacity", "sizegb" : {}}', function (done) {
         subscription.storagePack = [{"class" : "ontap-capacity", "sizegb" : {}}];
-        return subscription.save(function (err) {  
+        subscription.save(function (err) {  
           //error saying size procured required
           should.exist(err);              
           done();
@@ -314,7 +314,7 @@ describe('Subscription Model Unit Tests:', function () {
 
       it('should be able to show an error when try to save with invalid a storage pack with negative ie. {"class" : "ontap-capacity", "sizegb" :{"procured" : -1}}', function (done) {
         subscription.storagePack = [{"class" : "ontap-capacity", "sizegb" : {"procured" : -1}}];
-        return subscription.save(function (err, subscription) {  
+        subscription.save(function (err, subscription) {  
           //error saying size procured should not be negative        
           should.exist(err);              
           done();
@@ -322,7 +322,7 @@ describe('Subscription Model Unit Tests:', function () {
       });
 
       it('should be able to show an error when try to update with invalid a storage pack with negative ie. {"class" : "ontap-capacity", "sizegb" :{"procured" : 1, "available" : -1}}', function (done) {
-        return subscription.save(function (err, subscription) {  
+        subscription.save(function (err, subscription) {  
           subscription.storagePack = [{"class" : "ontap-capacity", "sizegb" : {"procured" : 1, "available" : -1}}];
           subscription.save(function (err, subscription) {
             //error saying size available should not be negative        
@@ -337,7 +337,7 @@ describe('Subscription Model Unit Tests:', function () {
         {"class" : "ontap-capacity", "sizegb" : {"procured" : 1}},
         {"class" : "ontap-capacity", "sizegb" : {"procured" : 1}}
         ];
-        return subscription.save(function (err, subscription) {  
+        subscription.save(function (err, subscription) {  
           //error saying class already exist       
           should.exist(err);              
           done();
@@ -348,7 +348,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save description with invalid char', function (done) {
       subscription.description = '@desc_*&';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -356,7 +356,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save description with more than 256 char', function (done) {
       subscription.description = 'sdfsdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhfdshfksdfksdfksdjhfsdkjhfksdfhsdkjfhsdkfhskdfhsdkfhskdksdhfkdshfkdshfksdhfksdhfksdhfksdfhksdjhfksdhfksdfhsdkjfhsdkfhksdjfhsdjfhsdkjfhsdkfhsdkfndlkdncldsfejsdlxzjvfgsadjvnsdzljvndngsdngs';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -364,7 +364,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save url with more than 256 char', function (done) {
       subscription.url = 'sdfsdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhdfsdfsdhfksdhfksdhfksdhfksdhfsdfosdjfosdjfosdjfosdhfdshfsdhfdshfksdfksdfksdjhfsdkjhfksdfhsdkjfhsdkfhskdfhsdkfhskdksdhfkdshfkdshfksdhfksdhfksdhfksdfhksdjhfksdhfksdfhsdkjfhsdkfhksdjfhsdjfhsdkjfhsdkfhsdkfndlkdncldsfejsdlxzjvfgsadjvnsdzljvndngsdngs';
-      return subscription.save(function (err) {
+      subscription.save(function (err) {
         should.exist(err);
         done();
       });
@@ -372,7 +372,7 @@ describe('Subscription Model Unit Tests:', function () {
 
     it('should be able to get the json Object with removed security risk values to display', function (done) {
       this.timeout(10000);
-      return subscription.save(function (err, subResponse) {
+      subscription.save(function (err, subResponse) {
         should.not.exist(err);
         var obj =  JSON.parse(JSON.stringify(subResponse));
 

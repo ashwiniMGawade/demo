@@ -17,7 +17,7 @@ var should = require('should'),
   describe('Lookups route tests:', function() {
     before(function(done){
       // get the application
-      app = express.init(mongoose);
+      app = express.init(mongoose.connection.db);
       agent = request.agent(app);
       done();
     });
@@ -65,7 +65,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/status')
@@ -73,7 +73,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -91,7 +91,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/sgStatus')
@@ -99,7 +99,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -117,7 +117,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/suStatus')
@@ -125,7 +125,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -143,7 +143,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/managed')
@@ -151,7 +151,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -169,7 +169,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/protocol')
@@ -177,7 +177,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -196,7 +196,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/lunos')
@@ -204,7 +204,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -221,7 +221,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/icrstatus')
@@ -229,7 +229,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -247,7 +247,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/notificationCategory')
@@ -255,7 +255,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -273,7 +273,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/provider')
@@ -281,7 +281,7 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
@@ -299,7 +299,7 @@ var should = require('should'),
     .end(function (signinErr, signinRes) {
       // Handle signin error
       if (signinErr) {
-        return done(signinErr);
+        done(signinErr);
       }
         // Get an existing job
         agent.get('/api/lookups/storagePackClasses')
@@ -307,11 +307,11 @@ var should = require('should'),
           .end(function (lookupErr, lookupRes) {
             // Handle job update error
             if (lookupErr) {
-              return done(lookupErr);
+              done(lookupErr);
             }
             // Set assertions
             (lookupRes.body.length).should.be.above(0);
-            (lookupRes.body).should.containEql('ontap-value');
+            (lookupRes.body).should.containEql('ontap-standard');
             // Call the assertion callback
             done();
           });

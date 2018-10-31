@@ -22,7 +22,7 @@ describe('User CRUD tests', function () {
 
   before(function (done) {
     // Get application
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
 
     done();
@@ -2015,7 +2015,7 @@ describe('User CRUD tests', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         agent.post('/api/users/picture')
@@ -2025,7 +2025,7 @@ describe('User CRUD tests', function () {
           .end(function (userInfoErr, userInfoRes) {
             // Handle change profile picture error
             if (userInfoErr) {
-              return done(userInfoErr);
+              done(userInfoErr);
             }
 
             userInfoRes.body.should.be.instanceof(Object);

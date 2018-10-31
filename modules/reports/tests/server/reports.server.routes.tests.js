@@ -12,7 +12,7 @@ var should = require('should'),
   express = require(path.resolve('./config/lib/express')),
   config = require(path.resolve('./config/config'));
 
-var dir = config.reports.storage_path;
+  var dir = config.reports.storage_path;
 
 /**
  * Globals
@@ -25,7 +25,9 @@ var app, agent, credentials1, credentials2, user1, user2, tenant2, tenant1;
  */
 describe('Reports routes testcases', function () {
 
+
   if (!fs.existsSync(dir)) {
+    console.log("mkdir")
     fs.mkdirSync(dir);
   }
 
@@ -43,12 +45,13 @@ describe('Reports routes testcases', function () {
 
   before(function (done) {
     // Get application
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
     done();
   });
 
   beforeEach(function (done) {
+
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
@@ -156,7 +159,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // get report list
@@ -166,7 +169,7 @@ describe('Reports routes testcases', function () {
           .end(function (err, res) {
             // Handle err
             if (err) {
-              return done(err);
+              done(err);
             }
 
             // Get report
@@ -184,7 +187,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // get report list
@@ -194,7 +197,7 @@ describe('Reports routes testcases', function () {
           .end(function (err, res) {
             // Handle err
             if (err) {
-              return done(err);
+              done(err);
             }
             res.body.message.should.be.equal('Invalid Tenant ID');
             done();
@@ -210,7 +213,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // get report list
@@ -231,7 +234,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         var curDate = new Date();        
         curDate.setDate(curDate.getDate()+1);
@@ -259,7 +262,7 @@ describe('Reports routes testcases', function () {
   //     .end(function (signinErr, signinRes) {
   //       // Handle signin error
   //       if (signinErr) {
-  //         return done(signinErr);
+  //         done(signinErr);
   //       } 
        
   //       var curDate = new Date();
@@ -290,7 +293,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         } 
 
         tenant1.created = Date.now();
@@ -324,7 +327,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         } 
         var curDate = new Date();
         curDate.setDate(curDate.getDate()-2);
@@ -355,7 +358,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         } 
         var curDate = new Date();
         curDate.setDate(curDate.getDate());
@@ -386,7 +389,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         } 
        
         var curDate = new Date();
@@ -428,7 +431,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // get report
@@ -450,7 +453,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
 
         // get report list
@@ -471,7 +474,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         // get report list
         agent.get('/api/reports/dfaasreport_12344_20160403.csv')
@@ -491,7 +494,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         // get report list
         agent.get('/api/reports/dfaasreport_20160403.pdf')
@@ -512,7 +515,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         // get report list
         agent.get('/api/reports/dfassreport_123_20160403.pdf')
@@ -533,7 +536,7 @@ describe('Reports routes testcases', function () {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         // get report list
         agent.get('/api/reports/dfaasreport_a12345_20160403.csv')

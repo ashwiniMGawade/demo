@@ -124,7 +124,7 @@ describe('ICRS Model Unit Tests:', function () {
 
   describe('Method Save', function () {
     it('should be able to save & delete without problems', function (done) {
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.not.exist(err);
         icr.remove(function (err) {
           should.not.exist(err);
@@ -135,7 +135,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without icr message', function (done) {
       icr.message = '';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -143,7 +143,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without icr cluster text', function (done) {
       icr.clusterExt = '';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -151,7 +151,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without icr external IPs', function (done) {
       icr.ipsExt = '';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -159,7 +159,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without icr server', function (done) {
       icr.server = null;
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -167,7 +167,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without icr tenant', function (done) {
       icr.tenant = null;
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -175,7 +175,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with invalid status', function (done) {
       icr.status = 'test';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -183,7 +183,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr message less than 3 char', function (done) {
       icr.message = 'TT';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -191,7 +191,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr message more than 1024 char', function (done) {
       icr.message = 'TTTTTTTasdfasdfasdfasdfasdfasdfasdfsadhfsakjdhfkajsdhfjskhdfsjdhfskaskdflakdflasdf aksjdfaldsf akjsdhfas kajsdhfladhfa kajshdflakdhf alkdsflakdshfasdfjkadjfaksdjfhakdfhaksdfhakdfhaksdfakfasfsakjhfskfhskhfshflkhsdfsldfalsfhskdffalsdfjasdlflasdfadsfadasdfasdfsfasdfsadfasdfasdasdfasTTTTTTTTTasdfasdfasdfasdfasdfasdfasdfsadhfsakjdhfkajsdhfjskhdfsjdhfskaskdflakdflasdf aksjdfaldsf akjsdhfas kajsdhfladhfa kajshdflakdhf alkdsflakdshfasdfjkadjfaksdjfhakdfhaksdfhakdfhaksdfakfasfsakjhfskfhskhfshflkhsdfsldfalsfhskdffalsdfjasdlflasdfadsfadasdfasdfsfasdfsadfasdfasdasdfasTTTTTTTTTasdfasdfasdfasdfasdfasdfasdfsadhfsakjdhfkajsdhfjskhdfsjdhfskaskdflakdflasdf aksjdfaldsf akjsdhfas kajsdhfladhfa kajshdflakdhf alkdsflakdshfasdfjkadjfaksdjfhakdfhaksdfhakdfhaksdfakfasfsakjhfskfhskhfshflkhsdfsldfalsfhskdffalsdfjasdlflasdfadsfadasdfasdfsfasdfsadfasdfasdasdfasTTTTTTTTTasdfasdfasdfasdfasdfasdfasdfsadhfsakjdhfkajsdhfjskhdfsjdhfskaskdflakdflasdf aksjdfaldsf akjsdhfas kajsdhfladhfa kajshdflakdhf alkdsflakdshfasdfjkadjfaksdjfhakdfhaksdfhakdfhaksdfakfasfsakjhfskfhskhfshflkhsdfsldfalsfhskdffalsdfjasdlflasdfadsfadasdfasdfsfasdfsadfasdfasdasdfasTTTTTTTTTasdfasdfasdfasdfasdfasdfasdfsadhfsakjdhfkajsdhfjskhdfsjdhfskaskdflakdflasdf aksjdfaldsf akjsdhfas kajsdhfladhfa kajshdflakdhf alkdsflakdshfasdfjkadjfaksdjfhakdfhaksdfhakdfhaksdfakfasfsakjhfskfhskhfshflkhsdfsldfalsfhskdffalsdfjasdlflasdfadsfadasdfasdfsfasdfsadfasdfasdasdfasTTTTTTTTTasdfasdfasdfasdfasdfasdfasdfsadhfsakjdhfkajsdhfjskhdfsjdhfskaskdflakdflasdf aksjdfaldsf akjsdhfas kajsdhfladhfa kajshdflakdhf alkdsflakdshfasdfjkadjfaksdjfhakdfhaksdfhakdfhaksdfakfasfsakjhfskfhskhfshflkhsdfsldfalsfhskdffalsdfjasdlflasdfadsfadasdfasdfsfasdfsadfasdfasdasdfasTT';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -199,7 +199,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr message with invalid content eg. test@', function (done) {
       icr.message = 'test@';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -207,7 +207,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr clusterExt more than 64 char', function (done) {
       icr.clusterExt = 'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -215,7 +215,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr ipsExt more than 128 char', function (done) {
       icr.ipsExt = '10.20.30.14, 10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,10.20.30.14,';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -223,7 +223,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr with invalid tenant id', function (done) {
       icr.tenant = 'test';
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });
@@ -232,7 +232,7 @@ describe('ICRS Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save icr with invalid tenant id', function (done) {
       icr.tenant = user._id;
-      return icr.save(function (err) {
+      icr.save(function (err) {
         should.exist(err);
         done();
       });

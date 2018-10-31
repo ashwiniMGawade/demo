@@ -147,7 +147,7 @@ exports.getUUIDs = function(serverCode, clusterName, res) {
   var adminVserver = {
     ontap_cluster_uuid : '',
     ontap_vserver_uuid : '',
-    ontap_vserver_key  : ''
+    apis_storage_vm_key  : ''
   };
 
 
@@ -180,7 +180,7 @@ exports.getUUIDs = function(serverCode, clusterName, res) {
         } else if (result.length > 0) {
           adminVserver.ontap_cluster_uuid = result[0].cluster_uuid;
           adminVserver.ontap_vserver_uuid = result[0].vserver_uuid;
-          adminVserver.ontap_vserver_key = result[0].storage_vm_key;
+          adminVserver.apis_storage_vm_key = result[0].storage_vm_key;
           res(null, adminVserver);
         } else {
           res(null, false);

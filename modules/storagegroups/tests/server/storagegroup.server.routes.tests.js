@@ -32,7 +32,7 @@ describe('Storage Group CRUD tests', function () {
 
   before(function (done) {
     // Get application
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
     done();
   });
@@ -148,7 +148,7 @@ describe('Storage Group CRUD tests', function () {
     storagegroup1 = new Storagegroup({
       name: 'Test Storage one',
       code: 'testcode1',
-      tier: 'ultra',
+      tier: 'standard',
       snapshotPolicy: '7daily1810',
       status: 'Operational'
     });
@@ -156,7 +156,7 @@ describe('Storage Group CRUD tests', function () {
     storagegroup2 = new Storagegroup({
       name: 'Test Storage two',
       code: 'testcode2',
-      tier: 'ultra',
+      tier: 'standard',
       snapshotPolicy: '7daily1810',
       status: 'Operational'
     });
@@ -272,7 +272,7 @@ describe('Storage Group CRUD tests', function () {
                                 storagegroup = {
                                   name: 'Test Storage',
                                   code: 'testcode',
-                                  tier: 'ultra',
+                                  tier: 'standard',
                                   snapshotPolicy: '7daily1810',
                                   serverId : mongoose.Types.ObjectId(server1._id)
                                 };
@@ -530,7 +530,6 @@ describe('Storage Group CRUD tests', function () {
             //SetTImeout for the update to happen and storagegroup in Operational Status
             setTimeout(function(){
               storagegroup.name = 'newname';
-              storagegroup.tier = 'value';
               // Update an existing storagegroup
               agent.put('/api/storagegroups/' + strGrpSaveRes.body.storagegroupId)
                 .send(storagegroup)
@@ -544,7 +543,7 @@ describe('Storage Group CRUD tests', function () {
                   // Set assertions for the name and status
                   (strGrpUpdateRes.body.storagegroupId).should.equal(strGrpSaveRes.body.storagegroupId);
                   (strGrpUpdateRes.body.name).should.match('newname');
-                  (strGrpUpdateRes.body.status).should.match('Updating');
+                  (strGrpUpdateRes.body.status).should.match('Operational');
 
                   // Call the assertion callback
                   done();

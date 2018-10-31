@@ -21,7 +21,7 @@ var app, agent, credentials, user, tenant;
 
 describe('support server controller test cases', function() {
   before(function(done){
-    app = express.init(mongoose);
+    app = express.init(mongoose.connection.db);
     agent = request.agent(app);
     done();
   });
@@ -72,13 +72,13 @@ describe('support server controller test cases', function() {
   //     .end(function (signinErr, signinRes) {
   //       // Handle signin error
   //       if (signinErr) {
-  //         return done(signinErr);
+  //         done(signinErr);
   //       }
   //       agent.get('/api/support/downloads?software=cloud-manager')
   //       .expect(200)
   //       .end(function(err, res) {
   //         if (err) {
-  //           return done(err);
+  //           done(err);
   //         }
   //         done();
   //       });
@@ -90,7 +90,7 @@ describe('support server controller test cases', function() {
     .expect(401)
     .end(function(err, res) {
       if (err) {
-        return done(err);
+        done(err);
       }
       done();
     });
@@ -101,7 +101,7 @@ describe('support server controller test cases', function() {
     .expect(401)
     .end(function(err, res) {
       if (err) {
-        return done(err);
+        done(err);
       }
       done();
     });
@@ -114,7 +114,7 @@ describe('support server controller test cases', function() {
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         agent.post('/api/support/policy')
         .send({'user': signinRes.body.userId})
@@ -123,7 +123,7 @@ describe('support server controller test cases', function() {
           console.log(err);
           console.log(res.body);
           if (err) {
-            return done(err);
+            done(err);
           }
           (res.body.acceptTC).should.be.equal(true);
           done();
@@ -136,7 +136,7 @@ describe('support server controller test cases', function() {
     .expect(401)
     .end(function(err, res) {
       if (err) {
-        return done(err);
+        done(err);
       }
       done();
     });
@@ -149,33 +149,33 @@ describe('support server controller test cases', function() {
   //     .end(function (signinErr, signinRes) {
   //       // Handle signin error
   //       if (signinErr) {
-  //         return done(signinErr);
+  //         done(signinErr);
   //       }
   //       agent.get('/api/support/softwarekey?software=ontapdsm')
   //       .expect(200)
   //       .end(function(err, res) {
   //         if (err) {
-  //           return done(err);
+  //           done(err);
   //         }
   //         done();
   //       });
   //     });    
   // });
 
-  it('should be able to return error when trying to get the master key and key does not exist for sowftware', function(done) {
+  it('should be able to error when trying to get the master key and key does not exist for sowftware', function(done) {
     agent.post('/api/auth/signin')
       .send(credentials)
       .expect(200)
       .end(function (signinErr, signinRes) {
         // Handle signin error
         if (signinErr) {
-          return done(signinErr);
+          done(signinErr);
         }
         agent.get('/api/support/softwarekey?software=cloud-manager')
         .expect(400)
         .end(function(err, res) {
           if (err) {
-            return done(err);
+            done(err);
           }
           done();
         });

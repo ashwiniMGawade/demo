@@ -64,7 +64,7 @@ describe('Jobs Model Unit Tests:', function () {
 
   describe('Method Save', function () {
     it('should be able to save & delete without problems', function (done) {
-      return job.save(function (err) {
+      job.save(function (err) {
         should.not.exist(err);
         job.remove(function (err) {
           should.not.exist(err);
@@ -75,7 +75,7 @@ describe('Jobs Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without job operation', function (done) {
       job.operation = '';
-      return job.save(function (err) {
+      job.save(function (err) {
         should.exist(err);
         done();
       });
@@ -83,7 +83,7 @@ describe('Jobs Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without job user', function (done) {
       job.user = null;
-      return job.save(function (err, jobRes) {
+      job.save(function (err, jobRes) {
         should.exist(err);
         done();
       });
@@ -91,7 +91,7 @@ describe('Jobs Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save with invalid status', function (done) {
       job.status = 'test';
-      return job.save(function (err) {
+      job.save(function (err) {
         should.exist(err);
         done();
       });
@@ -99,7 +99,7 @@ describe('Jobs Model Unit Tests:', function () {
 
     // it('should be able to show an error when try to save job with invalid tenant id', function (done) {
     //   job.tenant = 'test';
-    //   return job.save(function (err) {
+    //   job.save(function (err) {
     //     should.exist(err);
     //     done();
     //   });
@@ -108,7 +108,7 @@ describe('Jobs Model Unit Tests:', function () {
 
     // it('should be able to show an error when try to save job with invalid tenant id', function (done) {
     //   job.tenant = user._id;
-    //   return job.save(function (err) {
+    //   job.save(function (err) {
     //     should.exist(err);
     //     done();
     //   });
