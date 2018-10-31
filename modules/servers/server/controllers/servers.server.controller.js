@@ -346,7 +346,6 @@ exports.create = function (req, res) {
           server.status = 'Contact Support';
           serverCreateJob.update('Failed', 'Recieved Failed Status from WFA, Error: ' + err, server);
           saveServer(server);
-          getOutputs(jobId, null);
         } else if (resWfa.jobStatus !== 'COMPLETED') {
           logger.info('SVM Create: Not completed yet, polling again in 30 seconds, Job ID: ' + jobId);
           setTimeout(function () { untilCreated(jobId, clusterName); }, config.wfa.refreshRate);
