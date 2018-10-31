@@ -205,7 +205,7 @@ var ServerSchema = new Schema({
     type: String,
     default: null
   },
-  storage_vm_key: {
+  apis_storage_vm_key: {
     type: String,
     default: null
   },
