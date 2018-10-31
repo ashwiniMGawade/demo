@@ -356,7 +356,7 @@ exports.create = function (req, res) {
     });
   }
 
-  function getUUIDs(server, clusterName) {
+  function getUUIDs(server, clusterName, counter = 0) {
     dbWfa.getUUIDs(server.code, clusterName, function(err, resDB) {
       if (err) {
         logger.info('SVM Create: Failed to obtain output related UUID, Error: ' + err);
@@ -379,8 +379,15 @@ exports.create = function (req, res) {
             }
           });
         } else {
-           logger.info('SVM Create: No output parameters: Response from db: '+ resDB);
-           setTimeout(function () { getUUIDs(server, clusterName); }, config.wfa.refreshRate);          
+           logger.info('SVM Create: No output parameters: Response from db trying again trail no: counter : '+ counter);
+            if (counter <= config.wfa.getUUIDtrails) {
+              setTimeout(function () { getUUIDs(server, clusterName, counter+1); }, config.wfa.refreshRate);
+            } else {
+              logger.info('SVM Create: Failed to obtain output related UUID, after');
+              server.status = 'Contact Support';
+              serverCreateJob.update('Failed', 'Failed to obtain output Parameters, Error: ' + err, server);
+              saveServer(server);
+            }                     
         }
       }
     });

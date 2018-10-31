@@ -38,7 +38,7 @@ exports.svmCreateExec = function (req, res) {
   };
 
   //logger.info('SVM WFA Create: Args : ' + util.inspect(args, {showHidden: false, depth: null}));
-
+  console.log("vfasscreaejob", config.wfa.vFasCreateJob);
   var svmCreateReq = client.post(config.wfa.vFasCreateJob, args, function (data, response) {
 
     if (Buffer.isBuffer(data)) {
@@ -150,6 +150,7 @@ exports.svmCreateOut = function (req, res) {
     if (Buffer.isBuffer(data)) {
       data = data.toString('utf8');
     }
+    console.log("job id=" + req.jobId);
 
     logger.info('SVM WFA CreateOut: Received: ' + util.inspect(data, {showHidden: false, depth: null}));
     if (data.collection) {

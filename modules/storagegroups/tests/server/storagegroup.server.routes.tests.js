@@ -334,7 +334,7 @@ describe('Storage Group CRUD tests', function () {
   it('should go to Contact Support while saving a storagegroup if WFA is down', function (done) {
     this.timeout(18000);
     //Setting an invalid WFA URL to fail the create and make it move to Contact Support
-    config.wfa.sgCreateJob = 'http://wfatestportal.com/sgCreate/failjobs';
+    nock.cleanAll();
 
     agent.post('/api/auth/signin')
       .send(credentials)

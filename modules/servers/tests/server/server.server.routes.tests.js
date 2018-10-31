@@ -644,6 +644,88 @@ describe('Server CRUD tests', function () {
       });
   });
 
+  it('should be able to save an server with the status as contact support if wfa returns success but getuuid is failed to obtain the output', function (done) {
+    this.timeout(15000);
+    nock.cleanAll();
+    couchdbvFasCreate= nock('http://wfatestportal.com')
+      .post('/vFasCreate/jobs')
+      .reply(200, {
+          "job":{
+            "$":{
+              "xmlns:atom":"http://www.w3.org/2005/Atom",
+              "jobId":"65370"
+            }
+          }
+        }
+      );
+
+    // mock get status request for create
+    var couchdbvFasReadStatus= nock('http://wfatestportal.com')
+      .get('/vFasCreate/jobs/65370')
+      .reply(200, {
+        "job":{
+            "jobStatus":[{"jobStatus":["COMPLETED"], "phase":["EXECUTION"]}]
+          }
+        }
+      );
+
+    // mock get status request for create
+    var couchdbvFasPlanOut= nock('http://wfatestportal.com')
+      .get('/vFasCreate/jobs/65370/plan/out')
+      .reply(200, {
+        "collection":{
+            "keyAndValuePair":[
+              {"$":{"value" : "57.57.57.5" } },
+              {"$":{"value" : "57.57.57.5" } },
+              {"$":{"value" : "code1" } }
+            ]
+          }
+        }
+      );
+
+    agent.post('/api/auth/signin')
+      .send(credentialsRoot)
+      .expect(200)
+      .end(function (signinErr, signinRes) {
+        // Handle signin error
+        if (signinErr) {
+          return done(signinErr);
+        }
+        // Save a new server
+        server.code = "code1";
+        agent.post('/api/servers')
+          .send(server)
+          .expect(200)
+          .end(function (serverSaveErr, serverSaveRes) {
+            // Handle server save error
+            if (serverSaveErr) {
+              return done(serverSaveErr);
+            }
+            (serverSaveRes.body.name).should.equal(server.name);
+
+            setTimeout(function() {
+            // Get a list of servers
+              agent.get('/api/servers')
+                .end(function (serversGetErr, serversGetRes) {
+                  console.log("get is called");
+                  // Handle server save error
+                  if (serversGetErr) {
+                    return done(serversGetErr);
+                  }
+
+                  // Get servers list
+                  var servers = serversGetRes.body;
+                  (servers[2].name).should.equal(server.name);
+                  (servers[2].status).should.equal('Contact Support');
+                  // Call the assertion callback
+                  return done();
+
+                });
+              }, 5000);
+          });
+      });
+  });
+
   it('should be able to populate ipsIcl in create server request for server if managed = customer', function (done) {
     this.timeout(16000);
     agent.post('/api/auth/signin')
@@ -690,9 +772,11 @@ describe('Server CRUD tests', function () {
       });
   });
 
+  /////////////////////////////////////
+
   it('should be able to save an server with contact support status if WFA is down', function (done) {
     this.timeout(10000);
-    config.wfa.vFasCreateJob = 'http://wfatestportal.com/vFasCreate/failjobs';
+    nock.cleanAll();
     agent.post('/api/auth/signin')
       .send(credentialsRoot)
       .expect(200)
@@ -720,6 +804,7 @@ describe('Server CRUD tests', function () {
               agent.get('/api/servers')
                 .end(function (serversGetErr, serversGetRes) {
                   // Handle server save error
+                  console.log("get called");
                   if (serversGetErr) {
                     return done(serversGetErr);
                   }
@@ -733,74 +818,74 @@ describe('Server CRUD tests', function () {
                   done();
 
                 });
-              }, 9000);
+              }, 900);
           });
       });
   });
 
-  it('should be able to save an server with contact support status if WFA status read is down', function (done) {
-    this.timeout(10000);
-    config.wfa.vFasCreateJob = 'http://wfatestportal.com/vFasCreate/jobs';
-    nock.cleanAll();
-    var couchdbvFasReadStatus= nock('http://wfatestportal.com')
-      .get('/vFasCreate/jobs/65370')
-      .reply(200, {
-       }
-      );
+  // it('should be able to save an server with contact support status if WFA status read is down', function (done) {
+  //   this.timeout(10000);
+  //   config.wfa.vFasCreateJob = 'http://wfatestportal.com/vFasCreate/jobs';
+  //   nock.cleanAll();
+  //   var couchdbvFasReadStatus= nock('http://wfatestportal.com')
+  //     .get('/vFasCreate/jobs/65370')
+  //     .reply(200, {
+  //      }
+  //     );
 
-    couchdbvFasCreate= nock('http://wfatestportal.com')
-      .post('/vFasCreate/jobs')
-      .reply(200, {
-          "job":{
-            "$":{
-              "xmlns:atom":"http://www.w3.org/2005/Atom",
-              "jobId":"65370"
-            }
-          }
-        }
-      );
+  //   couchdbvFasCreate= nock('http://wfatestportal.com')
+  //     .post('/vFasCreate/jobs')
+  //     .reply(200, {
+  //         "job":{
+  //           "$":{
+  //             "xmlns:atom":"http://www.w3.org/2005/Atom",
+  //             "jobId":"65370"
+  //           }
+  //         }
+  //       }
+  //     );
 
-    agent.post('/api/auth/signin')
-      .send(credentialsRoot)
-      .expect(200)
-      .end(function (signinErr, signinRes) {
-        // Handle signin error
-        if (signinErr) {
-          return done(signinErr);
-        }
+  //   agent.post('/api/auth/signin')
+  //     .send(credentialsRoot)
+  //     .expect(200)
+  //     .end(function (signinErr, signinRes) {
+  //       // Handle signin error
+  //       if (signinErr) {
+  //         return done(signinErr);
+  //       }
 
-        // Save a new server
-        agent.post('/api/servers')
-          .send(server)
-          .expect(200)
-          .end(function (serverSaveErr, serverSaveRes) {
-            // Handle server save error
-            if (serverSaveErr) {
-              return done(serverSaveErr);
-            }
-            (serverSaveRes.body.name).should.equal(server.name);
+  //       // Save a new server
+  //       agent.post('/api/servers')
+  //         .send(server)
+  //         .expect(200)
+  //         .end(function (serverSaveErr, serverSaveRes) {
+  //           // Handle server save error
+  //           if (serverSaveErr) {
+  //             return done(serverSaveErr);
+  //           }
+  //           (serverSaveRes.body.name).should.equal(server.name);
 
-            setTimeout(function() {
-            // Get a list of servers
-              agent.get('/api/servers')
-                .end(function (serversGetErr, serversGetRes) {
-                  // Handle server save error
-                  if (serversGetErr) {
-                    return done(serversGetErr);
-                  }
+  //           setTimeout(function() {
+  //           // Get a list of servers
+  //             agent.get('/api/servers')
+  //               .end(function (serversGetErr, serversGetRes) {
+  //                 // Handle server save error
+  //                 if (serversGetErr) {
+  //                   return done(serversGetErr);
+  //                 }
 
-                  // Get servers list
-                  var servers = serversGetRes.body;
-                  (servers[2].name).should.equal(server.name);
-                  (servers[2].status).should.equal('Contact Support');
-                  // Call the assertion callback
-                  done();
+  //                 // Get servers list
+  //                 var servers = serversGetRes.body;
+  //                 (servers[2].name).should.equal(server.name);
+  //                 (servers[2].status).should.equal('Contact Support');
+  //                 // Call the assertion callback
+  //                 done();
 
-                });
-              }, 9000);
-          });
-      });
-  });
+  //               });
+  //             }, 9000);
+  //         });
+  //     });
+  // });
 
   //############################## update #######################################
 
@@ -1105,6 +1190,7 @@ describe('Server CRUD tests', function () {
       });
   });
 
+  // not to commment out
   // it('should be able to update an server with contact support status if WFA is down', function (done) {
   //   this.timeout(15000);
   //   config.wfa.vFasUpdateJob = 'http://wfatestportal.com/vFasUpdate/failjobs';
@@ -1441,7 +1527,7 @@ describe('Server CRUD tests', function () {
       });
   });
 
-  //########################### delete ###############################
+  // //########################### delete ###############################
 
   it('should not  be able to delete an server if status is not operational', function (done) {
     agent.post('/api/auth/signin')
@@ -1526,9 +1612,10 @@ describe('Server CRUD tests', function () {
       });
   });
 
+
   it('should not be able to delete an server if status is operational but wfa fails to return', function (done) {
-    this.timeout(10000);
-    config.wfa.vFasDeleteJob = 'http://wfatestportal.com/vFasDelete/failjobs';
+    this.timeout(1000);
+    nock.cleanAll();
     agent.post('/api/auth/signin')
       .send(credentialsRoot)
       .expect(200)
@@ -1568,6 +1655,7 @@ describe('Server CRUD tests', function () {
                   config.wfa.vFasDeleteJob = 'http://wfatestportal.com/vFasDelete/jobs';
                    // Get servers list
                   var servers = serversGetRes.body;
+                  console.log("servers", servers, server);
                   (servers[2].name).should.equal(server.name);
                   (servers[2].status).should.equal('Contact Support');
                   serverObj.remove();
@@ -1575,7 +1663,7 @@ describe('Server CRUD tests', function () {
                   done();
 
                 });
-              }, 5000);
+              }, 500);
             });
           });
       });
@@ -1754,7 +1842,7 @@ describe('Server CRUD tests', function () {
       });
   });
 
-   it('should  be able to delete an server if signed in, but has ICR dependancy with ICR status is  `closed`', function (done) {
+  it('should  be able to delete an server if signed in, but has ICR dependancy with ICR status is  `closed`', function (done) {
     this.timeout(8000);
     agent.post('/api/auth/signin')
       .send(credentials)

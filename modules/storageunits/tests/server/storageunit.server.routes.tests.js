@@ -591,7 +591,7 @@ describe('Storageunit CRUD tests', function () {
                   // Call the assertion callback
                   done();
                 });
-              }, 4000);
+              }, 10);
           });
       });
   });
