@@ -368,7 +368,7 @@ exports.create = function (req, res) {
         if (resDB) {
           server.ontap_cluster_uuid = resDB.ontap_cluster_uuid;
           server.ontap_vserver_uuid = resDB.ontap_vserver_uuid;
-          server.ontap_vserver_key = resDB.ontap_vserver_key;
+          server.storage_vm_key = resDB.storage_vm_key;
 
           server.save(function (err) {
             if (err) {
