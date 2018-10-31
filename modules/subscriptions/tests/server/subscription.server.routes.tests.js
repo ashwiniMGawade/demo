@@ -84,7 +84,7 @@ describe('Subscription CRUD tests', function () {
 
     partnerTenant = new Tenant({
       code:'ptc',
-      name:'partnerTenant'
+      name:'partnerTenant2'
     });
 
     tenant2 = new Tenant({
@@ -891,12 +891,14 @@ describe('Subscription CRUD tests', function () {
   afterEach(function (done) {
     Subscription.remove().exec(function () {
       User.remove().exec(function() {
-        partnerTenant.remove();
-        tenant1.remove();
-        tenant2.remove();
-        subscription1.remove();
-        subscription2.remove(); 
-        Site.remove().exec(done);
+        Tenant.remove().exec(function() {
+          partnerTenant.remove();
+          tenant1.remove();
+          tenant2.remove();
+          subscription1.remove();
+          subscription2.remove(); 
+          Site.remove().exec(done);
+        });
       });
     });
   });
