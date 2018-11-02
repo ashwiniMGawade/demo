@@ -29,7 +29,7 @@ exports.create = function (req, res) {
     if (err) {
       logger.info('Pod Create: Invalid Site ID');
       return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
+        message: 'Invalid Site ID'
       });
     } else if(!site) {
       logger.info('Pod Create: Invalid Site ID');

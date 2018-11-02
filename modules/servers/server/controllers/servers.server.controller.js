@@ -136,7 +136,8 @@ exports.create = function (req, res) {
           logger.error('SVM Create: Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err); 
           return respondError(res, 400, 'Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err);
         } else {
-          logger.info("after fetch info adminvserver details", adminVserver);
+          logger.info("after fetch info adminvserver details");
+          logger.info(adminVserver);
           // Get Pod
           Pod.findByCode(adminVserver.podCode, function (err, podResults) {
             if (podResults.length === 0) {
@@ -147,7 +148,7 @@ exports.create = function (req, res) {
               // Multiple pods can exist for a site, but this code only considers the first one
               // returned. JL - 9 Mar 2018
               pod = podResults[0];
-              server.cluster_id = adminVserver.clusterId;
+              
     
               //Perform all model level validation and return error
               server.validate(function(err){
@@ -232,7 +233,11 @@ exports.create = function (req, res) {
                     var lastNasIpLastOctet = lastNasIp.split(".")[3];
                     server.ipsIcl = firstNasIp + '-' + lastNasIpLastOctet;
                   }
-            
+                  
+                  console.log(adminVserver, "before calling createsvm");
+                  server.cluster_id = mongoose.Types.ObjectId(adminVserver.clusterId);
+                  console.log("server with cluster", server); 
+
                   Job.create(req, 'server', function(err, createJobRes) {
                     serverCreateJob = createJobRes;
                     server.save(function (err) {
@@ -245,6 +250,7 @@ exports.create = function (req, res) {
                               .populate('subtenant','name code')
                               .populate('subscription','name code')
                               .populate('user', 'username displayName')
+                              .populate('cluster_id', 'name uuid')
                               .populate('site','name code', function (err, serverPopulated) {
                           if (err){
                             logger.info('SVM Create: Populate Error: ' + err);
@@ -281,7 +287,6 @@ exports.create = function (req, res) {
                               } else {
                                 logger.info('SVM Create: pod.save() succeeded.');
                                 server.pod = pod;
-                                console.log(adminVserver, "before calling createsvm");
                                 createSvm(adminVserver.clusterName);
                               }
                             });
@@ -515,32 +520,7 @@ exports.read = function (req, res) {
     console.log("iops object", iops_object);
     return iops_object;
   }
-
-  // dbWfa.svmRead(req.server.code, function (err, svm) {
-  //   if (err) {
-  //     logger.info('SVM Read: Failed to read WFA (Ignoring), Error: ' + err);
-  //   } else {
-  //     server.volumesName = svm.volumesName;
-  //     server.volumesCapacity = svm.volumesCapacity;
-  //     server.volumesUsed = svm.volumesUsed;
-  //     server.volumesTier = svm.volumesTier;
-
-  //     if (svm.iopsTotal) {
-  //       server.iopsTotal = svm.iopsTotal.replace('IOPS', '');
-  //     }
-
-  //     if (svm.volumesCapacity) {
-  //       server.volumesCapacityTotal = _.round(_.sum(_.map(svm.volumesCapacity.split(','), _.parseInt)) / 1024);
-  //     }
-
-  //     if (svm.volumesUsed) {
-  //       server.volumesUsedTotal = _.round(_.sum(_.map(svm.volumesUsed.split(','), _.parseInt)) / 1024);
-  //     }
-  //   }
-
-  //   logger.info('SVM Read: Server Object Returned: ' + util.inspect(server, {showHidden: false, depth: null}));
-  //   sendServerResponse(res, server);
-  // });
+  
 };
 
 /**

@@ -230,7 +230,7 @@ describe('Pod CRUD tests', function () {
     });
   });
 
-  it('should be not be able to save an pod if logged in and unauthorized', function (done) {
+  it('should not be able to save an pod if logged in and unauthorized', function (done) {
 
     userAdmin.save(function (err) {
       should.not.exist(err);
@@ -297,6 +297,75 @@ describe('Pod CRUD tests', function () {
             .end(function (podSaveErr, podSaveRes) {
               // Set message assertion
               (podSaveRes.body.message).should.match('Pod name required');
+
+              // Handle pod save error
+              done(podSaveErr);
+            });
+        });
+    });
+  });
+
+  it('should not be able to save an pod if invalid siteId is provided', function (done) {
+    // Invalidate title field
+    pod.siteId = 'test';
+
+    user.roles = ['root'];
+    user.save(function (err) {
+      should.not.exist(err);
+      agent.post('/api/auth/signin')
+        .send(credentials)
+        .expect(200)
+        .end(function (signinErr, signinRes) {
+          // Handle signin error
+          if (signinErr) {
+            done(signinErr);
+          }
+
+          // Get the userId
+          var userId = user.id;
+
+          // Save a new pod
+          agent.post('/api/pods')
+            .send(pod)
+            .expect(400)
+            .end(function (podSaveErr, podSaveRes) {
+              // Set message assertion
+              console.log(podSaveRes.body);
+              (podSaveRes.body.message).should.match('Invalid Site ID');
+
+              // Handle pod save error
+              done(podSaveErr);
+            });
+        });
+    });
+  });
+
+  it('should not be able to save an pod if invalid siteId with non-existing objectId is provided', function (done) {
+    
+    user.roles = ['root'];
+    user.save(function (err) {
+      should.not.exist(err);
+      agent.post('/api/auth/signin')
+        .send(credentials)
+        .expect(200)
+        .end(function (signinErr, signinRes) {
+          // Handle signin error
+          if (signinErr) {
+            done(signinErr);
+          }
+
+          // Get the userId
+          var userId = user.id;
+          pod.siteId = user.id;
+
+          // Save a new pod
+          agent.post('/api/pods')
+            .send(pod)
+            .expect(400)
+            .end(function (podSaveErr, podSaveRes) {
+              // Set message assertion
+              console.log(podSaveRes.body);
+              (podSaveRes.body.message).should.match('Invalid Site ID');
 
               // Handle pod save error
               done(podSaveErr);

@@ -42,7 +42,7 @@ describe('Storagegroup Model Unit Tests:', function () {
     });
 
     pod = new Pod({
-      name: 'Test Pod',
+      name: 'TestPod',
       code: 'tpd'
     });
 
@@ -376,6 +376,7 @@ describe('Storagegroup Model Unit Tests:', function () {
             Site.remove().exec(function(){
               Subscription.remove().exec(function() {
                 Server.remove().exec(function(){
+                  pod.remove();
                   Storagegroup.remove().exec(done);
                 });
               });
