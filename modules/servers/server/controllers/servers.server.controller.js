@@ -147,6 +147,7 @@ exports.create = function (req, res) {
               // Multiple pods can exist for a site, but this code only considers the first one
               // returned. JL - 9 Mar 2018
               pod = podResults[0];
+              server.cluster_id = adminVserver.clusterId;
     
               //Perform all model level validation and return error
               server.validate(function(err){
