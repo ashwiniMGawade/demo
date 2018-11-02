@@ -124,10 +124,11 @@ module.exports = {
       connectionLimit : 5,
       host: wfaServer,
       user: process.env.WFA_SERVER_MYSQL_USERNAME,
-      password: process.env.WFA_SERVER_MYSQL_PASSWORD,
-      database: process.env.WFA_SERVER_MYSQL_DATABASE
+      password: process.env.WFA_SERVER_MYSQL_PASSWORD ,
+      database: process.env.WFA_SERVER_MYSQL_DATABASE 
     },
     refreshRate: '30000',
+    getUUIDtrails: 10,
     httpsClientOptions: {
       connection: {
           secureOptions: constants.SSL_OP_NO_SSLv2|constants.SSL_OP_NO_SSLv3|constants.SSL_OP_NO_TLSv1, // Disable SSL2/SSL3/TLS1.
