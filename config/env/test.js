@@ -131,6 +131,8 @@ module.exports = {
       password: 'Qwerty1234%',
       database: 'cm_storage_test'
     },
+     refreshRate: '30',
+     getUUIDtrails: 2,
   },
   APIservice : {
     'authorization' : 'Basic YWRtaW46TmV0YXBwITEyMw==',
