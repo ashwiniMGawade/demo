@@ -20,7 +20,7 @@ exports.create = function (req, res) {
   var cluster = new Cluster();
   cluster.user = req.user;
   cluster.name = req.body.name;
-  cluster.key = req.body.key;
+  cluster.uuid = req.body.uuid;
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
   cluster.rest_uri = req.body.rest_uri || '';
@@ -57,6 +57,7 @@ exports.update = function (req, res) {
   var cluster = req.cluster;
 
   cluster.name = _.isUndefined(req.body.name) ? cluster.name : req.body.name;
+  cluster.uuid = req.body.uuid;
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
   cluster.rest_uri = req.body.rest_uri;

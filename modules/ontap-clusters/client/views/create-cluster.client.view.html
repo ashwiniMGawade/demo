@@ -10,26 +10,22 @@
           <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
             ng-minlength="3"
             ng-maxlength="64"
-            ng-pattern="/^[a-zA-Z0-9\ -]*$/"
+            ng-pattern="/^[a-zA-Z0-9\-]*$/"
             required>
          <div ng-messages="clusterForm.name.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Cluster name is required.</p>
             <p class="help-block error-text" ng-message="minlength">Cluster name should have Minimum 3 characters.</p>
             <p class="help-block error-text" ng-message="maxlength">Cluster name should have Maximum 64 characters.</p>
-            <p class="help-block error-text" ng-message="pattern">Cluster name can only include alphanumeric characters including space and dash.</p>
+            <p class="help-block error-text" ng-message="pattern">Cluster name can only include alphanumeric characters including dash.</p>
           </div>
         </div>
         <div class="form-group required" show-errors>
-          <label for="key">Key</label>
-          <input name="key" type="text" ng-model="key" id="key" class="form-control" placeholder="Key"
-          ng-minlength="3"
-          ng-maxlength="32"
-          ng-pattern="/^[a-z0-9\-]*$/" required>
-          <div ng-messages="clusterForm.key.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Cluster key is required.</p>
-            <p class="help-block error-text" ng-message="minlength">Key must be minimum 3 characters long.</p>
-            <p class="help-block error-text" ng-message="maxlength">Key should be maximum 32 characters long.</p>
-            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters with dash are allowed</p>
+          <label for="uuid">UUID</label>
+          <input name="uuid" type="text" ng-model="uuid" id="uuid" class="form-control" placeholder="eg. 90ba5cfe-a3aa-11e6-b4c4-005056a8f8ff"
+          ng-pattern="/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/" required>
+          <div ng-messages="clusterForm.uuid.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Cluster UUID is required.</p>            
+            <p class="help-block error-text" ng-message="pattern">UUID is invalid</p>
           </div>
         </div>
         <div class="form-group required" show-errors >

@@ -12,8 +12,8 @@
   <div class="table-responsive" ng-show="tableParams.total(value)">
     <table ng-table="tableParams" class="table table-bordered table-striped">
       <tr ng-repeat="cluster in $data">
-        <td ng-bind="cluster.name" class="capitalize breakword" title="'Name'" sortable="'name'"></td>
-        <td ng-bind="cluster.key" title="'Key'" sortable="'key'" class="breakword"></td>
+        <td ng-bind="cluster.name" class="breakword" title="'Name'" sortable="'name'"></td>
+        <td ng-bind="cluster.uuid" title="'UUID'" sortable="'uuid'" class="breakword"></td>
         <td ng-bind="cluster.management_ip" title="'Management IP'" sortable="'management_ip'" class="breakword"></td>
         <td ng-bind="cluster.provisioning_state" title="'Provisioning State'" sortable="'provisioning_state'" class="breakword capitalize"></td>
         <!-- <td ng-bind="cluster.rest_uri" title="'REST URI'" sortable="'rest_uri'" class="breakword"></td> -->
