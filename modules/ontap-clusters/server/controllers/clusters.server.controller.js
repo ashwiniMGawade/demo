@@ -34,7 +34,6 @@ exports.create = function (req, res) {
         });
       } else {
         logger.info('Cluster cluster.save(): Calling Job.create()...');
-        logger.info('Cluster cluster.save(): req: ' + util.inspect(req, {showHidden: false, depth: null}));
         Job.create(req, 'cluster', function(err, createJobRes) {
           createJobRes.update('Completed', 'Cluster Saved', cluster);
         });
@@ -69,8 +68,7 @@ exports.update = function (req, res) {
           message: errorHandler.getErrorMessage(err)
         });
       } else {
-        logger.info('Cluster cluster.save(): Calling Job.create()...');
-        logger.info('Cluster cluster.save(): req: ' + util.inspect(req, {showHidden: false, depth: null}));
+        logger.info('Cluster cluster.save(): Calling Job.create()...');        
         Job.create(req, 'cluster', function(err, createJobRes) {
           createJobRes.update('Completed', 'Cluster Saved', cluster);
         });

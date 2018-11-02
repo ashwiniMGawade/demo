@@ -26,7 +26,6 @@ var ClusterSchema = new Schema({
   },
   uuid: {
     type: String,
-    default: '',
     trim:true,
     unique:true,
     required: 'Cluster UUID is required',
