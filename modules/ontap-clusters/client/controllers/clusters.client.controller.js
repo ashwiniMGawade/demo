@@ -32,7 +32,7 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
       // Create new cluster object
       var cluster = new Clusters({
         name: $sanitize(this.name),
-        key: $sanitize(this.key),
+        uuid: $sanitize(this.uuid),
         management_ip: $sanitize(this.management_ip),
         provisioning_state: $sanitize(this.provisioning_state),
         rest_uri: $sanitize(this.rest_uri)
@@ -45,7 +45,7 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
 
         // Clear form fields
         $scope.name = '';
-        $scope.key = '';
+        $scope.uuid = '';
         $scope.management_ip = '';
         $scope.provisioning_state = '';
         $scope.rest_uri = '';

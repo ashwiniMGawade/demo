@@ -102,6 +102,24 @@ describe('Pod Model Unit Tests:', function () {
       });
     });
 
+    it('should be able to show an error when try to save with invalid site ie. asdd@a', function (done) {
+      pod.site = 'asdd@a';
+
+      pod.save(function (err) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should be able to show an error when try to save with invalid cluster_keys ie. ["asdd@a"]', function (done) {
+      pod.site = ['asdd@a'];
+
+      pod.save(function (err) {
+        should.exist(err);
+        done();
+      });
+    });
+
   });
 
   afterEach(function (done) {

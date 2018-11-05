@@ -111,8 +111,8 @@ describe('Cluster CRUD tests', function () {
           site.save(function (err) {
             should.not.exist(err);
             cluster = {
-              name: 'Cluster Title',
-              key: 'cluster',
+              name: 'cluster',
+              uuid: '19158fba-d063-11e8-b4c4-005056a8f8ff',
               management_ip:"10.20.30.40",
               provisioning_state:"open",
               rest_uri:"http://sample.com",
@@ -164,7 +164,7 @@ describe('Cluster CRUD tests', function () {
                   var clusters = clustersGetRes.body;
 
                   // Set assertions
-                  (clusters[0].name).should.match('Cluster Title');
+                  (clusters[0].name).should.match('cluster');
 
                   // Call the assertion callback
                   done();
@@ -213,7 +213,7 @@ describe('Cluster CRUD tests', function () {
                   var cluster = clustersGetRes.body;
 
                   // Set assertions
-                  (cluster.name).should.match('Cluster Title');
+                  (cluster.name).should.match('cluster');
 
                   // Call the assertion callback
                   done();
@@ -321,8 +321,8 @@ describe('Cluster CRUD tests', function () {
               return done(clusterSaveErr);
             }
 
-            // Update cluster title
-            cluster.name = 'WHY YOU GOTTA BE SO MEAN';
+            // Update cluster
+            cluster.name = 'test123';
             cluster.managed_ip = '12.34.12.12';
             cluster.user = mongoose.Types.ObjectId(user._id);
 
@@ -335,10 +335,9 @@ describe('Cluster CRUD tests', function () {
                 if (clusterUpdateErr) {
                   return done(clusterUpdateErr);
                 }
-                console.log(clusterUpdateRes.body);
                 // Set assertions
                 (clusterUpdateRes.body.clusterId).should.equal(clusterSaveRes.body.clusterId);
-                (clusterUpdateRes.body.name).should.match('WHY YOU GOTTA BE SO MEAN');
+                (clusterUpdateRes.body.name).should.match('test123');
 
                 // Call the assertion callback
                 done();

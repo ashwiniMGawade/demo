@@ -29,8 +29,8 @@ describe('Cluster Model Unit Tests:', function () {
 
     user.save(function () {
       cluster = new Cluster({
-        name: 'Cluster Title',
-        key: 'cluster',
+        name: 'cluster',
+        uuid: '19158fba-d063-11e8-b4c4-005056a8f8ff',
         management_ip:"10.20.30.40",
         provisioning_state:"open",
         rest_uri:"http://sample.com",
@@ -59,8 +59,8 @@ describe('Cluster Model Unit Tests:', function () {
       });
     });
 
-    it('should be able to show an error when try to save without key', function (done) {
-      cluster.key = '';
+    it('should be able to show an error when try to save without uuid', function (done) {
+      cluster.uuid = '';
 
       cluster.save(function (err) {
         should.exist(err);
@@ -95,8 +95,17 @@ describe('Cluster Model Unit Tests:', function () {
       });
     });
 
-    it('should be able to show an error when try to save with invalid key ie. 123%', function (done) {
-      cluster.key = '123%';
+    it('should be able to show an error when try to save with invalid name ie. abc a', function (done) {
+      cluster.name = 'abc a';
+
+      cluster.save(function (err) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should be able to show an error when try to save with invalid uuid ie. abc-a1212-121', function (done) {
+      cluster.uuid = 'abc-a1212-121';
 
       cluster.save(function (err) {
         should.exist(err);
@@ -127,6 +136,15 @@ describe('Cluster Model Unit Tests:', function () {
 
       cluster.save(function (err) {
         should.exist(err);
+        done();
+      });
+    });
+
+    it('should be able to add apis_cluster_key with proper data when successfully saved', function (done) {
+      
+      cluster.save(function (err) {
+        should.not.exist(err);
+        should.exist(cluster.apis_cluster_key);
         done();
       });
     });

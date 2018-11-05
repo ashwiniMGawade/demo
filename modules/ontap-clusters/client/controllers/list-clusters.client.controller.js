@@ -17,7 +17,7 @@ angular.module('clusters').controller('ClustersListController', ['$scope', '$fil
             var filteredData = $filter('filter')($scope.clusters, function(data) {    
               if ($scope.search) {
                 return ((data.name) ? data.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                       ((data.key) ? data.key.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
+                       ((data.uuid) ? data.uuid.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.management_ip) ? data.management_ip.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.provisioning_state) ? data.provisioning_state.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.rest_uri) ? data.rest_uri.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ;

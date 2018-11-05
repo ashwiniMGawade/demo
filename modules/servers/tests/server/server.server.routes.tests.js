@@ -81,8 +81,8 @@ describe('Server CRUD tests', function () {
     });
 
     cluster = new Cluster({
-      name: 'Cluster Title',
-      key: 'cluster',
+      name: 'cluster',
+      uuid: '19158fba-d063-11e8-b4c4-005056a8f8ff',
       management_ip:"10.20.30.40",
       provisioning_state:"open",
       rest_uri:"http://sample.com",
