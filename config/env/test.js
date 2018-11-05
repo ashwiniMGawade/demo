@@ -113,6 +113,14 @@ module.exports = {
       }]
     }]
   },
+  reports: {
+    storage_path : 'reports/',
+    default_records : 30,
+    report_generation_time_UTC: {
+      hours:process.env.REPORTS_GRNERATION_TIME_IN_HOURS || '17',
+      minutes:'0'
+    }
+  },
   coverage: process.env.COVERAGE || false,
   wfa: {
     sgCreateJob: 'http://wfatestportal.com/sgCreate/jobs',
@@ -124,6 +132,7 @@ module.exports = {
     vFasCreateJob: 'http://wfatestportal.com/vFasCreate/jobs',
     vFasUpdateJob: 'http://wfatestportal.com/vFasUpdate/jobs',
     vFasDeleteJob: 'http://wfatestportal.com/vFasDelete/jobs',
+    authorization:'Basic YWRtaW46TmV0YXBwITEyMw==',
     sql: {
       connectionLimit : 5,
       host: '10.128.113.180',
