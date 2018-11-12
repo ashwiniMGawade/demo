@@ -37,6 +37,8 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         $scope.$broadcast('show-errors-check-validity', 'replicaForm');
         return false;
       }
+
+      /*
       let months = [];
       for (const key of Object.keys($scope.selectedMonths)) {
         if ($scope.selectedMonths[key] == true) {
@@ -44,12 +46,20 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         }
       }
 
-      console.log(months);
-      // Create new Pod object
+      console.log(months);     
+
+      */
+
+    
+      // Create new Replica object
       var replica = new Replicas({
         // code: $sanitize(this.code),
         source_volume_id: $sanitize(this.sourceVolumeId),
-        destination_server_id: $sanitize(this.destinationServerId)
+        destination_server_id: $sanitize(this.destinationServerId),
+        schedule: {
+          hour:$sanitize(this.hour),
+          minute:this.minute
+        }
       });
 
 
@@ -61,7 +71,7 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         // Clear form fields
         $scope.source_volume_id = '';
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.message); 
+        throwFlashErrorMessage(errorResponse.data.user_message); 
       });
     };
 

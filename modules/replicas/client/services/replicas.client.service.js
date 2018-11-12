@@ -3,7 +3,7 @@
 //replicas service used for communicating with the replicas REST endpoints
 angular.module('replicas').factory('Replicas', ['$resource',
   function ($resource) {
-    return $resource('api/replicas/:replicaId', {
+    return $resource(goAPIHost +'/replicas/:replicaId', {
       replicaId: '@replicaId'
     }, {
       update: {
