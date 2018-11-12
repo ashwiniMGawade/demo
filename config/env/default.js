@@ -178,5 +178,8 @@ module.exports = {
           latency : "target=alias(removeAbovePercentile(netapp.tenant.#Tenant.svm.#SVM.perf.vol_summary.read_latency,95), 'Read')&target=alias(removeAbovePercentile(netapp.tenant.#Tenant.svm.#SVM.perf.vol_summary.write_latency,95), 'Write')&target=alias(removeAbovePercentile(netapp.tenant.#Tenant.svm.#SVM.perf.vol_summary.avg_latency,95), 'Avg')"
         }
       }
+  },
+  go : {
+    'api_host':process.env.GO_API_HOST
   }
 };

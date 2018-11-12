@@ -11,17 +11,18 @@
   </div>
   <div class="table-responsive" ng-show="tableParams.total(value)">
     <table ng-table="tableParams" class="table table-bordered table-striped">
-      <tr ng-repeat="pod in $data">
-        <td ng-bind="pod.name" class="capitalize breakword" title="'Name'" sortable="'name'"></td>
-        <td ng-bind="pod.code" title="'Code'" sortable="'code'" class="breakword"></td>
-        <td ng-bind="pod.site.name" title="'Site'" sortable="'site.name'" class="breakword"></td>
-        <td  title="'Clusters'"  class="breakword"> 
-          <li ng-repeat="cluster in pod.cluster_keys">
-            {{cluster.name}}
-          </li>
-        </td>
-        <td ng-if="(podAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="pods.edit({podId: pod.podId})">Edit</button></td>
-        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="pods.view({podId: pod.podId})">Details</button></td>
+      <tr ng-repeat="replica in $data">
+        <!-- <td ng-bind="replica.source_site_id.name" title="'Source Site'" sortable="'source_site_id.name'" class="breakword"></td> -->
+        <td ng-bind="replica.source_site_id" title="'Source Site'" sortable="'source_site_id'" class="breakword"></td>
+        <td ng-bind="replica.source_server_id" title="'Source Server'" sortable="'source_server_id'" class="breakword"></td>
+        <td ng-bind="replica.source_volume_id" title="'Source Volume'" sortable="'source_volume_id'" class="breakword"></td>
+        <td ng-bind="replica.destination_site_id" title="'Destination Site'" sortable="'destination_site_id'" class="breakword"></td>
+        <td ng-bind="replica.destination_server_id" title="'Destination Server'" sortable="'destination_server_id'" class="breakword"></td>
+        <td ng-bind="replica.destination_volume_id" title="'Destination Volume'" sortable="'destination_volume_id'" class="breakword"></td>
+        <td ng-bind="replica.status" class="capitalize breakword" title="'Status'" sortable="'status'"></td>
+        <td ng-bind="replica.state" title="'Volume Replication state'" sortable="'state'" class="breakword"></td>
+        <td ng-if="(replicaAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="replicas.edit({replicaId: replica.id})">Edit</button></td>
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="replicas.view({replicaId: replica.id})">Details</button></td>
       </tr>
     </table>
   </div>

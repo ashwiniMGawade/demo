@@ -1,10 +1,10 @@
 'use strict';
 
-angular.module('pods').controller('PodsListController', ['$scope', '$filter', 'Authentication', 'Pods', 'NgTableParams',
-  function ($scope, $filter, Authentication, Pods, NgTableParams) {
+angular.module('replicas').controller('ReplicasListController', ['$scope', '$filter', 'Authentication', 'Replicas', 'NgTableParams',
+  function ($scope, $filter, Authentication, Replicas, NgTableParams) {
 
     $scope.authentication = Authentication;
-    $scope.podAccessRoles = featuresSettings.roles.pod;
+    $scope.replicaAccessRoles = featuresSettings.roles.replica;
     $scope.rowsToDisplay = function () {
       $scope.tableParams = new NgTableParams({
         count: 10,              // count per page
@@ -12,13 +12,19 @@ angular.module('pods').controller('PodsListController', ['$scope', '$filter', 'A
       }, {
         counts: [],
         getData: function($defer, params) {
-          Pods.query(function (data) {
-            $scope.pods = data;
-            var filteredData = $filter('filter')($scope.pods, function(data) {    
+          Replicas.query(function (data) {
+            console.log("here in response", data);
+            $scope.replicas = data;
+            var filteredData = $filter('filter')($scope.replicas, function(data) {    
               if ($scope.search) {
-                return ((data.name) ? data.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                       ((data.code) ? data.code.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
-                       ((data.site) ? data.site.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
+                return ((data.source_site_id) ? data.source_site_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.source_server_id) ? data.source_server_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.source_volume_id) ? data.source_volume_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.destination_site_id) ? data.destination_site_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.destination_server_id) ? data.destination_server_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.destination_volume_id) ? data.destination_volume_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                       ((data.status) ? data.status.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
+                       ((data.state) ? data.state.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
               } else {
                 return true;
               }

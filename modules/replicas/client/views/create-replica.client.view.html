@@ -5,7 +5,6 @@
   <div class="col-md-6">
     <form name="replicaForm" class="form-horizontal" ng-submit="create(replicaForm.$valid)" novalidate>
       <fieldset>
-       
         <div class="form-group required" show-errors>
           <label for="sourceVolumeId">Source Volume</label>
           <select name="sourceVolumeId" ng-model="sourceVolumeId" id="sourceVolumeId" class="form-control" ng-options="storagegroup.storagegroupId as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required>
@@ -25,17 +24,14 @@
           </div>
         </div>
         <div class="row show-grid mLeft0">
-          <label for="policySchedule">Replica schedule:</label>
-            <div class="form-group" ng-if="monthsArray.length > 0">
+          <label for="policySchedule">Replica schedule:
+          </label>
+            <!-- <div class="form-group" ng-if="monthsArray.length > 0">
               <div><label for="month">Month</label></div>
               <div class="input-group col-md-3 col-xs-4 col-s-4"  ng-repeat="monthName in monthsArray" show-errors style="display:inline-grid;">
                 <input type="checkbox" ng-model="selectedMonths[monthName]" name="selectedMonths" value="{{monthName}}" > 
                 <span class="capitalize breakword">{{monthName.slice(0, 3)}}</span>
               </div>
-
-              <!-- <div ng-if="!someSelected && touched" role="alert">
-                <p class="has-error help-block red">Cluster is required.</p>
-              </div> -->
             </div>
             <div class="form-group" ng-if="weeksArray.length > 0">
               <div><label for="dayOfWeek">Day of the week</label></div>
@@ -44,9 +40,9 @@
                 <span class="capitalize breakword">{{dayOfWeek.slice(0, 3)}}</span>
               </div>
 
-              <!-- <div ng-if="!someSelected && touched" role="alert">
+              <div ng-if="!someSelected && touched" role="alert">
                 <p class="has-error help-block red">Cluster is required.</p>
-              </div> -->
+              </div>
             </div>
             <div class="form-group" show-errors>
               <label for="day">Day</label>
@@ -55,13 +51,11 @@
                       ng-pattern="/^(?!.*(\b(?:[1-9]|[1-2]\d|3[0-1])\b).*\b\1\b)(?:[1-9]|[1-2]\d|3[0-1])(?:,(?:[1-9]|[1-2]\d|3[0-1]))*$/"
                       >
 
-              <div ng-messages="replicaForm.day.$error" role="alert">
-                <!-- <p class="help-block error-text" ng-message="required">Name is required.</p> -->
-                
+              <div ng-messages="replicaForm.day.$error" role="alert">               
                 <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 1, 31 are allowed, each number should occure only once</p>
               </div>
               <p class="help-block">Please enter coma separated string of numbers between 1 to 31, each number should occure only once</p>
-            </div>
+            </div> -->
             <div class="form-group" show-errors>
               <label for="hour">Hour</label>
               <input name="hour" type="text" ng-model="hour" id="hour" class="form-control"
@@ -88,7 +82,6 @@
               </div>              
             </div>
         </div>
-
         <div class="form-group">
           <input type="submit" value="Create" class="btn btn-primary">
         </div>
