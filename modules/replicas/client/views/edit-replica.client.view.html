@@ -1,42 +1,55 @@
-<section ng-controller="PodsController" ng-init="findOne()" ng-show="pod.podId">
+<section ng-controller="ReplicasController" ng-init="findOne()" ng-show="replica.id">
   <div class="page-header">
     <h1>Replica: <span>{{ ::replica.id }}</span></h1>
   </div>
   <div class="row show-grid">
     <div class="col-md-6">
-      <form name="podForm" class="form-horizontal" ng-submit="update(podForm.$valid)" novalidate>
-        <fieldset>
-          <div class="form-group required" show-errors>
-            <label for="name">Name</label>
-            <input name="name" type="text" ng-model="pod.name" id="name" class="form-control" placeholder="Name" 
-            ng-minlength="3"
-            ng-maxlength="64"
-            ng-pattern="/^[a-zA-Z0-9\ -]*$/"
-            ng-bind-html
-            required>
-            <div ng-messages="podForm.name.$error" role="alert">
-              <p class="help-block error-text" ng-message="required">Pod name is required.</p>
-              <p class="help-block error-text" ng-message="minlength">Pod name should have Minimum 3 characters</p>
-            <p class="help-block error-text" ng-message="maxlength">Pod name should have Maximum 64 characters.</p>
-            <p class="help-block error-text" ng-message="pattern">Pod name can only include alphanumeric characters including space and dash.</p>
-            </div>
-            <p class="help-block">Name of the Pod</p>
-          </div>
+      <form name="replicaForm" class="form-horizontal" ng-submit="update(replicaForm.$valid)" novalidate>
           <div class="form-group" show-errors>
-            <label for="vlansAvailable">Available VLANs</label>
-            <input name="vlansAvailable" type="text" ng-model="pod.vlansAvailable" id="vlansAvailable" class="form-control" placeholder="Available VLANs" ng-pattern="/^(\d+)(,\s*\d+)*$/" ng-bind-html>
-            <div ng-messages="podForm.vlansAvailable.$error" role="alert">             
-              <p class="help-block error-text" ng-message="pattern">Please enter Comma-separated list of VLAN IDs.</p>
-            </div>
-            <p class="help-block">Comma-separated list of VLAN IDs in a Pod available for associating with new Storage Servers</p>
+            <label for="action">Action</label>   
+            <select name="action" ng-model="replica.action" id="action" class="form-control" >
+              <option value="">Please select a Action</option>
+              <option value="break" ng-if="replica.state!='broken'">Break</option>
+              <option value="pause" ng-if="replica.state=='insync'">Pause</option>
+              <option value="resume" ng-if="replica.state=='paused'">Resume</option>
+              <option value="resync" ng-if="replica.state=='broken'">Resync</option>
+            </select>
           </div>
+
+          <div class="row show-grid mLeft0">
+            <label for="policySchedule">Replica schedule:
+            </label>
+            
+            <div class="form-group" show-errors>
+              <label for="hour">Hour</label>
+              <input name="hour" type="text" ng-model="replica.schedule.hour" id="hour" class="form-control"
+              placeholder="Hour"
+              ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
+              >
+
+              <div ng-messages="replicaForm.hour.$error" role="alert">
+                
+                <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed, each number should occure only once</p>
+              </div>
+              <p class="help-block">Please enter coma separated string of numbers between 0 to 23, each number should occure only once</p>
+            </div>
+            <div class="form-group" show-errors>
+              <label for="minute">Minute</label>
+              <input name="minute" type="number" ng-model="replica.schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
+              <div ng-messages="replicaForm.minute.$error" role="alert">
+                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+              </div>              
+            </div>
+        </div>
           <div class="form-group">
             <input type="submit" value="Update" class="btn btn-primary">
           </div>
           <div ng-show="error" class="text-danger">
             <strong ng-bind="error"></strong>
           </div>
-        </fieldset>
       </form>
     </div>
   </div>

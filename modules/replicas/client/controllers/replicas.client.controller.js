@@ -89,7 +89,7 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
             $location.path('replicas');
             Flash.create('success', '<strong ng-non-bindable>Successfully Deleted the replica!</strong>', 3000, { class: '', id: '' }, true);
           }, function (errorResponse) {
-            throwFlashErrorMessage(errorResponse.data.message);           
+            throwFlashErrorMessage(errorResponse.data.user_message);           
           });
 
           for (var i in $scope.replicas) {
@@ -111,13 +111,22 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         return false;
       }
 
-      var replica = $scope.replica;
+      var replica = $scope.replica;      
+      delete replica.destination_server_id;
+      delete replica.destination_volume_id;
+      delete replica.destination_site_id;
+      delete replica.source_server_id;
+      delete replica.source_volume_id;
+      delete replica.source_site_id; 
+      delete replica.state;
+      delete replica.status;
+      delete replica.id;
 
       replica.$update(function () {
         $location.path('replicas');
         Flash.create('success', '<strong ng-non-bindable>Successfully updated the replica!</strong>', 3000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.message); 
+        throwFlashErrorMessage(errorResponse.data.user_message); 
       });
     };
 
@@ -132,6 +141,14 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         replicaId: $stateParams.replicaId
       }, function(data) {
         $scope.replica = data;
+        $scope.replica.replicaId = $scope.replica.id;
+        //MODIFY THE HOUR FORMAT
+        var a = data.schedule.hour.split(",");
+        var stripped_hour_array = [];
+        a.forEach(function(n) {
+          stripped_hour_array.push(parseInt(n));
+        });
+        $scope.replica.schedule.hour = stripped_hour_array.join(",");
       }, function(error){
         $location.path('replicas');
         throwFlashErrorMessage('No replica with that identifier has been found');
