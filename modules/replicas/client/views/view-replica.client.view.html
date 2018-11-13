@@ -12,6 +12,10 @@
       <tr><th>Destination Volume</th><td ng-bind="replica.destination_volume_id" class="capitalize"></td></tr>
       <tr><th>Status</th><td ng-bind="replica.status"></td></tr>
       <tr><th>Volume Replication Status</th><td ng-bind="replica.state"></td></tr>
+      <tr><th>Replica Schedule:</th>
+        <td>Hour : {{replica.schedule.hour}}</td>        
+        <td>Minute: {{replica.schedule.minute}}</td>
+      </tr>
       
       
       <tr ng-if="(replicaAccessRoles.update | intersect : authentication.user.roles) > 0 || (replicaAccessRoles.delete | intersect : authentication.user.roles) > 0">

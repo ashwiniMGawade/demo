@@ -13,7 +13,6 @@ angular.module('replicas').controller('ReplicasListController', ['$scope', '$fil
         counts: [],
         getData: function($defer, params) {
           Replicas.query(function (data) {
-            console.log("here in response", data);
             $scope.replicas = data;
             var filteredData = $filter('filter')($scope.replicas, function(data) {    
               if ($scope.search) {
@@ -24,7 +23,7 @@ angular.module('replicas').controller('ReplicasListController', ['$scope', '$fil
                         ((data.destination_server_id) ? data.destination_server_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
                         ((data.destination_volume_id) ? data.destination_volume_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
                        ((data.status) ? data.status.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
-                       ((data.state) ? data.state.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
+                       ((data.state) ? data.state.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
               } else {
                 return true;
               }
