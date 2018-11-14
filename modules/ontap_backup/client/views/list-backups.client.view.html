@@ -1,0 +1,32 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Backups</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()"  ng-bind-html/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="backup in $data">
+        <!-- <td ng-bind="backup.source_site_id.name" title="'Source Site'" sortable="'source_site_id.name'" class="breakword"></td> -->
+        <td ng-bind="backup.source_site_id" title="'Source Site'" sortable="'source_site_id'" class="breakword"></td>
+        <td ng-bind="backup.source_server_id" title="'Source Server'" sortable="'source_server_id'" class="breakword"></td>
+        <td ng-bind="backup.source_volume_id" title="'Source Volume'" sortable="'source_volume_id'" class="breakword"></td>
+        <td ng-bind="backup.destination_site_id" title="'Destination Site'" sortable="'destination_site_id'" class="breakword"></td>
+        <td ng-bind="backup.destination_server_id" title="'Destination Server'" sortable="'destination_server_id'" class="breakword"></td>
+        <td ng-bind="backup.destination_volume_id" title="'Destination Volume'" sortable="'destination_volume_id'" class="breakword"></td>
+        <td ng-bind="backup.status" class="capitalize breakword" title="'Status'" sortable="'status'"></td>
+        <td ng-bind="backup.state" title="'Volume backuption state'" sortable="'state'" class="breakword"></td>
+        <td ng-if="(backupAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="backups.edit({backupId: backup.id})">Edit</button></td>
+        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="backups.view({backupId: backup.id})">Details</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

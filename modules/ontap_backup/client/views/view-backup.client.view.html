@@ -1,0 +1,33 @@
+<section ng-controller="BackupsController" ng-init="findOne()" ng-show="backup.id">
+  <div class="page-header">
+    <h1>Backup: <span ng-bind="backup.id" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Source Site</th><td ng-bind="backup.source_site_id" class="capitalize"></td></tr>
+      <tr><th>Source Server</th><td ng-bind="backup.source_server_id" class="capitalize"></td></tr>
+      <tr><th>Source Volume</th><td ng-bind="backup.source_volume_id" class="capitalize"></td></tr>
+      <tr><th>Destination Site</th><td ng-bind="backup.destination_site_id" class="capitalize"></td></tr>
+      <tr><th>Destination Server</th><td ng-bind="backup.destination_server_id" class="capitalize"></td></tr>
+      <tr><th>Destination Volume</th><td ng-bind="backup.destination_volume_id" class="capitalize"></td></tr>
+      <tr><th>Status</th><td ng-bind="backup.status"></td></tr>
+      <tr><th>Volume Replication Status</th><td ng-bind="backup.state"></td></tr>
+      <tr><th>Backup Schedule:</th>
+        <td>Hour : {{backup.schedule.hour}}</td>        
+        <td>Minute: {{backup.schedule.minute}}</td>
+      </tr>
+      
+      
+      <tr ng-if="(backupAccessRoles.update | intersect : authentication.user.roles) > 0 || (backupAccessRoles.delete | intersect : authentication.user.roles) > 0">
+        <th>Actions</th>
+        <td>
+          <button ng-if="(backupAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ui-sref="backups.edit({backupId: backup.id})">Edit</button>
+          <button ng-if="(backupAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ng-click="remove(backup);">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>
