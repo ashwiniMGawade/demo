@@ -29,13 +29,14 @@
               <input name="bkPolicyEnabled" type="checkbox" ng-model="bkPolicyEnabled" id="bkPolicyEnabled" class="form-control checkbox-left">
             </div>
             <div class="form-group col-md-10">
-              <label style="margin-top: 12px;">Enable Snapshot Policy</label>
+              <label style="margin-top: 12px;">Enable Backup Policy</label>
             </div>
           </div>
           <div class="col-md-12" ng-show="bkPolicyEnabled">
             <div>
               <label for="policySchedule">Hourly schedule:
               </label>
+               <p class="faint-text">If enabled, update remote backup every hour e.g. at 04:00, 05:00, 06:00</p>
               <div class="form-group" show-errors>
                 <label for="minute">Minute</label>
                 <input name="hourly_schedule_minute" type="number" ng-model="hourly_schedule.minute" id="hourly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
@@ -99,6 +100,7 @@
             <div>
               <label for="WeeklyypolicySchedule">Weekly schedule:
               </label>
+              <p class="faint-text">If enabled, update remote backup every hour e.g. at 04:00, 05:00, 06:00</p>
               <div class="form-group" show-errors>
                 <label for="dayOfWeek">Day of the week</label>
                 <select ng-model="weekly_schedule['day']" name="weekly_schedule_day" id="weekly_schedule_day" class="form-control" ng-options="dayOfWeek as dayOfWeek for dayOfWeek in weeksArray">
@@ -139,7 +141,7 @@
               </div>
             </div>
             <div>
-              <label for="MonthlypolicySchedule">Weekly schedule:
+              <label for="MonthlypolicySchedule">Monthly schedule:
               </label>
               <div class="form-group" show-errors>
                 <label for="dayOfWeek">Day of the month</label>
