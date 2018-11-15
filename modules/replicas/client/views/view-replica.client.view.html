@@ -1,20 +1,31 @@
 <section ng-controller="ReplicasController" ng-init="findOne()" ng-show="replica.id">
   <div class="page-header">
-    <h1>Replica: <span ng-bind="replica.id" class="capitalize"></span></h1>
+    <h3>Replica: 
+      <a ui-sref="storagegroups.view({storagegroupId: replica.source_volume.id})">
+        <span>{{replica.source_site.name}}://{{replica.source_server.name}}/{{replica.source_volume.name}}</span>
+      </a>
+      ->
+      <a ui-sref="storagegroups.view({storagegroupId: replica.destination_volume.id})">
+        <span>{{replica.destination_site.name}}://{{replica.destination_server.name}}/{{replica.destination_volume.name}}</span>
+      </a>
+    <h3>
   </div>
   <div class="col-md-6">
     <table class="table table-striped">
-      <tr><th>Source Site</th><td ng-bind="replica.source_site_id" class="capitalize"></td></tr>
-      <tr><th>Source Server</th><td ng-bind="replica.source_server_id" class="capitalize"></td></tr>
-      <tr><th>Source Volume</th><td ng-bind="replica.source_volume_id" class="capitalize"></td></tr>
-      <tr><th>Destination Site</th><td ng-bind="replica.destination_site_id" class="capitalize"></td></tr>
-      <tr><th>Destination Server</th><td ng-bind="replica.destination_server_id" class="capitalize"></td></tr>
-      <tr><th>Destination Volume</th><td ng-bind="replica.destination_volume_id" class="capitalize"></td></tr>
+      <tr><th>Source Site</th><td ng-bind="replica.source_site.name" class="capitalize"></td></tr>
+      <tr><th>Source Server</th><td ng-bind="replica.source_server.name" class="capitalize"></td></tr>
+      <tr><th>Source Volume</th><td ng-bind="replica.source_volume.name" class="capitalize"></td></tr>
+      <tr><th>Destination Site</th><td ng-bind="replica.destination_site.name" class="capitalize"></td></tr>
+      <tr><th>Destination Server</th><td ng-bind="replica.destination_server.name" class="capitalize"></td></tr>
+      <tr><th>Destination Volume</th><td ng-bind="replica.destination_volume.name" class="capitalize"></td></tr>
       <tr><th>Status</th><td ng-bind="replica.status"></td></tr>
       <tr><th>Volume Replication Status</th><td ng-bind="replica.state"></td></tr>
       <tr><th>Replica Schedule:</th>
-        <td>Hour : {{replica.schedule.hour}}</td>        
-        <td>Minute: {{replica.schedule.minute}}</td>
+        <td>
+          <ul style="list-style-type: none;padding:0">
+            <li>Hour : {{replica.schedule.hour}}</li>        
+            <li>Minute: {{replica.schedule.minute}}</li>
+          </ul>
       </tr>
       
       

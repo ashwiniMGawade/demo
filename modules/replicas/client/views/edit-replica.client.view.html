@@ -1,6 +1,14 @@
 <section ng-controller="ReplicasController" ng-init="findOne()" ng-show="replica.id">
   <div class="page-header">
-    <h1>Replica: <span>{{ ::replica.id }}</span></h1>
+    <h3>Replica: 
+      <a ui-sref="storagegroups.view({storagegroupId: replica.source_volume.id})">
+        <span>{{replica.source_site.name}}://{{replica.source_server.name}}/{{replica.source_volume.name}}</span>
+      </a>
+      ->
+      <a ui-sref="storagegroups.view({storagegroupId: replica.destination_volume.id})">
+        <span>{{replica.destination_site.name}}://{{replica.destination_server.name}}/{{replica.destination_volume.name}}</span>
+      </a>
+    <h3>
   </div>
   <div class="row show-grid">
     <div class="col-md-6">

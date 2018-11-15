@@ -28,6 +28,34 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
       }
     }
 
+    $scope.getDestinationServers = function(sg) {
+      var sourceServerId = '';
+      $scope.peeredServer = [];
+      var peeredServerIds = [];
+      var keepGoing = true;
+      angular.forEach($scope.storagegroups, function(storagegroup) {
+        if (storagegroup.storagegroupId == sg && keepGoing) {
+          sourceServerId = storagegroup.server._id;
+          keepGoing = false;
+        }
+      });
+      keepGoing = true;
+      angular.forEach($scope.servers, function(server) {
+        if (server.serverId == sourceServerId && keepGoing) {
+          angular.forEach(server.peers, function(peer) {
+            peeredServerIds.push(peer.serverId);
+          });
+          keepGoing = false;
+        }
+      });
+
+      angular.forEach($scope.servers, function(server) {
+        if (peeredServerIds.indexOf(server.serverId) !== -1 ) {
+          $scope.peeredServer.push(server);
+        }
+      });
+    }
+
     // Create new Replica
     $scope.create = function (isValid) {
 
@@ -57,8 +85,8 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         source_volume_id: $sanitize(this.sourceVolumeId),
         destination_server_id: $sanitize(this.destinationServerId),
         schedule: {
-          hour:$sanitize(this.hour),
-          minute:this.minute
+          hour:this.hour ? $sanitize(this.hour): $sanitize(0),
+          minute:this.minute ? this.minute : 0
         }
       });
 
