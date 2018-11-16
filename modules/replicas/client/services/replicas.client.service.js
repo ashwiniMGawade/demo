@@ -12,6 +12,15 @@ angular.module('replicas').factory('Replicas', ['$resource',
       create: {
         method: 'POST'
       }
+      //,
+      // 'query': {
+      //   method: 'GET',
+      //   url:'/api/replicas'
+      // },
+      // 'get': {
+      //   method: 'GET',
+      //   url:'/api/replicas/:replicaId'
+      // }
     });
   }
 ]);
