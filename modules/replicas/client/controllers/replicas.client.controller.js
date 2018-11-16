@@ -148,8 +148,7 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
       delete replica.source_site_id; 
       delete replica.state;
       delete replica.status;
-      delete replica.id;
-
+      
       replica.$update(function () {
         $location.path('replicas');
         Flash.create('success', '<strong ng-non-bindable>Successfully updated the replica!</strong>', 3000, { class: '', id: '' }, true);
