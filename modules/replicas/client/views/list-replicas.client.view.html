@@ -13,14 +13,14 @@
     <table ng-table="tableParams" class="table table-bordered table-striped">
       <tr ng-repeat="replica in $data">
         <!-- <td ng-bind="replica.source_site.name.name" title="'Source Site'" sortable="'source_site.name.name'" class="breakword"></td> -->
-        <td ng-bind="replica.source_site.name" title="'Source Site'" sortable="'source_site.name'" class="breakword"></td>
-        <td ng-bind="replica.source_server.name" title="'Source Server'" sortable="'source_server.name'" class="breakword"></td>
-        <td ng-bind="replica.source_volume.name" title="'Source Volume'" sortable="'source_volume.name'" class="breakword"></td>
-        <td ng-bind="replica.destination_site.name" title="'Destination Site'" sortable="'destination_site.name'" class="breakword"></td>
-        <td ng-bind="replica.destination_server.name" title="'Destination Server'" sortable="'destination_server.name'" class="breakword"></td>
-        <td ng-bind="replica.destination_volume.name" title="'Destination Volume'" sortable="'destination_volume.name'" class="breakword"></td>
-        <td ng-bind="replica.status" class="capitalize breakword" title="'Status'" sortable="'status'"></td>
-        <td ng-bind="replica.state" title="'Volume Replication state'" sortable="'state'" class="breakword"></td>
+        <td style="width: 13%;" ng-bind="replica.source_site.name" title="'Source Site'" sortable="'source_site.name'" class="breakword"></td>
+        <td style="width: 14%;" ng-bind="replica.source_server.name" title="'Source Server'" sortable="'source_server.name'" class="breakword"></td>
+        <td style="width: 14%;" ng-bind="replica.source_volume.name" title="'Source Volume'" sortable="'source_volume.name'" class="breakword"></td>
+        <td style="width: 14%;" ng-bind="replica.destination_site.name" title="'Destination Site'" sortable="'destination_site.name'" class="breakword"></td>
+        <td style="width: 17%;" ng-bind="replica.destination_server.name" title="'Destination Server'" sortable="'destination_server.name'" class="breakword"></td>
+        <td style="width: 17%;" ng-bind="replica.destination_volume.name" title="'Destination Volume'" sortable="'destination_volume.name'" class="breakword"></td>
+        <td style="width: 6%;" ng-bind="replica.status" class="capitalize breakword" title="'Status'" sortable="'status'"></td>
+        <td  style="width: 5%;"ng-bind="replica.state" title="'State'" sortable="'state'" class="breakword"></td>
         <td ng-if="(replicaAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ui-sref="replicas.edit({replicaId: replica.id})">Edit</button></td>
         <td><button type="button" class="btn btn-xs btn-primary" ui-sref="replicas.view({replicaId: replica.id})">Details</button></td>
       </tr>
