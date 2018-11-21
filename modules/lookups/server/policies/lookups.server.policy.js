@@ -85,6 +85,13 @@ exports.invokeRolesPolicies = function () {
       permissions: ['get']
     }]
   }]);
+  acl.allow([{
+    roles: roles,
+    allows: [{
+      resources: '/api/lookups/serviceLevels',
+      permissions: ['get']
+    }]
+  }]);
 };
 
 /**

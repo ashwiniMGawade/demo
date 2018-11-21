@@ -10,6 +10,10 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.labels = featuresSettings.labels;
     $scope.SGAccessRoles = featuresSettings.roles.storagegroup;
     $scope.snapshotAccessRoles = featuresSettings.roles.snapshot;
+    $http.get('api/lookups/serviceLevels')
+      .then(function(response) {
+        $scope.validTierToAssign = response.data;
+    });
 
     var flashTimeout = 3000;
     var defaultDailyRetention = '7';
@@ -258,7 +262,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       $http.get('api/lookups/sgStatus')
         .then(function(response) {
           $scope.validStatusToAssign = response.data;
-      });
+      });     
     };
 
     //Fix to be applied by root (managed services)
@@ -274,8 +278,8 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     };
 
 
-    $scope.validTierToAssign = [{id:'standard',name:'Standard'}, {id:'premium',name:'Premium'}, {id:'performance',name:'Performance'}];
-    $scope.tier = 'standard';
+   // $scope.validTierToAssign = [{id:'standard',name:'Standard'}, {id:'premium',name:'Premium'}, {id:'performance',name:'Performance'}];
+    //$scope.tier = 'standard';
     $scope.sspDailySchedules = [{val:'1810',displayVal:'18:10'},
                                 {val:'2010',displayVal:'20:10'},
                                 {val:'2210',displayVal:'22:10'},
