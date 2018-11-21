@@ -158,9 +158,9 @@ angular.module('storageunits')
         $scope.storageunit = data;
         var acl_array = data.acl.split(',');        
         $scope.acl_array = acl_array.length >= 1 ? acl_array : [];
-        if(acl_array.length === 1 && !$scope.storageunit.aclRemove && acl_array[0] !==''){
-          $scope.storageunit.aclRemove = acl_array[0];
-        }
+        // if(acl_array.length === 1 && !$scope.storageunit.aclRemove && acl_array[0] !==''){
+        //   $scope.storageunit.aclRemove = acl_array[0];
+        // }
       }, function(error) {
         $location.path('storageunits');
         throwFlashErrorMessage('No storage unit with that identifier has been found');
