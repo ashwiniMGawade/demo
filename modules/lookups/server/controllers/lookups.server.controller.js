@@ -11,6 +11,7 @@ var _ = require('lodash'),
   Storagegroup = mongoose.model('Storagegroup'),
   Subscription = mongoose.model('Subscription'),
   Storageunit = mongoose.model('Storageunit'),
+  Servicelevel = mongoose.model('servicelevel'),
   Icr = mongoose.model('Icr'),
   NotificationSchema = mongoose.model('Notification'),
   User = mongoose.model('User');
@@ -57,3 +58,15 @@ exports.listProvider = function (req, res) {
 exports.listStoragePackClasses = function (req, res) {
   res.json(Subscription.schema.path('storagePack').schema.path('class').enumValues);
 };
+
+exports.listServiceLevels = function(req, res) {
+  Servicelevel.find({}).exec(function (err, servicelevels) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      res.json(servicelevels);
+    }
+  });
+}

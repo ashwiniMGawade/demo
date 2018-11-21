@@ -68,11 +68,16 @@
         </div>
         <div class="form-group required" show-errors>
           <label for="tier">Tier</label>
-          <select ng-model="tier" ng-options="tier.id as tier.name for tier in validTierToAssign" class="form-control" id="tier" name="tier" class="form-control" required></select>
+          <select ng-model="tier" ng-options="tier.name as tier.name for tier in validTierToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required></select>
           <div ng-messages="storagegroupForm.tier.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Tier is required.</p>
           </div>
-          <p class="help-block">The tier of storage the NetApp Volume is to reside on: Performance (6144 IOPS/TB), Premium (1536 IOPS/TB), Standard (128 IOPS/TB)</p>
+          <p class="help-block">The Tier of storage the NetApp Volume is to reside on:
+            <span ng-repeat="tierDetails in validTierToAssign">
+              <span class="capitalize">{{tierDetails.name}}</span>
+              ( {{tierDetails.max_iops_per_tb}} IOPS/TB)
+            </span>
+          </p>
         </div>
       </div>
     </div>

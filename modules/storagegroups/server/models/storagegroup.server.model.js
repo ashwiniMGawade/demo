@@ -42,11 +42,7 @@ var StoragegroupSchema = new Schema({
   },   
   tier: {
     type: String,
-    default: 'standard',
-    enum: {
-            values: ['standard', 'premium', 'performance'],
-            message: '`{VALUE}` not a valid value for Tier'
-          },
+    default: 'value',
     required: 'Storage Group Tier required'
   },
   snapshotPolicy: {
