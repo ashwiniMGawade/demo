@@ -37,6 +37,8 @@ angular.module('users')
       $http.post('/api/auth/signin', $scope.credentials).success(function (response) {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
+        Authentication.setHeader($scope.credentials.username, $scope.credentials.password)
+        //$scope.authentication.user[""]
         
         // And redirect to the previous or home page if not root or partner user
         if($state.previous.state.name === 'home' && response.roles.indexOf('root') === -1 && response.roles.indexOf('l1ops') === -1 && response.roles.indexOf('partner') === -1) {

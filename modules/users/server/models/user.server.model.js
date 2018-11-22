@@ -255,7 +255,7 @@ UserSchema.pre('validate', function (next) {
  * Create instance method for hashing a password
  */
 UserSchema.methods.hashPassword = function (password) {
-  if (this.salt && password) {
+  if (this.salt && password) {    
     return crypto.pbkdf2Sync(password, new Buffer(this.salt, 'base64'), 10000, 64, 'sha512').toString('base64');
   } else {
     return password;
