@@ -148,7 +148,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         annotation: (this.annotation) ? $sanitize(this.annotation) : '',
         serverId: $sanitize(this.serverId),
         tier: $sanitize(this.tier),
-        snapshotPolicy: formattedSanpShotPolicy
+        snapshot_policy: formattedSanpShotPolicy
       });
 
       // Redirect after save
@@ -162,7 +162,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $scope.annotation = '';
         $scope.serverId = '';
         $scope.tier = '';
-        $scope.snapshotPolicy = '';
+        $scope.snapshot_policy = '';
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.message);
       });
@@ -222,7 +222,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
       var formattedSanpShotPolicy = formatSnapShotPolicy();
       var storagegroup = $scope.storagegroup;
-      storagegroup.snapshotPolicy = formattedSanpShotPolicy;
+      storagegroup.snapshot_policy = formattedSanpShotPolicy;
       storagegroup.$update(function () {
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Update request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
@@ -245,9 +245,9 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         storagegroupId: $stateParams.storagegroupId
       }, function(data) {
         $scope.storagegroup = data;
-        if(data.snapshotPolicy !== 'none'){
+        if(data.snapshot_policy !== 'none'){
           $scope.ssPolicyEnabled = true;
-          parseSnapShotPolicy(data.snapshotPolicy);
+          parseSnapShotPolicy(data.snapshot_policy);
           prepareDetailedSnapShotPolicy();
         }else{
           $scope.sspDailyRetention = defaultDailyRetention;
