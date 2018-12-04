@@ -21,6 +21,11 @@ angular.module('storagegroups').factory('Storagegroups', ['$resource', '$window'
         headers: authHeader,
         url: goAPIHost + '/volumes/:storagegroupId'
       },
+      'remove': {
+        method: 'DELETE',
+        headers: authHeader,
+        url: goAPIHost + '/volumes/:storagegroupId'
+      },
       'query': {
         method: 'GET',
         isArray: true,

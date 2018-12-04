@@ -14,12 +14,7 @@
       <tr><th>Subscription</th><td ng-bind="storagegroup.subscription.name"></td></tr>
       <tr>
           <th>Tier</th>
-          <td class="capitalize">
-            <span ng-switch="storagegroup.tier">
-              <span ng-switch-when="standard">Standard</span>
-              <span ng-switch-when="premium">Premium</span>
-              <span ng-switch-when="performance">Performance</span>
-            </span>
+          <td class="capitalize">{{storagegroup.tier}}
           </td>
       </tr>
       <tr><th>SnapshotPolicy</th><td><pre>{{detailedSnapShotDesc}}</pre></td></tr>

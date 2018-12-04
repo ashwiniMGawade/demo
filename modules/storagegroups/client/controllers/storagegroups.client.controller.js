@@ -16,8 +16,8 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     });
 
     var flashTimeout = 3000;
-    var defaultDailyRetention = '7';
-    var defaultDailySchedule = '1810';
+
+    $scope.weeksArray = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
     function throwFlashErrorMessage(message) {
       var errMsg;
@@ -50,26 +50,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }
       }
     }
-    function formatSnapShotPolicy(){
-      var formattedSanpShotPolicy = '';
-      if($scope.ssPolicyEnabled){
-        //SnapshotPolicy is to be in required format (eg: 12hourly-7daily1810-13weekly-1monthly)
-        if($scope.sspHourlyRetention && parseInt($scope.sspHourlyRetention) !== 0){
-          formattedSanpShotPolicy = $scope.sspHourlyRetention + 'hourly-';
-        }
-        formattedSanpShotPolicy = formattedSanpShotPolicy + $scope.sspDailyRetention + 'daily' + $scope.sspDailySchedule;
-        if($scope.sspWeeklyRetention && parseInt($scope.sspWeeklyRetention) !== 0){
-          formattedSanpShotPolicy = formattedSanpShotPolicy + '-' + $scope.sspWeeklyRetention + 'weekly';
-        }
-        if($scope.sspMonthlyRetention && parseInt($scope.sspMonthlyRetention) !== 0){
-          formattedSanpShotPolicy = formattedSanpShotPolicy + '-' + $scope.sspMonthlyRetention + 'monthly';
-        }
-      }else{
-        formattedSanpShotPolicy = 'none';
-      }
-      return formattedSanpShotPolicy;
-    }
-
+    
     function prepareDetailedSnapShotPolicy(){
       $scope.detailedSnapShotDesc = "";
       if($scope.sspHourlyRetention){
@@ -140,15 +121,25 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         return false;
       }
 
-      var formattedSanpShotPolicy = formatSnapShotPolicy();
+      //need to remove the line once the modification is done in model
+      this.daily_schedule.hour = $sanitize(this.daily_schedule.hour);
+
+      //var formattedSanpShotPolicy = formatSnapShotPolicy();
       // Create new Storagegroup object
       var storagegroup = new Storagegroups({
         name: $sanitize(this.name),
         code: $sanitize(this.code),
         annotation: (this.annotation) ? $sanitize(this.annotation) : '',
-        serverId: $sanitize(this.serverId),
+        server_id: $sanitize(this.serverId),
         tier: $sanitize(this.tier),
-        snapshot_policy: formattedSanpShotPolicy
+        size_bytes:this.size_bytes,
+        snapshot_policy: {
+          enabled:ssPolicyEnabled ? true: false,
+          hourly_schedule: this.hourly_schedule,
+          daily_schedule: this.daily_schedule,
+          weekly_schedule: this.weekly_schedule,
+          monthly_schedule:this.monthly_schedule
+        }
       });
 
       // Redirect after save
@@ -164,7 +155,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $scope.tier = '';
         $scope.snapshot_policy = '';
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.message);
+        throwFlashErrorMessage(errorResponse.data.user_message || errorResponse.data.error || "Something went wrong!");
       });
     };
 
@@ -181,12 +172,13 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $location.path( '/storagegroups/' + storagegroupId + '/snapshots');
         Flash.create('success', '<strong ng-non-bindable>Snapshot Create request accepted. Please wait and list the Snapshots in a 10 seconds or so.</strong>', 10000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.message);
+        throwFlashErrorMessage(errorResponse.data.user_message);
       });
     };
 
     // Remove existing Subtenant
     $scope.remove = function (storagegroup) {
+      storagegroup.storagegroupId = storagegroup.id;
       var modalOptions = {
         closeButtonText: 'Cancel',
         actionButtonText: 'Ok',
@@ -200,7 +192,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
             $location.path('storagegroups');
             Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Delete request.<br>Please wait for the object to be removed from the list.</strong>', 10000, { class: '', id: '' }, true);
           }, function (errorResponse) {
-            throwFlashErrorMessage(errorResponse.data.message);
+            throwFlashErrorMessage(errorResponse.data.user_message);
           });
 
           for (var i in $scope.storagegroups) {
@@ -222,12 +214,19 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
       var formattedSanpShotPolicy = formatSnapShotPolicy();
       var storagegroup = $scope.storagegroup;
-      storagegroup.snapshot_policy = formattedSanpShotPolicy;
+      storagegroup.storagegroupId = storagegroup.id;
+      storagegroup.snapshot_policy = {
+        enabled:ssPolicyEnabled ? true: false,
+        hourly_schedule: this.hourly_schedule,
+        daily_schedule: this.daily_schedule,
+        weekly_schedule: this.weekly_schedule,
+        monthly_schedule:this.monthly_schedule
+      };
       storagegroup.$update(function () {
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Update request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.message);
+        throwFlashErrorMessage(errorResponse.data.user_message);
       });
     };
 
@@ -235,8 +234,9 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.find = function () {
       //$scope.storagegroups = Storagegroups.query();
       //$scope.servers = Servers.query();
-      $scope.sspDailyRetention = defaultDailyRetention;
-      $scope.sspDailySchedule = defaultDailySchedule;
+      // $scope.sspDailyRetention = defaultDailyRetention;
+      // $scope.sspDailySchedule = defaultDailySchedule;
+
     };
 
     // Find existing Storagegroup
@@ -245,18 +245,18 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         storagegroupId: $stateParams.storagegroupId
       }, function(data) {
         $scope.storagegroup = data;
-        if(data.snapshot_policy !== 'none'){
+        if(data.snapshot_policy.enabled){
           $scope.ssPolicyEnabled = true;
-          parseSnapShotPolicy(data.snapshot_policy);
-          prepareDetailedSnapShotPolicy();
-        }else{
-          $scope.sspDailyRetention = defaultDailyRetention;
-          $scope.sspDailySchedule = defaultDailySchedule;
-          $scope.detailedSnapShotDesc = "No Snapshot Policy scheduled";
+          $scope.hourly_schedule = data.snapshot_policy.hourly_schedule;
+          $scope.daily_schedule = data.snapshot_policy.daily_schedule;
+          $scope.monthly_schedule = data.snapshot_policy.monthly_schedule;
+          $scope.weekly_schedule = data.snapshot_policy.weekly_schedule;
+          //parseSnapShotPolicy(data.snapshot_policy);
+          //prepareDetailedSnapShotPolicy();
         }
       }, function(error){
         $location.path('storagegroups');
-        throwFlashErrorMessage(error.data.message);
+        throwFlashErrorMessage(error.data.user_message);
       });
 
       $http.get('api/lookups/sgStatus')
@@ -273,7 +273,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Successfully fixed the Storagegroup!</strong>', 10000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.message);
+        throwFlashErrorMessage(errorResponse.data.user_message);
       });
     };
 
