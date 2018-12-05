@@ -277,6 +277,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       Storagegroups.get({
         storagegroupId: $stateParams.storagegroupId
       }, function(data) {
+        $scope.storagegroup = data;
         if(data.snapshot_policy.enabled){
           $scope.ssPolicyEnabled = true;
           $scope.hourly_schedule = data.snapshot_policy.hourly_schedule;
@@ -289,7 +290,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
           $scope.monthlyScheduleEnabled = data.snapshot_policy.monthly_schedule.snapshots_to_keep > 0 ? true : false;
           //parseSnapShotPolicy(data.snapshot_policy);
           prepareDetailedSnapShotPolicy();
-          $scope.storagegroup = data;
+          
         }
       }, function(error){
         $location.path('storagegroups');
