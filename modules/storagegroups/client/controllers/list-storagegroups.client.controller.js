@@ -11,11 +11,8 @@ angular.module('storagegroups').controller('StoragegroupListController', ['$scop
     $scope.labels = featuresSettings.labels;
     $scope.SGAccessRoles = featuresSettings.roles.storagegroup;
 
-    var reloadCnt = 0 , pollingParams = {} ;
-
     //Refresh the contents of the page after every 30 seconds
     var refreshData = $interval(function() { 
-      reloadCnt++;
       $scope.tableParams.reload();
     }, featuresSettings.pageRefresh);
 
@@ -34,10 +31,7 @@ angular.module('storagegroups').controller('StoragegroupListController', ['$scop
       }, {
         counts: [],
         getData: function($defer, params) {
-          if (reloadCnt >= 1){
-            pollingParams.ispolling = 1;
-          }
-          Storagegroups.query(pollingParams, function (data) {
+          Storagegroups.query({}, function (data) {
             $scope.storagegroups = data;
 
             var filteredData = $filter('filter')($scope.storagegroups, function(data) {
