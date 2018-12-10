@@ -44,10 +44,10 @@ angular.module('storageunits')
     $scope.populateSG = function(server, callback) {
       $scope.storagegroups = [];
       $scope.storagegroupId = '';
-      var storagegroups = Storagegroups.query({'server' : server});
+      var storagegroups = Storagegroups.query({'file-server' : server});
       storagegroups.$promise.then(function(results) {
         angular.forEach(storagegroups, function(storagegroup) {
-          if (storagegroup.server && storagegroup.server._id === server && storagegroup.status === 'Operational') {
+          if (storagegroup.server && storagegroup.server.id === server && storagegroup.status === 'Operational') {
             $scope.storagegroups.push(storagegroup);
           }
         });
