@@ -155,8 +155,9 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
 
       //need to remove the line once the modification is done in model
-      this.daily_schedule.hour = $sanitize(this.daily_schedule.hour);
-
+      if (this.dailyScheduleEnabled) {
+        this.daily_schedule.hour = $sanitize(this.daily_schedule.hour);
+      }
       //var formattedSanpShotPolicy = formatSnapShotPolicy();
       // Create new Storagegroup object
       var storagegroup = new Storagegroups({

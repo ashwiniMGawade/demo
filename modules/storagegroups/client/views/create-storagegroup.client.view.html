@@ -83,7 +83,7 @@
         </div>
         <div class="form-group" show-errors>
           <label for="size_bytes">Size (Bytes)</label>
-          <input name="size_bytes" type="number" ng-model="size_bytes" id="size_bytes" class="form-control" placeholder="Size (Bytes)"  min="0" required  ng-pattern="/^[\d]*$/">
+          <input name="size_bytes" type="number" ng-model="size_bytes" id="size_bytes" class="form-control" placeholder="Size (Bytes)"  min="0"  ng-pattern="/^[\d]*$/">
           <div ng-messages="storagegroupForm.size_bytes.$error" role="alert">
             <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
             <!-- <p class="help-block error-text" ng-message="max">Maximum value is 16384.</p> -->
