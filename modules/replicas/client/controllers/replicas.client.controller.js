@@ -39,6 +39,9 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
           keepGoing = false;
         }
       });
+      //Add source server as destination server
+      peeredServerIds.push(sourceServerId);
+      
       keepGoing = true;
       angular.forEach($scope.servers, function(server) {
         if (server.serverId == sourceServerId && keepGoing) {
