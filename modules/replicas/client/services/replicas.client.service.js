@@ -28,7 +28,12 @@ angular.module('replicas').factory('Replicas', ['$resource', '$window',
         isArray: true,
         headers: authHeader,
         url:goAPIHost + '/replicas'
-      }
+      },
+      'remove': {
+        method: 'DELETE',
+        headers: authHeader,
+        url: goAPIHost + '/replicas/:replicaId'
+      },
       
     });
   }
