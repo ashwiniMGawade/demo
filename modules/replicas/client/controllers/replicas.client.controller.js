@@ -34,8 +34,8 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
       var peeredServerIds = [];
       var keepGoing = true;
       angular.forEach($scope.storagegroups, function(storagegroup) {
-        if (storagegroup.storagegroupId == sg && keepGoing) {
-          sourceServerId = storagegroup.server._id;
+        if (storagegroup.id == sg && keepGoing) {
+          sourceServerId = storagegroup.server.id;
           keepGoing = false;
         }
       });
