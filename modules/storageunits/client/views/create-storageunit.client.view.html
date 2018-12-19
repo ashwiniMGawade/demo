@@ -79,7 +79,7 @@
         </div>
         <div class="form-group required" show-errors>
           <label for="storagegroupId">Storage Group</label>
-          <select name="storagegroupId" ng-model="storagegroupId" id="storagegroupId" class="form-control" ng-options="storagegroup.id as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required ng-disabled="!serverId">
+          <select name="storagegroupId" ng-model="storagegroupId" id="storagegroupId" class="form-control" ng-options="storagegroup.id as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required ng-disabled="!serverId || storagegroups.length == 0">
             <option value="">Please select a storage group</option>
           </select>
           <div ng-messages="storageunitForm.storagegroupId.$error" role="alert">

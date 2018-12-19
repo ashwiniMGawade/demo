@@ -121,8 +121,8 @@ StorageunitSchema.pre('save', function (next, done) {
       } else if (!storagegroup) {
         logger.info('Storageunit Model: Invalid Storagegroup ID');
       } else {
-        self.tenant = storagegroup.tenant;
-        self.subtenant = storagegroup.subtenant;
+        self.tenant = storagegroup.tenant_id;
+        self.subtenant = storagegroup.subtenant_id;
         self.server = storagegroup.server;
         self.partner = storagegroup.partner;
         self.subscription = storagegroup.subscription;
