@@ -116,9 +116,6 @@ StorageunitSchema.pre('save', function (next, done) {
   } else {
     var self = this;
     mongoose.model('Storagegroup').findById(self.storagegroup).exec(function (err, storagegroup) {
-      if(storagegroup =='') {
-        logger.info("its blacnk")
-      }
       if (err) {
         logger.info('Storageunit Model: ' + err);
       } else if (!storagegroup) {
@@ -129,7 +126,6 @@ StorageunitSchema.pre('save', function (next, done) {
         self.server = storagegroup.server;
         self.partner = storagegroup.partner;
         self.subscription = storagegroup.subscription;
-        logger.info(self);
       }
       next();
     });
