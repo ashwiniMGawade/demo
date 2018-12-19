@@ -52,7 +52,7 @@ var StoragegroupSchema = new Schema({
               'Invalid SnapshotPolicy'],
     required: 'Storage Group Snapshot Policy is required'
   },
-  tenant: {
+  tenant_id: {
     type: Schema.ObjectId,
     ref: 'Tenant'
   },
@@ -64,7 +64,7 @@ var StoragegroupSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'Subscription'
   },
-  subtenant: {
+  subtenant_id: {
     type: Schema.ObjectId,
     ref: 'Subtenant'
   },
@@ -100,8 +100,8 @@ StoragegroupSchema.pre('save', function (next, done) {
       } else if (!server) {
         logger.info('Storage Group Model: Invalid Server ID');
       } else {
-        self.tenant = server.tenant;
-        self.subtenant = server.subtenant;
+        self.tenant_id = server.tenant;
+        self.subtenant_id = server.subtenant;
         self.partner = server.partner;
         self.subscription = server.subscription;
       }

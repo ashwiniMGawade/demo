@@ -37,7 +37,7 @@ angular.module('core.admin').run(['Menus',
       title: 'Data Protection',
       state: 'dataProtection',
       type: 'dropdown',
-      roles: ['root', 'partner'],
+      roles: ['root', 'partner', 'admin'],
       position:2
     });
    

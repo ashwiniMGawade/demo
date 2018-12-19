@@ -116,16 +116,20 @@ StorageunitSchema.pre('save', function (next, done) {
   } else {
     var self = this;
     mongoose.model('Storagegroup').findById(self.storagegroup).exec(function (err, storagegroup) {
+      if(storagegroup =='') {
+        logger.info("its blacnk")
+      }
       if (err) {
         logger.info('Storageunit Model: ' + err);
       } else if (!storagegroup) {
         logger.info('Storageunit Model: Invalid Storagegroup ID');
       } else {
-        self.tenant = storagegroup.tenant;
-        self.subtenant = storagegroup.subtenant;
+        self.tenant = storagegroup.tenant_id;
+        self.subtenant = storagegroup.subtenant_id;
         self.server = storagegroup.server;
         self.partner = storagegroup.partner;
         self.subscription = storagegroup.subscription;
+        logger.info(self);
       }
       next();
     });
