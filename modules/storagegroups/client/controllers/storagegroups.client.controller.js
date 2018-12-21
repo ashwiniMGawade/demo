@@ -27,6 +27,16 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       {id :6, name : "saturday"}
     ];
 
+    $scope.hourlyScheduleEnabled = false;
+    $scope.dailyScheduleEnabled = false;
+    $scope.weeklyScheduleEnabled = false;
+    $scope.monthlyScheduleEnabled = false;
+
+    $scope.hourly_schedule = {}
+    $scope.daily_schedule = {}
+    $scope.weekly_schedule = {}
+    $scope.monthly_schedule = {}
+
     $scope.defaultHourlySchedule = {
       "minute": 0,
       "snapshots_to_keep": 0
@@ -65,24 +75,6 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
     }
 
-    function parseSnapShotPolicy(ssPolicy){
-      var ssPArr = ssPolicy.split("-");
-      for (var i in ssPArr){
-        if(ssPArr[i].includes("hourly")){
-          $scope.sspHourlyRetention = ssPArr[i].split("hourly")[0];
-        }
-        if(ssPArr[i].includes("daily")){
-          $scope.sspDailyRetention = ssPArr[i].split("daily")[0];
-          $scope.sspDailySchedule = ssPArr[i].split("daily")[1];
-        }
-        if(ssPArr[i].includes("weekly")){
-          $scope.sspWeeklyRetention = ssPArr[i].split("weekly")[0];
-        }
-        if(ssPArr[i].includes("monthly")){
-          $scope.sspMonthlyRetention = ssPArr[i].split("monthly")[0];
-        }
-      }
-    }
     
     function prepareDetailedSnapShotPolicy(){
       $scope.detailedSnapShotDesc = "";
@@ -145,6 +137,41 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
     });
 
+   
+
+    var checkSnapshotPolicyErrors = function(scopeVar) {
+      if (scopeVar.ssPolicyEnabled && !(scopeVar.hourlyScheduleEnabled || scopeVar.dailyScheduleEnabled || scopeVar.weeklyScheduleEnabled || scopeVar.monthlyScheduleEnabled)) {
+        throwFlashErrorMessage("Please enable at least one schedule with Snapshots to keep > 0");
+        return false;
+      }
+
+      if (scopeVar.hourlyScheduleEnabled && scopeVar.hourly_schedule.snapshots_to_keep == 0) {
+        throwFlashErrorMessage("Hourly schedule: Snapshots to keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.dailyScheduleEnabled && scopeVar.daily_schedule.snapshots_to_keep == 0) {
+        throwFlashErrorMessage("Daily schedule: Snapshots to keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.weeklyScheduleEnabled && scopeVar.weekly_schedule.snapshots_to_keep == 0) {
+        throwFlashErrorMessage("Weekly schedule: Snapshots to keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.monthlyScheduleEnabled && scopeVar.monthly_schedule.snapshots_to_keep == 0) {
+        throwFlashErrorMessage("Monthly schedule: Snapshots to keep should be greater than 0");
+        return false;
+      }
+      //need to remove the line once the modification is done in model
+      if (scopeVar.dailyScheduleEnabled) {
+        scopeVar.daily_schedule.hour = $sanitize(scopeVar.daily_schedule.hour);
+      }
+
+      return true
+    }
+
     // Create new Storagegroup
     $scope.create = function (isValid) {
       $scope.error = null;
@@ -154,10 +181,13 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         return false;
       }
 
-      //need to remove the line once the modification is done in model
-      if (this.dailyScheduleEnabled) {
-        this.daily_schedule.hour = $sanitize(this.daily_schedule.hour);
+      var ssResponse = checkSnapshotPolicyErrors(this);
+
+      if (!ssResponse) {
+        return false;
       }
+
+      
       //var formattedSanpShotPolicy = formatSnapShotPolicy();
       // Create new Storagegroup object
       var storagegroup = new Storagegroups({
@@ -168,13 +198,28 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         tier: $sanitize(this.tier),
         size_bytes:this.size_bytes,
         snapshot_policy: {
-          enabled:ssPolicyEnabled ? true: false,
-          hourly_schedule: this.hourlyScheduleEnabled ? this.hourly_schedule : this.defaultHourlySchedule,
-          daily_schedule: this.dailyScheduleEnabled ? this.daily_schedule : this.defaultDailySchedule,
-          weekly_schedule: this.weeklyScheduleEnabled ? this.weekly_schedule : this.defaultWeeklySchedule,
-          monthly_schedule:this.monthlyScheduleEnabled ? this.monthly_schedule : this.defaultMonthlySchedule
+          enabled:ssPolicyEnabled ? true: false
         }
       });
+
+      if (ssPolicyEnabled) {
+        if (this.hourlyScheduleEnabled) {
+          storagegroup.snapshot_policy.hourly_schedule = this.hourly_schedule ? this.hourly_schedule : this.defaultHourlySchedule;
+        }
+
+        if (this.dailyScheduleEnabled) {
+          storagegroup.snapshot_policy.daily_schedule = this.daily_schedule ? this.daily_schedule : this.defaultDailySchedule;
+        }
+        if (this.weeklyScheduleEnabled) {
+          storagegroup.snapshot_policy.weekly_schedule = this.weekly_schedule ? this.weekly_schedule : this.defaultWeeklySchedule;
+        }
+
+        if (this.monthlyScheduleEnabled) {
+          storagegroup.snapshot_policy.monthly_schedule = this.monthly_schedule ? this.monthly_schedule : this.defaultMonthlySchedule;
+        }       
+        
+      }
+
 
       // Redirect after save
       storagegroup.$create(function (response) {
@@ -246,16 +291,38 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $scope.$broadcast('show-errors-check-validity', 'storagegroupForm');
         return false;
       }
+
+      var ssResponse = checkSnapshotPolicyErrors(this);
+
+      if (!ssResponse) {
+        return false;
+      }
       
       var storagegroup = $scope.storagegroup;
       storagegroup.storagegroupId = storagegroup.id;
       storagegroup.snapshot_policy = {
-          enabled:ssPolicyEnabled ? true: false,
-          hourly_schedule: this.hourlyScheduleEnabled ? this.hourly_schedule : this.defaultHourlySchedule,
-          daily_schedule: this.dailyScheduleEnabled ? this.daily_schedule : this.defaultDailySchedule,
-          weekly_schedule: this.weeklyScheduleEnabled ? this.weekly_schedule : this.defaultWeeklySchedule,
-          monthly_schedule:this.monthlyScheduleEnabled ? this.monthly_schedule : this.defaultMonthlySchedule
+          enabled:ssPolicyEnabled ? true: false
+      }
+
+      if (ssPolicyEnabled) {
+        if (this.hourlyScheduleEnabled) {
+          storagegroup.snapshot_policy.hourly_schedule = this.hourly_schedule ? this.hourly_schedule : this.defaultHourlySchedule;
         }
+
+        if (this.dailyScheduleEnabled) {
+          storagegroup.snapshot_policy.daily_schedule = this.daily_schedule ? this.daily_schedule : this.defaultDailySchedule;
+        }
+        if (this.weeklyScheduleEnabled) {
+          storagegroup.snapshot_policy.weekly_schedule = this.weekly_schedule ? this.weekly_schedule : this.defaultWeeklySchedule;
+        }
+
+        if (this.monthlyScheduleEnabled) {
+          storagegroup.snapshot_policy.monthly_schedule = this.monthly_schedule ? this.monthly_schedule : this.defaultMonthlySchedule;
+        }       
+        
+      }
+
+
       storagegroup.$update(function () {
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Update request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
