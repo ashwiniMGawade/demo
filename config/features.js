@@ -14,7 +14,7 @@ var settings =  {
       'mandatory': false //false for optional,
     },
     'providers' : {
-      'allowed': ['raa', 'local', 'telstraifb']   
+      'allowed': ['raa', 'local', 'telstraifb', "activeDirectory"]   
     }
   },
   'subscription' : {

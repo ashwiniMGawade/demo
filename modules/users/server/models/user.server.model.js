@@ -58,7 +58,7 @@ var UserSchema = new Schema({
     unique: 'Username already exists',
     lowercase: true,
     trim: true,
-    match: [ /^[a-z0-9]{3,32}$/ , 'Username can only include alphanumeric(lowercase) & must be 3-32 characters']
+    match: [ /^[a-z0-9\-]{3,32}$/ , 'Username can only include alphanumeric(lowercase) including - & must be 3-32 characters']
   },
   password: {
     type: String,
@@ -143,11 +143,12 @@ UserSchema.pre('save', function (next) {
     }
   }
 
-  if(self.isNew && self.provider !== 'local'){
-    untilUniqueUserName();
-  }else{
-    next();
-  }
+  // if(self.isNew && self.provider !== 'local'){
+  //   untilUniqueUserName();
+  // }else{
+  //   next();
+  // }
+  next();
 
   //Generate unique username
   function untilUniqueUserName(){
@@ -288,13 +289,17 @@ UserSchema.methods.toJSON = function () {
 UserSchema.statics.findUniqueUsername = function (username, suffix, callback) {
   var _this = this;
   var possibleUsername = username.toLowerCase() + (suffix || '');
+  console.log("possoble username under findunique function", possibleUsername)
 
   _this.findOne({
     username: possibleUsername
   }, function (err, user) {
+    console.log(err)
+    console.log(user)
     if (!err) {
       if (!user) {
-        callback(possibleUsername);
+        console.log("inside user does not exist")
+        return callback(possibleUsername);
       } else {
         return _this.findUniqueUsername(username, (suffix || 0) + 1, callback);
       }

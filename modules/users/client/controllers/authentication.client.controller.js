@@ -5,6 +5,8 @@ angular.module('users')
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Flash, $timeout, $sanitize) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+
+    console.log($location.search().provider)
    
     // Get an eventual error defined in the URL query string:
     $timeout(function() {
@@ -34,7 +36,13 @@ angular.module('users')
         return false;
       }
 
-      $http.post('/api/auth/signin', $scope.credentials).success(function (response) {
+      var api_end_point = '/api/auth/ldap';
+
+      if ($location.search().provider == 'local') {
+        api_end_point = '/api/auth/signin';
+      }
+
+      $http.post(api_end_point, $scope.credentials).success(function (response) {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
         Authentication.setHeader($scope.credentials.username, $scope.credentials.password)

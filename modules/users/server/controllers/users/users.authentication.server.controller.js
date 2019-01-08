@@ -42,6 +42,30 @@ exports.signin = function (req, res, next) {
   })(req, res, next);
 };
 
+exports.ldap_signin = function (req, res, next) {
+  passport.authenticate('ldapauth', function (err, user, info) {
+    console.log(err, "err", user, "user", info, "info")
+    if (err || !user) {
+      res.status(422).send(info);
+    } else {
+      // Remove sensitive data before login
+      user.password = undefined;
+      user.salt = undefined;
+      console.log(user);
+      req.login(user, function (err) {
+        console.log("err in logging in user", err)
+        if (err) {
+          console.log("inside error")
+          res.status(400).send(err);
+        } else {
+          console.log("inside else")
+          res.json(user);
+        }
+      });
+    }
+  })(req, res, next);
+}
+
 /**
  * Signout
  */
@@ -160,8 +184,9 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
       } else {
         if (!user) {
           var possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
-
+          console.log("possibleUsername", possibleUsername)
           User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
+            console.log("available username", availableUsername)
             user = new User({
               firstName: providerUserProfile.firstName,
               lastName: providerUserProfile.lastName,
@@ -170,8 +195,12 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
               email: providerUserProfile.email,
               profileImageURL: providerUserProfile.profileImageURL,
               provider: providerUserProfile.provider,
-              providerData: providerUserProfile.providerData
+              providerData: providerUserProfile.providerData,
+              roles: providerUserProfile.roles,
+              tenant: providerUserProfile.tenant
             });
+
+            console.log("user before inserting recored in user table", user)
 
             // And save the user
             user.save(function (err) {
