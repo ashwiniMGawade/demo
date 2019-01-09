@@ -42,26 +42,32 @@ exports.signin = function (req, res, next) {
   })(req, res, next);
 };
 
+ var loginUser = function(req, res, user) {
+    // Remove sensitive data before login
+    user.password = undefined;
+    user.salt = undefined;
+    req.login(user, function (err) {      
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.json(user);
+      }
+    });
+}
+
 exports.ldap_signin = function (req, res, next) {
   passport.authenticate('ldapauth', function (err, user, info) {
-    console.log(err, "err", user, "user", info, "info")
     if (err || !user) {
-      res.status(422).send(info);
-    } else {
-      // Remove sensitive data before login
-      user.password = undefined;
-      user.salt = undefined;
-      console.log(user);
-      req.login(user, function (err) {
-        console.log("err in logging in user", err)
-        if (err) {
-          console.log("inside error")
-          res.status(400).send(err);
+      passport.authenticate('local', function (err, user, info) {
+        if (err || !user) {
+          res.status(400).send(info);
         } else {
-          console.log("inside else")
-          res.json(user);
+          loginUser(req, res, user)
         }
-      });
+      })(req, res, next);
+      
+    } else {
+      loginUser(req, res, user)
     }
   })(req, res, next);
 }
@@ -233,7 +239,7 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
         return done(err, user, '/settings/accounts');
       });
     } else {
-      return done(new Error('User is already connected using this provider'), user);
+      return done(null, user);
     }
   }
 };
