@@ -34,15 +34,9 @@ angular.module('users')
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
         return false;
-      }
+      }      
 
-      var api_end_point = '/api/auth/ldap';
-
-      if ($location.search().provider == 'local') {
-        api_end_point = '/api/auth/signin';
-      }
-
-      $http.post(api_end_point, $scope.credentials).success(function (response) {
+      $http.post('/api/auth/ldap', $scope.credentials).success(function (response) {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
         Authentication.setHeader($scope.credentials.username, $scope.credentials.password)
