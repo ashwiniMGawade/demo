@@ -251,7 +251,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $location.path( '/storagegroups/' + storagegroupId + '/snapshots');
         Flash.create('success', '<strong ng-non-bindable>Snapshot Create request accepted. Please wait and list the Snapshots in a 10 seconds or so.</strong>', 10000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message);
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
       });
     };
 
@@ -271,7 +271,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
             $location.path('storagegroups');
             Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Delete request.<br>Please wait for the object to be removed from the list.</strong>', 10000, { class: '', id: '' }, true);
           }, function (errorResponse) {
-            throwFlashErrorMessage(errorResponse.data.user_message);
+            throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
           });
 
           for (var i in $scope.storagegroups) {
@@ -327,7 +327,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Update request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message);
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
       });
     };
 
@@ -362,7 +362,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }
       }, function(error){
         $location.path('storagegroups');
-        throwFlashErrorMessage(error.data.user_message);
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
       });
 
       $http.get('api/lookups/sgStatus')
@@ -379,7 +379,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Successfully fixed the Storagegroup!</strong>', 10000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message);
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
       });
     };
 
