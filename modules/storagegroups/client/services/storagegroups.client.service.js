@@ -18,6 +18,7 @@ angular.module('storagegroups').factory('Storagegroups', ['$resource', '$window'
       },
       'get': {
         method: 'GET',
+        isArray: false,
         headers: authHeader,
         url: goAPIHost + '/volumes/:storagegroupId'
       },
