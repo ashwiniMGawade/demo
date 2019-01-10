@@ -32,7 +32,7 @@ module.exports = function (config) {
     logoutUrl: config.idp.logoutUrl,
     identifierFormat: config.idp.identifierFormat,
     passReqToCallback: true,
-    cert: config.idp.cert
+    cert: config.idp.cert || "test"
     //privateCert: fs.readFileSync(config.idp.privateCertFile, 'utf-8')
   },
     function (req, profile, done) {
