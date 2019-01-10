@@ -101,7 +101,7 @@ module.exports = {
     path: process.env.IDP_CALLBACK_URL,  // e.g '/login/callback'
     entryPoint: process.env.IDP_ENTRYPOINT_URL, // e.g 'https://10.128.113.126:9443/samlsso'
     logoutUrl: process.env.IDP_LOGOUT_URL, // e.g 'https://10.128.113.126:9443/samlsso'
-    cert: process.env.IDP_CERT, // e.g  'MIICNTCCAZ6gA...
+    cert: process.env.IDP_CERT || "test", // e.g  'MIICNTCCAZ6gA...
     privateCertFile: './cert.pem',
     identifierFormat: process.env.IDP_IDENTIFIERFORMAT,
     issuer:process.env.IDP_ISSUER
