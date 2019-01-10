@@ -20,6 +20,9 @@ module.exports = function (app) {
   app.route('/api/auth/signin').post(users.signin);
   app.route('/api/auth/signout').get(users.signout);
 
+  //setting ldap AD auth routes
+  app.route('/api/auth/ldap').post(users.ldap_signin);
+
   // Setting the facebook oauth routes
   app.route('/api/auth/facebook').get(users.oauthCall('facebook', {
     scope: ['email']

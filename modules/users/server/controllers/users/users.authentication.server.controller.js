@@ -42,6 +42,36 @@ exports.signin = function (req, res, next) {
   })(req, res, next);
 };
 
+ var loginUser = function(req, res, user) {
+    // Remove sensitive data before login
+    user.password = undefined;
+    user.salt = undefined;
+    req.login(user, function (err) {      
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.json(user);
+      }
+    });
+}
+
+exports.ldap_signin = function (req, res, next) {
+  passport.authenticate('ldapauth', function (err, user, info) {
+    if (err || !user) {
+      passport.authenticate('local', function (err, user, info) {
+        if (err || !user) {
+          res.status(400).send(info);
+        } else {
+          loginUser(req, res, user)
+        }
+      })(req, res, next);
+      
+    } else {
+      loginUser(req, res, user)
+    }
+  })(req, res, next);
+}
+
 /**
  * Signout
  */
@@ -160,7 +190,6 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
       } else {
         if (!user) {
           var possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
-
           User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
             user = new User({
               firstName: providerUserProfile.firstName,
@@ -170,8 +199,12 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
               email: providerUserProfile.email,
               profileImageURL: providerUserProfile.profileImageURL,
               provider: providerUserProfile.provider,
-              providerData: providerUserProfile.providerData
+              providerData: providerUserProfile.providerData,
+              roles: providerUserProfile.roles,
+              tenant: providerUserProfile.tenant
             });
+
+            console.log("user before inserting recored in user table", user)
 
             // And save the user
             user.save(function (err) {
@@ -204,7 +237,7 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
         return done(err, user, '/settings/accounts');
       });
     } else {
-      return done(new Error('User is already connected using this provider'), user);
+      return done(null, user);
     }
   }
 };

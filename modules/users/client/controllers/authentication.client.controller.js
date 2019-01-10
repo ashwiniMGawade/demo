@@ -5,7 +5,8 @@ angular.module('users')
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator, Flash, $timeout, $sanitize) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
-   
+
+    
     // Get an eventual error defined in the URL query string:
     $timeout(function() {
       if ($location.search().err && angular.element(document.getElementsByClassName("alert-danger")).length === 0) {
@@ -16,7 +17,6 @@ angular.module('users')
    
     // If user is signed in then redirect back home
     if ($scope.authentication.user) {  
-      console.log($scope.authentication.user.roles)
       if ($scope.authentication.user.roles.indexOf('root') === -1 && $scope.authentication.user.roles.indexOf('l1ops') === -1) {
         $location.path('/dashboards');
       } else {
@@ -32,9 +32,9 @@ angular.module('users')
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
         return false;
-      }
+      }      
 
-      $http.post('/api/auth/signin', $scope.credentials).success(function (response) {
+      $http.post('/api/auth/ldap', $scope.credentials).success(function (response) {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
         Authentication.setHeader($scope.credentials.username, $scope.credentials.password)
@@ -42,7 +42,6 @@ angular.module('users')
         
         // And redirect to the previous or home page if not root or partner user
         if($state.previous.state.name === 'home' && response.roles.indexOf('root') === -1 && response.roles.indexOf('l1ops') === -1 && response.roles.indexOf('partner') === -1) {
-          console.log("going to dashboard");
           $state.go('dashboard', $state.previous.params);
         } else {
           console.log($state.previous.state.name);
