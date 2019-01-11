@@ -75,7 +75,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
         // Clear form fields
         $scope.source_volume_id = '';
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message); 
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!"); 
       });
     };
 
@@ -93,7 +93,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
             $location.path('backups');
             Flash.create('success', '<strong ng-non-bindable>Successfully Deleted the backup!</strong>', 3000, { class: '', id: '' }, true);
           }, function (errorResponse) {
-            throwFlashErrorMessage(errorResponse.data.user_message);           
+            throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");           
           });
 
           for (var i in $scope.backups) {
@@ -130,7 +130,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
         $location.path('backups');
         Flash.create('success', '<strong ng-non-bindable>Successfully updated the backup!</strong>', 3000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message); 
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!"); 
       });
     };
 
