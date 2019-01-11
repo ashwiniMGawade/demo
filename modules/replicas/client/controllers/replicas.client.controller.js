@@ -102,7 +102,7 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         // Clear form fields
         $scope.source_volume_id = '';
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message); 
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!"); 
       });
     };
 
@@ -120,7 +120,7 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
             $location.path('replicas');
             Flash.create('success', '<strong ng-non-bindable>Successfully Deleted the replica!</strong>', 3000, { class: '', id: '' }, true);
           }, function (errorResponse) {
-            throwFlashErrorMessage(errorResponse.data.user_message);           
+            throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");           
           });
 
           for (var i in $scope.replicas) {
@@ -156,7 +156,7 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
         $location.path('replicas');
         Flash.create('success', '<strong ng-non-bindable>Successfully updated the replica!</strong>', 3000, { class: '', id: '' }, true);
       }, function (errorResponse) {
-        throwFlashErrorMessage(errorResponse.data.user_message); 
+        throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!"); 
       });
     };
 

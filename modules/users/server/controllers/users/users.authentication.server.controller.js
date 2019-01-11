@@ -282,6 +282,19 @@ exports.removeOAuthProvider = function (req, res, next) {
   });
 };
 
+
+var loginODINUser = function(req, res, next, user) {
+  //check user is allowed access to API 
+  req.login(user, {}, function (err) {
+        if (err) {
+          return next(err);
+        }
+      });
+  logger.info('ODIN logged in');
+  // Temporary odinuser identification as its session less, not available on req.user
+  next();    
+}
+
 /**
  * Authentication for User creation through ODIN
  */
@@ -291,34 +304,33 @@ exports.loginODIN = function (req, res, next) {
     next();
   }
   else {
-    // User not logged in, login as ODIN
-    passport.authenticate('basic', { session: false }, function (err, user) {
-      if (user === false) {
-        // Invalid user or user not authorized
-        return res.status(401).json({
-          message: 'Invalid username/password'
-        });
+    // User not logged in, login as ODIN (LDAP)
+    var parts = req.headers.authorization.split(' ')
+    if (parts.length < 2) { return this.fail(400); }
+  
+    var scheme = parts[0]
+    , credentials = new Buffer(parts[1], 'base64').toString().split(':');
+
+    req.query.username = credentials[0]
+    req.query.password = credentials[1]
+
+    passport.authenticate('ldapauth', function (err, user, info) {
+      if (err || !user) {
+        passport.authenticate('basic', { session: false }, function (err, user) {
+          if (user === false) {
+            // Invalid user or user not authorized
+            return res.status(401).json({
+              message: 'Invalid username/password'
+            });
+          }
+          else {
+            loginODINUser(req, res, next, user)     
+          }
+        })(req, res, next);
+      } else {
+        loginODINUser(req, res, next, user) 
       }
-      else {
-        //check user is allowed access to API 
-        if (_.includes(user.roles, 'root') || _.includes(user.roles, 'partner') ) {
-          // make passportjs setup the user object
-          req.login(user, {}, function (err) {
-            if (err) {
-              return next(err);
-            }
-          });
-          logger.info('ODIN logged in');
-          // Temporary odinuser identification as its session less, not available on req.user
-          next();
-        } else {
-          // user not authorized
-          return res.status(403).json({
-            message: 'User is not authorized.'
-          });
-        }        
-      }
-    })(req, res, next);
+      })(req, res, next);    
   }
 };
 
