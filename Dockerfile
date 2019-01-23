@@ -5,6 +5,9 @@ RUN apt-get update
 RUN apt-get install -y build-essential
 RUN apt-get install -y ruby ruby-dev libkrb5-dev
 RUN apt-get install -y net-tools dnsutils vim-tiny
+RUN gem install "rubygems-update:<3.0.0" --no-document
+RUN update_rubygems
+RUN gem install rb-inotify -v 0.9.10
 RUN gem install sass
 
 WORKDIR /home/mean
