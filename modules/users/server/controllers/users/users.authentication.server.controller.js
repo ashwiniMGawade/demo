@@ -304,6 +304,11 @@ exports.loginODIN = function (req, res, next) {
     next();
   }
   else {
+    if (!req.headers.authorization) {
+      return res.status(401).json({
+          message: 'Authentication required!'
+        });
+    }
     // User not logged in, login as ODIN (LDAP)
     var parts = req.headers.authorization.split(' ')
     if (parts.length < 2) { return this.fail(400); }
