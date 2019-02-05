@@ -143,7 +143,7 @@ var ServerSchema = new Schema({
   cifsDnsDomain: {
     type: String,
     default: null,
-    minlength: [ 2, 'CIFS DNS Domain, Minimum 2 char required'],
+    minlength: [ isCIFSEnabled? 2: false, 'CIFS DNS Domain, Minimum 2 char required'],
     maxlength: [ 64, 'CIFS DNS Domain, Maximum 64 char allowed'],
     required: [ isCIFSEnabled, 'CifsDnsDomain is required' ],
     trim: true,
@@ -160,7 +160,7 @@ var ServerSchema = new Schema({
   cifsServername: {
     type: String,
     default: null,
-    minlength: [ 2, 'CIFS Server Name, Minimum 2 char required'],
+    minlength: [ isCIFSEnabled? 2 : false, 'CIFS Server Name, Minimum 2 char required'],
     maxlength: [ 15, 'CIFS Server Name, Maximum 15 char allowed'],
     required: [ isCIFSEnabled, 'CifsServername is required' ],
     trim: true,
@@ -169,7 +169,7 @@ var ServerSchema = new Schema({
   cifsDomain: {
     type: String,
     default: null,
-    minlength: [ 2, 'CIFS Domain, Minimum 2 char required'],
+    minlength: [ isCIFSEnabled? 2: false, 'CIFS Domain, Minimum 2 char required'],
     maxlength: [ 64, 'CIFS Domain, Maximum 64 char allowed'],
     required: [ isCIFSEnabled, 'CifsDomain is required' ],
     trim: true,
