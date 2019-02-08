@@ -386,7 +386,7 @@ exports.create = function (req, res) {
           });
         } else {
            logger.info('SVM Create: No output parameters: Response from db trying again trail no: counter : '+ counter);
-            if (counter <= config.wfa.getUUIDtrails) {
+            if (counter <= config.wfa.getUUIDtrials) {
               setTimeout(function () { getUUIDs(server, clusterName, counter+1); }, config.wfa.refreshRate);
             } else {
               logger.info('SVM Create: Failed to obtain output related UUID, after');
