@@ -183,7 +183,7 @@ module.exports = {
     'api_host':process.env.GO_API_HOST
   },
   ldap : {
-    'url': process.env.LDAP_URL || 'ldap://localhost:389',
+    'url': process.env.LDAP_URL,
     'bindDN': process.env.LDAP_BIND_DN,
     'bindCredentials': process.env.LDAP_BIND_CREDENTIALS,
     'searchBase': process.env.LDAP_SEARCH_BASE,
