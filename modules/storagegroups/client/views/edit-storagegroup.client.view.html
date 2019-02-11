@@ -32,7 +32,7 @@
         <div class="form-group required" show-errors>
           <label for="tier">Performance Service Level</label>
           <select name="tier" ng-model="storagegroup.tier" id="tier" class="form-control" required>
-            <option ng-repeat="tier in validTierToAssign | orderBy:'name'" value="{{tier.name}}" ng-selected="{{trim(storagegroup.tier)==tier.name ? 'selected' : ''}}" class="capitalize">{{tier.name}}</option>
+            <option ng-repeat="SL in validProtectionSLToAssign | orderBy:'name'" value="{{SL.name}}" ng-selected="{{trim(storagegroup.tier)==SL.name ? 'selected' : ''}}" class="capitalize">{{SL.name}}</option>
             <option value="">Please select the Performance Service Level</option>
           </select>
           <div ng-messages="storagegroupForm.tier.$error" role="alert">
