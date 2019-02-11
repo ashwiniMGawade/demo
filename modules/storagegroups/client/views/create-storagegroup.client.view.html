@@ -68,14 +68,14 @@
         </div>
         <div class="form-group required" show-errors>
           <label for="tier">Performance Service Level</label>
-          <select ng-model="tier" ng-options="SL.name as SL.name for SL in validProtectionSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
+          <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
             <option value="">Please select the Performance Service Level</option>
           </select>
           <div ng-messages="storagegroupForm.tier.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
           </div>
           <p class="help-block">The Performance Service Level of storage the NetApp Volume is to reside on:
-            <span ng-repeat="SL in validProtectionSLToAssign">
+            <span ng-repeat="SL in validPerformanceSLToAssign">
               <span class="capitalize">{{SL.name}}</span>
               ( {{SL.max_iops_per_tb}} IOPS/TB)
             </span>

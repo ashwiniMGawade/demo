@@ -12,7 +12,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.snapshotAccessRoles = featuresSettings.roles.snapshot;
     $http.get('api/lookups/serviceLevels')
       .then(function(response) {
-        $scope.validTierToAssign = response.data;
+        $scope.validPerformanceSLToAssign = response.data;
     });
 
     var flashTimeout = 3000;
@@ -384,7 +384,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     };
 
 
-   // $scope.validTierToAssign = [{id:'standard',name:'Standard'}, {id:'premium',name:'Premium'}, {id:'performance',name:'Performance'}];
+   // $scope.validPerformanceSLToAssign = [{id:'standard',name:'Standard'}, {id:'premium',name:'Premium'}, {id:'performance',name:'Performance'}];
     //$scope.tier = 'standard';
     $scope.sspDailySchedules = [{val:'1810',displayVal:'18:10'},
                                 {val:'2010',displayVal:'20:10'},
