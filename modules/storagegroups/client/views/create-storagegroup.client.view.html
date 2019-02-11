@@ -81,6 +81,15 @@
             </span>
           </p>
         </div>
+        <div class="form-group required" show-errors>
+          <label for="protection_service_level">Protection Service Level</label>
+          <select ng-model="protection_service_level" ng-options="SL.name as SL.name for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" required>
+            <option value="">Please select the Protection Service Level</option>
+          </select>
+          <div ng-messages="storagegroupForm.protection_service_level.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Protection Service Level is required.</p>
+          </div>          
+        </div>
         <div class="form-group" show-errors>
           <label for="size_bytes">Size (Bytes)</label>
           <input name="size_bytes" type="number" ng-model="size_bytes" id="size_bytes" class="form-control" placeholder="Size (Bytes)"  min="0"  ng-pattern="/^[\d]*$/">

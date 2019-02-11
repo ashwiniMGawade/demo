@@ -10,9 +10,14 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.labels = featuresSettings.labels;
     $scope.SGAccessRoles = featuresSettings.roles.storagegroup;
     $scope.snapshotAccessRoles = featuresSettings.roles.snapshot;
-    $http.get('api/lookups/serviceLevels')
+    $http.get('api/lookups/performanceServiceLevels')
       .then(function(response) {
         $scope.validPerformanceSLToAssign = response.data;
+    });
+
+    $http.get('api/lookups/protectionServiceLevels')
+      .then(function(response) {
+        $scope.validProtectionSLToAssign = response.data;
     });
 
     var flashTimeout = 3000;
@@ -196,6 +201,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         annotation: (this.annotation) ? $sanitize(this.annotation) : '',
         server_id: $sanitize(this.serverId),
         tier: $sanitize(this.tier),
+        protection_service_level: $sanitize(this.protection_service_level),
         size_bytes:this.size_bytes,
         snapshot_policy: {
           enabled:ssPolicyEnabled ? true: false
