@@ -67,14 +67,14 @@
           <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
         </div>
         <div class="form-group required" show-errors>
-          <label for="tier">Tier</label>
+          <label for="tier">Performance Service Level</label>
           <select ng-model="tier" ng-options="tier.name as tier.name for tier in validTierToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
-            <option value="">Please select the Tier</option>
+            <option value="">Please select the Performance Service Level</option>
           </select>
           <div ng-messages="storagegroupForm.tier.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Tier is required.</p>
+            <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
           </div>
-          <p class="help-block">The Tier of storage the NetApp Volume is to reside on:
+          <p class="help-block">The Performance Service Level of storage the NetApp Volume is to reside on:
             <span ng-repeat="tierDetails in validTierToAssign">
               <span class="capitalize">{{tierDetails.name}}</span>
               ( {{tierDetails.max_iops_per_tb}} IOPS/TB)
