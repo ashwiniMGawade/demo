@@ -10,13 +10,13 @@
           <input name="name" type="text" ng-model="storagegroup.name" id="name" class="form-control"
                   ng-minlength="3"
                   ng-maxlength="64"
-                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  ng-pattern="/^[a-zA-Z0-9\ \-\_]*$/"
                   required placeholder="Name" ng-bind-html>
           <div ng-messages="storagegroupForm.name.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Name is required.</p>
             <p class="help-block error-text" ng-message="minlength">Storage Group name must be minimum 3 characters long.</p>
             <p class="help-block error-text" ng-message="maxlength">Storage Group name should be maximum 64 characters long.</p>
-            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes are allowed</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, underscore and dashes are allowed</p>
           </div>
         </div>
         <div class="form-group" show-errors>
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="row show-grid mLeft0">
+    <div class="row show-grid mLeft0"  ng-show="storagegroup.volume_type!='mirror'">
       <div class="col-md-6">
         <div class="form-group col-md-2">
           <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left">

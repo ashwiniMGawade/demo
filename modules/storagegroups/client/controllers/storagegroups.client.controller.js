@@ -20,6 +20,9 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $scope.validProtectionSLToAssign = response.data;
     });
 
+    $scope.showReplicaForm = false;
+    $scope.showBackupForm = false;
+
     var flashTimeout = 3000;
 
     $scope.weeksArray = [
@@ -37,10 +40,20 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.weeklyScheduleEnabled = false;
     $scope.monthlyScheduleEnabled = false;
 
+    $scope.backupHourlyScheduleEnabled = false;
+    $scope.backupDailyScheduleEnabled = false;
+    $scope.backupWeeklyScheduleEnabled = false;
+    $scope.backupMonthlyScheduleEnabled = false;
+
     $scope.hourly_schedule = {}
     $scope.daily_schedule = {}
     $scope.weekly_schedule = {}
     $scope.monthly_schedule = {}
+
+    $scope.backup_hourly_schedule = {}
+    $scope.backup_daily_schedule = {}
+    $scope.backup_weekly_schedule = {}
+    $scope.backup_monthly_schedule = {}
 
     $scope.defaultHourlySchedule = {
       "minute": 0,
@@ -120,6 +133,46 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       });
     };
 
+
+
+    $scope.setVarsAsPerDPlevel = function (dp) {
+      $scope.showReplicaForm = false;
+      $scope.showBackupForm = false;
+      if(dp[0].has_mirror) {
+        $scope.showReplicaForm = true;
+        getDestinationServers($scope.serverId)
+      } 
+      if(dp[0].has_vault) {
+        $scope.showBackupForm = true;
+      }
+
+
+    }
+
+    var getDestinationServers = function(sourceServerId) {
+      
+      $scope.peeredServer = [];
+      var peeredServerIds = [];
+      var keepGoing = true;
+      
+      //Add source server as destination server
+      peeredServerIds.push(sourceServerId);
+      angular.forEach($scope.servers, function(server) {
+        if (server.serverId == sourceServerId && keepGoing) {
+          angular.forEach(server.peers, function(peer) {
+            peeredServerIds.push(peer.serverId);
+          });
+          keepGoing = false;
+        }
+      });
+
+      angular.forEach($scope.servers, function(server) {
+        if (peeredServerIds.indexOf(server.serverId) !== -1 ) {
+          $scope.peeredServer.push(server);
+        }
+      });
+    }
+
     // watchers to check the update of value and preselect the dropdown if only one value is present
     if($scope.isRoot) {
       $scope.tenants = Tenants.query();
@@ -141,8 +194,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         });
       }
     });
-
-   
+ 
 
     var checkSnapshotPolicyErrors = function(scopeVar) {
       if (scopeVar.ssPolicyEnabled && !(scopeVar.hourlyScheduleEnabled || scopeVar.dailyScheduleEnabled || scopeVar.weeklyScheduleEnabled || scopeVar.monthlyScheduleEnabled)) {
@@ -177,6 +229,39 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       return true
     }
 
+    var checkBackupPolicyErrors = function(scopeVar) {
+      if (scopeVar.backupPolicyEnabled && !(scopeVar.backupHourlyScheduleEnabled || scopeVar.backupDailyScheduleEnabled || scopeVar.backupWeeklyScheduleEnabled || scopeVar.backupMonthlyScheduleEnabled)) {
+        throwFlashErrorMessage("Please enable at least one backup schedule with keep > 0");
+        return false;
+      }
+
+      if (scopeVar.backupHourlyScheduleEnabled && scopeVar.backup_hourly_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Hourly schedule: Keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.backupDailyScheduleEnabled && scopeVar.backup_daily_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Daily schedule: Keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.backupWeeklyScheduleEnabled && scopeVar.backup_weekly_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Weekly schedule: Keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.backupMonthlyScheduleEnabled && scopeVar.backup_monthly_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Monthly schedule: Keep should be greater than 0");
+        return false;
+      }
+      //need to remove the line once the modification is done in model
+      if (scopeVar.backupDailyScheduleEnabled) {
+        scopeVar.backup_daily_schedule.hour = $sanitize(scopeVar.backup_daily_schedule.hour);
+      }
+
+      return true
+    }
+
     // Create new Storagegroup
     $scope.create = function (isValid) {
       $scope.error = null;
@@ -192,6 +277,11 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         return false;
       }
 
+      var backupPolicyResponse = checkBackupPolicyErrors(this);
+
+      if (!backupPolicyResponse) {
+        return false;
+      }
       
       //var formattedSanpShotPolicy = formatSnapShotPolicy();
       // Create new Storagegroup object
@@ -208,6 +298,17 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }
       });
 
+      if (this.showReplicaForm) {
+        storagegroup.replica_destination_server_id = $sanitize(this.replica_destination_server_id)
+        storagegroup.replica_schedule = this.replica_schedule
+      }
+
+      if (this.showBackupForm) {
+        storagegroup.backup_destination_server_id = $sanitize(this.backup_destination_server_id)
+        storagegroup.backup_schedule = this.backup_schedule;
+        //storagegroup.backup_policy = this.backup_policy;
+      }
+
       if (ssPolicyEnabled) {
         if (this.hourlyScheduleEnabled) {
           storagegroup.snapshot_policy.hourly_schedule = this.hourly_schedule ? this.hourly_schedule : this.defaultHourlySchedule;
@@ -222,6 +323,25 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
 
         if (this.monthlyScheduleEnabled) {
           storagegroup.snapshot_policy.monthly_schedule = this.monthly_schedule ? this.monthly_schedule : this.defaultMonthlySchedule;
+        }       
+        
+      }
+
+
+      if (backupPolicyEnabled) {
+        if (this.hourlyScheduleEnabled) {
+          storagegroup.backup_policy.hourly_schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
+        }
+
+        if (this.dailyScheduleEnabled) {
+          storagegroup.backup_policy.daily_schedule = this.backup_daily_schedule ? this.backup_daily_schedule : this.defaultDailySchedule;
+        }
+        if (this.weeklyScheduleEnabled) {
+          storagegroup.backup_policy.weekly_schedule = this.backup_weekly_schedule ? this.backup_weekly_schedule : this.defaultWeeklySchedule;
+        }
+
+        if (this.monthlyScheduleEnabled) {
+          storagegroup.backup_policy.monthly_schedule = this.backup_monthly_schedule ? this.backup_monthly_schedule : this.defaultMonthlySchedule;
         }       
         
       }
@@ -298,11 +418,14 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         return false;
       }
 
-      var ssResponse = checkSnapshotPolicyErrors(this);
+      if ($scope.storagegroup.volume_type != 'mirror') {
+         var ssResponse = checkSnapshotPolicyErrors(this);
 
-      if (!ssResponse) {
-        return false;
+        if (!ssResponse) {
+          return false;
+        }
       }
+     
       
       var storagegroup = $scope.storagegroup;
       storagegroup.storagegroupId = storagegroup.id;
