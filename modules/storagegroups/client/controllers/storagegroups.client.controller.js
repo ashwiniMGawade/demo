@@ -306,7 +306,9 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       if (this.showBackupForm) {
         storagegroup.backup_destination_server_id = $sanitize(this.backup_destination_server_id)
         storagegroup.backup_schedule = this.backup_schedule;
-        //storagegroup.backup_policy = this.backup_policy;
+        storagegroup.backup_policy =  {
+          enabled:backupPolicyEnabled ? true: false
+        }
       }
 
       if (ssPolicyEnabled) {
@@ -345,6 +347,9 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }       
         
       }
+
+      console.log(storagegroup);
+      
 
 
       // Redirect after save
