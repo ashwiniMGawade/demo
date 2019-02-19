@@ -7,18 +7,18 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 /**
- * ServiceLevel Schema
+ * PerformanceServiceLevelSchema Schema
  */
-var ServiceLevelSchema = new Schema({
+var PerformanceServiceLevelSchema = new Schema({
   name: {
     type: String,
     default: '',
     trim: true,
     unique: true,
-    required: 'ServiceLevel name required',
+    required: 'PerformanceServiceLevel name required',
     minlength: [3, 'Name: Minimum 3 char required'],
     maxlength: [64, 'Name: Maximum 64 char allowed'],
-    match: [/^[a-zA-Z0-9\-]*$/, 'ServiceLevel name can only include alphanumeric characters including dash']   
+    match: [/^[a-zA-Z0-9\-]*$/, 'PerformanceServiceLevel name can only include alphanumeric characters including dash']   
   },  
   user: {
     type: Schema.ObjectId,
@@ -48,4 +48,4 @@ var ServiceLevelSchema = new Schema({
 // };
 //console.log(ServiceLevelSchema);
 
-mongoose.model('servicelevel', ServiceLevelSchema);
+mongoose.model('performanceServiceLevel', PerformanceServiceLevelSchema);

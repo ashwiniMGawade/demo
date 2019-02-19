@@ -49,8 +49,11 @@ module.exports = function (app) {
   app.route('/api/lookups/storagePackClasses')
     .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listStoragePackClasses);
 
-  app.route('/api/lookups/serviceLevels')
-    .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listServiceLevels);
+  app.route('/api/lookups/performanceServiceLevels')
+    .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listPerformanceServiceLevels);
+
+  app.route('/api/lookups/protectionServiceLevels')
+    .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listProtectionServiceLevels);
 
     
 };
