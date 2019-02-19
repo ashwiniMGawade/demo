@@ -2,7 +2,7 @@
   <div class="page-header">
     <h1>Storage Group: <span ng-bind="storagegroup.name" class="capitalize"></span></h1>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-7">
     <table class="table table-striped">
       <tr><th>Name</th><td ng-bind="storagegroup.name" class="capitalize"></td></tr>
       <tr><th>Code</th><td ng-bind="storagegroup.code"></td></tr>
@@ -15,6 +15,11 @@
       <tr>
           <th>Performance Service Level</th>
           <td class="capitalize">{{storagegroup.tier}}
+          </td>
+      </tr>
+      <tr>
+          <th>Protection Service Level</th>
+          <td class="capitalize">{{storagegroup.protection_service_level ? storagegroup.protection_service_level.replace("_", " ") : 'None'}}
           </td>
       </tr>
       <tr><th>SnapshotPolicy</th><td><pre>{{detailedSnapShotDesc}}</pre></td></tr>

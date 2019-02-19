@@ -158,28 +158,26 @@
         <div class="row show-grid mLeft0">
           <label for="policySchedule">Backup schedule:
           </label>            
-            <div class="form-group required" show-errors>
+            <div class="form-group" show-errors>
               <label for="hour">Hour</label>
-              <input name="backupScheduleHour" type="text" ng-model="$parent.backup_schedule.hour" id="hour" class="form-control" required
+              <input name="backupScheduleHour" type="text" ng-model="$parent.backup_schedule.hour" id="hour" class="form-control"
                       placeholder="Hour"
                       ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
                       >
 
               <div ng-messages="storagegroupForm.backupScheduleHour.$error" role="alert">
                 <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
-                <p class="help-block error-text" ng-message="required">Backup Schedule, Hour is required</p>
               </div>
               <p class="help-block">Please enter coma separated string of numbers between 0 to 23. Each number should occure only once</p>
             </div>
-            <div class="form-group ng-required" show-errors>
+            <div class="form-group" show-errors>
               <label for="minute">Minute</label>
-              <input name="backupScheduleMinute" type="number" ng-model="$parent.backup_schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" required>
+              <input name="backupScheduleMinute" type="number" ng-model="$parent.backup_schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
               <div ng-messages="storagegroupForm.backupScheduleMinute.$error" role="alert">
                 <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
                 <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
                 <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
                 <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Backup Schedule, Minute is required</p>
               </div>              
             </div>
         </div>
