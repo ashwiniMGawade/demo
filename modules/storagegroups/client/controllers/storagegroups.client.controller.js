@@ -194,6 +194,12 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         });
       }
     });
+
+     $scope.$watch("serverId", function(newVal, oldVal) {
+      if (newVal) {
+        getDestinationServers(newVal);
+      }
+    });
  
 
     var checkSnapshotPolicyErrors = function(scopeVar) {
@@ -266,6 +272,8 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.create = function (isValid) {
       $scope.error = null;
 
+      console.log("backupPolicyEnabled", this.backupPolicyEnabled)
+
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'storagegroupForm');
         return false;
@@ -293,7 +301,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         tier: $sanitize(this.tier),       
         size_bytes:this.size_bytes,
         snapshot_policy: {
-          enabled:ssPolicyEnabled ? true: false
+          enabled:this.ssPolicyEnabled ? true: false
         }
       });
 
@@ -304,18 +312,24 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
 
       if (this.showReplicaForm) {
         storagegroup.replica_destination_server_id = $sanitize(this.replica_destination_server_id)
-        storagegroup.replica_schedule = this.replica_schedule
+        storagegroup.replica_schedule =  {
+          hour: this.replica_schedule && this.replica_schedule.hour ? $sanitize(this.replica_schedule.hour): $sanitize(0),
+          minute: this.replica_schedule && this.replica_schedule.minute ? this.replica_schedule.minute : 0
+        }
       }
 
       if (this.showBackupForm) {
         storagegroup.backup_destination_server_id = $sanitize(this.backup_destination_server_id)
-        storagegroup.backup_schedule = this.backup_schedule;
+        storagegroup.backup_schedule =  {
+          hour: this.backup_schedule && this.backup_schedule.hour ? $sanitize(this.backup_schedule.hour): $sanitize(0),
+          minute: this.backup_schedule && this.backup_schedule.minute ? this.backup_schedule.minute : 0
+        };
         storagegroup.backup_policy =  {
-          enabled:backupPolicyEnabled ? true: false
+          enabled:this.backupPolicyEnabled ? true: false
         }
       }
 
-      if (ssPolicyEnabled) {
+      if (this.ssPolicyEnabled) {
         if (this.hourlyScheduleEnabled) {
           storagegroup.snapshot_policy.hourly_schedule = this.hourly_schedule ? this.hourly_schedule : this.defaultHourlySchedule;
         }
@@ -334,19 +348,19 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
 
 
-      if (backupPolicyEnabled) {
-        if (this.hourlyScheduleEnabled) {
+      if (this.backupPolicyEnabled) {
+        if (this.backupHourlyScheduleEnabled) {
           storagegroup.backup_policy.hourly_schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
         }
 
-        if (this.dailyScheduleEnabled) {
+        if (this.backupDailyScheduleEnabled) {
           storagegroup.backup_policy.daily_schedule = this.backup_daily_schedule ? this.backup_daily_schedule : this.defaultDailySchedule;
         }
-        if (this.weeklyScheduleEnabled) {
+        if (this.backupWeeklyScheduleEnabled) {
           storagegroup.backup_policy.weekly_schedule = this.backup_weekly_schedule ? this.backup_weekly_schedule : this.defaultWeeklySchedule;
         }
 
-        if (this.monthlyScheduleEnabled) {
+        if (this.backupMonthlyScheduleEnabled) {
           storagegroup.backup_policy.monthly_schedule = this.backup_monthly_schedule ? this.backup_monthly_schedule : this.defaultMonthlySchedule;
         }       
         
