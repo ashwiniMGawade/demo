@@ -290,13 +290,17 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         code: $sanitize(this.code),
         annotation: (this.annotation) ? $sanitize(this.annotation) : '',
         server_id: $sanitize(this.serverId),
-        tier: $sanitize(this.tier),
-        protection_service_level: $sanitize(this.protection_service_level),
+        tier: $sanitize(this.tier),       
         size_bytes:this.size_bytes,
         snapshot_policy: {
           enabled:ssPolicyEnabled ? true: false
         }
       });
+
+      if ( this.protection_service_level) {
+        storagegroup.protection_service_level = $sanitize(this.protection_service_level)
+      } 
+
 
       if (this.showReplicaForm) {
         storagegroup.replica_destination_server_id = $sanitize(this.replica_destination_server_id)

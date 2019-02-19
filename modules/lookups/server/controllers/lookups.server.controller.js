@@ -74,7 +74,7 @@ exports.listPerformanceServiceLevels = function(req, res) {
 
 
 exports.listProtectionServiceLevels = function(req, res) {
-  ProtectionServicelevel.find({}).exec(function (err, servicelevels) {
+  ProtectionServicelevel.find({"name": {"$ne": "administrative"}}).exec(function (err, servicelevels) {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
