@@ -21,11 +21,7 @@ module.exports = function (app) {
   app.route('/api/lookups/suStatus')
     .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listSUStatus);
 
-  // All allowed roles
-  app.route('/api/lookups/managed')
-      .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listManaged);
-
-  //All allowed storageunit protocol
+   //All allowed storageunit protocol
   app.route('/api/lookups/protocol')
     .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listProtocol);
 
