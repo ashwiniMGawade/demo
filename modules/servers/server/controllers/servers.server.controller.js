@@ -72,7 +72,6 @@ exports.create = function (req, res) {
   server.name = req.body.name;
   server.vlan = req.body.vlan;
   server.subnet = req.body.subnet;
-  server.managed = req.body.managed;
 
   if (featuresSettings.server.gateway.enabled) {
     server.gateway = req.body.gateway;
@@ -101,7 +100,6 @@ exports.create = function (req, res) {
     }
   }
 
-  var password = req.body.password || '';
   var cidrSubnet;
   var site;
   var pod;
@@ -212,28 +210,7 @@ exports.create = function (req, res) {
                   }else{
                     server.gateway = cidrSubnet.firstAddress;
                   }
-            
-                  //Validating password
-                  if (server.managed === 'Customer') {
-                    if(!password){
-                      return respondError(res, 400, "Password is mandatory if Managed = Customer");
-                    }else if(!password.match(/^(?=.*[0-9])(?=.*[a-zA-Z])\w{8,16}$/)){
-                      return respondError(res, 400, "Password length must be 8-16 characters, contain no special characters, at least a digit and a letter");
-                    }
-                  }else if (req.body.managed === 'Portal') {
-                    if (req.body.password) {
-                      return respondError(res, 400, "Password must be blank if Managed = Portal");
-                    }
-                  }
-            
-                  // Assing ipsIcl field for customer managed vfaas
-                  if (server.managed === 'Customer') {
-                    var firstNasIp = ip.fromLong(ip.toLong(cidrSubnet.firstAddress) + 17);        
-                    var lastNasIp = ip.fromLong(ip.toLong(cidrSubnet.firstAddress)  + 24);
-                    var lastNasIpLastOctet = lastNasIp.split(".")[3];
-                    server.ipsIcl = firstNasIp + '-' + lastNasIpLastOctet;
-                  }
-                  
+                             
                   console.log(adminVserver, "before calling createsvm");
                   server.cluster_id = mongoose.Types.ObjectId(adminVserver.clusterId);
                   console.log("server with cluster", server); 
@@ -317,8 +294,7 @@ exports.create = function (req, res) {
       subtenantCode: server.subtenant.code,
       tenantCode: server.tenant.code,
       subscriptionCode: server.subscription.code,
-      clusterName: clusterName,
-      password: password
+      clusterName: clusterName
     };
     
     clientWfa.svmCreateExec(args, function (err, resWfa) {
@@ -412,10 +388,7 @@ exports.create = function (req, res) {
         saveServer(server);
       } else {
         if (resWfa) {
-          if (server.managed === 'Customer') {
-            server.ipVirtClus = resWfa.ipVirtClus;
-          }
-
+          
           server.ipMgmt = resWfa.ipMgmt;
           server.code = resWfa.code;
           server.status = 'Operational';
@@ -463,22 +436,7 @@ exports.read = function (req, res) {
   if (req.server.pod && req.server.vlan) {
     server.networkRef = req.server.site.code + req.server.pod.code + _.padStart(req.server.vlan, 4, '0');
   }
-
-  if (server.managed === "Customer") {
-    delete server.iscsiAlias;
-    delete server.iscsi;
-    delete server.cifsSite;
-    delete server.cifsOu;
-    delete server.cifsDomain;
-    delete server.cifsServername;
-    delete server.cifsDnsServers;
-    delete server.cifsDnsDomain;
-    delete server.cifs;
-    delete server.nfs;
-    delete server.ipsSan;
-  } else if (server.managed === "Portal") {
-    delete server.ipVirtClus;
-  }
+  delete server.ipVirtClus; 
 
   delete server.user;
   delete server.created;
@@ -559,10 +517,7 @@ exports.update = function (req, res) {
     logger.info('SVM Fix: Server Object: ' + util.inspect(server, {showHidden: false, depth: null}));
     logger.info('SVM Fix: Request Body: ' + util.inspect(req.body, {showHidden: false, depth: null}));
 
-    server.pod = _.isUndefined(req.body.podId) ? server.pod : req.body.podId ;
-    if(server.managed === 'Customer'){
-      server.ipVirtClus = _.isUndefined(req.body.ipVirtClus) ? server.ipVirtClus : req.body.ipVirtClus ;
-    }
+    server.pod = _.isUndefined(req.body.podId) ? server.pod : req.body.podId ;    
     server.ipMgmt = _.isUndefined(req.body.ipMgmt) ? server.ipMgmt : req.body.ipMgmt ;
     server.code = _.isUndefined(req.body.code) ? server.code : req.body.code ;
     server.vlan = _.isUndefined(req.body.vlan) ? server.vlan : req.body.vlan ;
@@ -619,12 +574,7 @@ exports.update = function (req, res) {
 
   var enabledProtocol = {};
 
-  if(server.managed === 'Portal'){
-    if (req.body.password) {
-      return respondError(res, 400, 'Password must be blank if Managed = Portal');
-    }
-
-    if(!_.isUndefined(req.body.nfs)){
+  if(!_.isUndefined(req.body.nfs)){
       req.body.nfs = JSON.parse(req.body.nfs); // Parse string passed via http.
       if(!_.isBoolean(req.body.nfs)){
         return respondError(res, 400, 'NFS should be either true or false');
@@ -681,15 +631,6 @@ exports.update = function (req, res) {
         }
       }
     }
-
-  } else if (server.managed === 'Customer') {
-    if (!_.isUndefined(req.body.password)){
-      if (!password.match(/^(?=.*[0-9])(?=.*[a-zA-Z])\w{8,16}$/)) {
-        return respondError(res, 400, 'Password length must be at least 8, must contain both characters and digits & no special characters are allowed');
-      }
-      wfaUpdateRequired = true;
-    }
-  }
 
   server.validate(function(err){
     if(err){
@@ -879,7 +820,7 @@ exports.delete = function (req, res) {
     if (err) return respondError(res, 400, errorHandler.getErrorMessage(err));
     if (storagegroups.length > 0)
       return respondError(res, 400, 'Can\'t perform Delete: Please ensure all associated Storage Groups are deleted');
-    if (server.managed === 'Customer') {
+    
       Icr.find({ 'server': mongoose.Types.ObjectId(server._id) }).exec(function (err, icrs) {
         var isICRDependent = false;
         if (err) return respondError(res, 400, errorHandler.getErrorMessage(err));
@@ -895,9 +836,7 @@ exports.delete = function (req, res) {
           return respondError(res, 400, 'Can\'t perform Delete: Please ensure all associated ICRs are deleted.');
         deleteServer();
       });
-    }else{
-      deleteServer();
-    }
+    
   });
 
   function deleteServer() {

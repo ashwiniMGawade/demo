@@ -60,14 +60,14 @@ var ServerSchema = new Schema({
     ref: 'Subscription',
     required: 'Server subscription required'
   },
-  managed: {
-    type: String,
-    enum: {
-            values: ['Portal', 'Customer'],
-            message: '`{VALUE}` not a valid value for managed'
-          },
-    required: 'Server managed type required'
-  },
+  // managed: {
+  //   type: String,
+  //   enum: {
+  //           values: ['Portal', 'Customer'],
+  //           message: '`{VALUE}` not a valid value for managed'
+  //         },
+  //   required: 'Server managed type required'
+  // },
   vlan: {
     type: String,
     default: 0,
@@ -307,22 +307,22 @@ ServerSchema.methods.toJSON = function() {
   delete obj.vlan;
   delete obj.pod;
   delete obj._id;
-  delete obj.__v;
-  if (obj.managed === "Customer") {
-    delete obj.iscsiAlias;
-    delete obj.iscsi;
-    delete obj.cifsSite;
-    delete obj.cifsOu;
-    delete obj.cifsDomain;
-    delete obj.cifsServername;
-    delete obj.cifsDnsServers;
-    delete obj.cifsDnsDomain;
-    delete obj.cifs;
-    delete obj.nfs;
-    delete obj.ipsSan;
-  } else if (obj.managed === "Portal") {
+  // delete obj.__v;
+  // if (obj.managed === "Customer") {
+  //   delete obj.iscsiAlias;
+  //   delete obj.iscsi;
+  //   delete obj.cifsSite;
+  //   delete obj.cifsOu;
+  //   delete obj.cifsDomain;
+  //   delete obj.cifsServername;
+  //   delete obj.cifsDnsServers;
+  //   delete obj.cifsDnsDomain;
+  //   delete obj.cifs;
+  //   delete obj.nfs;
+  //   delete obj.ipsSan;
+  // } else if (obj.managed === "Portal") {
     delete obj.ipVirtClus;
-  }
+  // /
   return obj;
 };
 

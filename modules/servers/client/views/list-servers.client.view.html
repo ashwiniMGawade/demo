@@ -22,8 +22,7 @@
         <td ng-if="isRoot || isL1ops" ng-bind="server.tenant.name" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
         <td ng-bind="server.subtenant.name" title="'Subtenant'" sortable="'subtenant.name'" class="breakword"></td>
         <td ng-bind="server.site.name" title="'Site'" sortable="'site.name'" class="breakword"></td>
-        <td ng-bind="validManagedToAssign[server.managed]" title="'Configuration'" sortable="'managed'"></td>
-        
+                
         <td ng-bind="server.status" title="'Status'" sortable="'status'"></td>
         <td ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="server.status!=='Operational'" ui-sref="servers.edit({serverId: server.serverId})">Edit</button></td>
         <td ng-if="isRoot"><button type="button" class="btn btn-xs btn-primary" ui-sref="servers.fix({serverId: server.serverId})">Fix</button></td>

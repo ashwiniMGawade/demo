@@ -107,44 +107,6 @@
             The 4th to 30th IPs in the Subnet are reserved for use by the {{labels.server.serverName}}.</p>
         </div>
 
-        <div class="form-group required" show-errors>
-          <label class="control-label" for="managed">Configuration</label>
-          <select class="form-control" name="managed" id="managed" ng-model="managed" required>
-              <option value="">Please select configuration type</option>
-              <option ng-repeat="(key, value) in validManagedToAssign" value="{{key}}">{{value}}</option>
-          </select>
-          <div ng-messages="serverForm.managed.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Configuration type is a required field.</p>
-          </div>
-
-          <p class="help-block">A {{labels.server.managedBy.customer}}-Configuration allows customised storage management.<br>
-            Inter-Cluster Relationships can be requested to set up SnapMirror relationships<br>
-            with non-DFaaS cDOT storage systems, facilitating DR and migration operations.<br>
-            The additional storage management is the responsibility of the customer.</p>
-          <p class="help-block">A {{labels.server.managedBy.portal}}-Configuration promotes ease-of-management with storage configured<br>
-            according to best practices for versatility, performance & reliability.<br>
-            Storage Groups and Storage Units can be rapidly configured through the Portal.<br>
-            Migration of data is to be performed at the host-level.</p>
-        </div>
-
-        <div class="form-group" ng-class="{'required' : managed == 'Customer', 'has-error': serverForm.password.$error}" show-errors ng-if="managed == 'Customer'">
-          <label for="password">Password</label>  
-          <input name="password" type="password" ng-model="$parent.password" id="password" class="form-control" placeholder="Password"
-                  ng-minlength="8"
-                  ng-maxlength="16"
-                  ng-required="managed == 'Customer'"
-                  ng-pattern="/^(?=.*[0-9])(?=.*[a-zA-Z])\w{8,16}$/"
-                  autocomplete="new-password"
-                  uib-popover="{{popoverMsg}}" uib-popover-trigger="focus">
-          <div ng-messages="serverForm.password.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} password is mandatory.</p>
-            <p class="help-block error-text" ng-message="minlength">{{labels.server.serverName}} password should be minimum 8 char.</p>
-            <p class="help-block error-text" ng-message="maxlength">{{labels.server.serverName}} password can not be more than 16 char.</p>
-            <p class="help-block error-text" ng-message="pattern">Password must contain no special characters, at least a digit and a letter</p>
-          </div>
-          <p class="help-block">A {{labels.server.managedBy.customer}}-Configured {{labels.server.serverName}} requires a password for SSH and OnCommand System Manager.<br>
-            Access is via the Virtual Cluster IP Address</p>
-        </div>            
 
         <div class="form-group">
           <input type="submit" value="Create" class="btn btn-xl btn-primary">

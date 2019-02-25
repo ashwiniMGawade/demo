@@ -19,27 +19,22 @@
         <li>Premium: {{ server.iopsTotal.premium}} IOPS</li>
         <li>Performance: {{ server.iopsTotal.performance}} IOPS</li>
       </td></tr>
-      <tr><th>Configuration</th><td ng-bind="validManagedToAssign[server.managed]"></td></tr>
       <tr><th>Subnet</th><td ng-bind="server.subnet"></td></tr>
       <tr><th>VLAN</th><td ng-bind="server.vlan"></td></tr>
       <tr ng-if="serverSettings.gateway.enabled"><th>Gateway</th><td ng-bind="server.gateway"></td></tr>
-      <tr ng-show="server.managed==='Customer'"><th>Cluster IP</th><td ng-bind="server.ipVirtClus"></td></tr>
-      <tr ng-show="server.managed==='Customer'"><th>OnCommand System Manager</th><td>
-      <a href="{{sysManagerLink}}" target="_blank" title="Access to storage array via OnCommand System Manager">{{sysManagerLink}}</td></tr>
       <tr><th>Primary IP</th><td ng-bind="server.ipMgmt"></td></tr>
       <tr><th>Network Ref</th><td ng-bind="server.networkRef"></td></tr>
-      <tr ng-show="server.managed==='Customer'"><th>ICL IPs</th><td ng-bind="server.ipsIcl"></td></tr>       
-      <tr ng-show="server.managed==='Portal'"><th>NFS Enabled</th><td ng-bind="server.nfs" class="capitalize"></td></tr>
-      <tr ng-show="server.managed==='Portal'"><th>CIFS Enabled</th><td ng-bind="server.cifs" class="capitalize"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS Server Name</th><td ng-bind="server.cifsServername"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS Domain</th><td ng-bind="server.cifsDomain"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS DNS Domain</th><td ng-bind="server.cifsDnsDomain"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS DNS Servers</th><td ng-bind="server.cifsDnsServers"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS Site</th><td ng-bind="server.cifsSite"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.cifs"><th>CIFS OU</th><td ng-bind="server.cifsOu"></td></tr>
-      <tr ng-show="server.managed==='Portal'"><th>iSCSI Enabled</th><td ng-bind="server.iscsi" class="capitalize"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.iscsi"><th>iSCSI Alias</th><td ng-bind="server.iscsiAlias"></td></tr>
-      <tr ng-show="server.managed==='Portal' && server.iscsi"><th>iSCSI IPs</th><td ng-bind="server.ipsSan"></td></tr>
+      <tr ><th>NFS Enabled</th><td ng-bind="server.nfs" class="capitalize"></td></tr>
+      <tr ><th>CIFS Enabled</th><td ng-bind="server.cifs" class="capitalize"></td></tr>
+      <tr ng-show="server.cifs"><th>CIFS Server Name</th><td ng-bind="server.cifsServername"></td></tr>
+      <tr ng-show="server.cifs"><th>CIFS Domain</th><td ng-bind="server.cifsDomain"></td></tr>
+      <tr ng-show="server.cifs"><th>CIFS DNS Domain</th><td ng-bind="server.cifsDnsDomain"></td></tr>
+      <tr ng-show="server.cifs"><th>CIFS DNS Servers</th><td ng-bind="server.cifsDnsServers"></td></tr>
+      <tr ng-show="server.cifs"><th>CIFS Site</th><td ng-bind="server.cifsSite"></td></tr>
+      <tr ng-show="server.cifs"><th>CIFS OU</th><td ng-bind="server.cifsOu"></td></tr>
+      <tr><th>iSCSI Enabled</th><td ng-bind="server.iscsi" class="capitalize"></td></tr>
+      <tr ng-show="server.iscsi"><th>iSCSI Alias</th><td ng-bind="server.iscsiAlias"></td></tr>
+      <tr ng-show="server.iscsi"><th>iSCSI IPs</th><td ng-bind="server.ipsSan"></td></tr>
       <tr ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0 || (serverAccessRoles.delete | intersect : authentication.user.roles)> 0">
         <th>Actions</th>
         <td>
