@@ -43,10 +43,7 @@ exports.create = function (req, res) {
   user.tenant = req.body.tenantId || null;
   user.providerData = req.body.providerCode ? { "code" : req.body.providerCode } : { } ;
 
-  if (!req.body.tenantId.match(/^[0-9a-fA-F]{24}$/)) {
-    return respondError(res, 400, 'Invalid Tenant Id, required mongoose ObjectId');
-  }
-
+  
   //Role is mandatory
   if (user.roles.length === 0) {
     return respondError(res, 400, 'Role field is required.');
@@ -98,6 +95,9 @@ exports.create = function (req, res) {
   }
 
   if (user.tenant) {
+    if (!req.body.tenantId.match(/^[0-9a-fA-F]{24}$/)) {
+      return respondError(res, 400, 'Invalid Tenant Id, required mongoose ObjectId');
+    }
     mongoose.model('Tenant').findById(user.tenant).exec(function (err, tenant) {
       var roles = (req.user) ? req.user.roles : ['guest'];
 
