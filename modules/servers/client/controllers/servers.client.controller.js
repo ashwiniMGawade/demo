@@ -15,19 +15,6 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
     $scope.serverAccessRoles = featuresSettings.roles.server;
     $scope.popoverMsg = "Please enter a passphrase or password with greater than 8 characters and maximum of 16 characters, no special characters, at least a digit and a letter."
     
-    $http.get('api/lookups/managed')
-      .then(function(response) {
-        $scope.validManagedToAssign = {};
-        angular.forEach(response.data, function(validValue) {
-          if ( validValue === 'Customer') {              
-            $scope.validManagedToAssign.Customer = $scope.labels.server.managedBy.customer || 'Advance';
-          }
-          if ( validValue === 'Portal') {              
-            $scope.validManagedToAssign.Portal = $scope.labels.server.managedBy.portal|| 'Simple';
-          }
-        });
-      });
-
     var flashTimeout = 10000;
 
     function throwFlashErrorMessage(message) {
@@ -86,8 +73,6 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
         vlan: $sanitize(this.vlan),
         subnet: $sanitize(this.subnet),
         gateway: $sanitize(this.gateway),
-        password: $sanitize(this.password),
-        managed: $sanitize(this.managed),
         subscriptionId: $sanitize(this.subscriptionId)
       });
 
@@ -103,7 +88,6 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
         $scope.vlan = '';
         $scope.subnet = '';
         $scope.gateway = '';
-        $scope.password = '';
         $scope.subscriptionId = '';
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.message);
@@ -178,9 +162,6 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
         $scope.cifs = $scope.server.cifs;
         $scope.nfs = $scope.server.nfs;
         $scope.iscsi = $scope.server.iscsi;
-        if($scope.server.managed==='Customer' && $scope.server.ipVirtClus) {
-          $scope.sysManagerLink = 'https://'+$scope.server.ipVirtClus+'/sysmgr/SysMgr.html';
-        }
         $scope.populateSubscriptions($scope.server.site._id, $scope.server.tenant._id, function() {
           $scope.subscriptionId = $scope.server.subscription ? $scope.server.subscription._id : '';
           if($scope.subscriptions.length === 1 && !$scope.subscriptionId){

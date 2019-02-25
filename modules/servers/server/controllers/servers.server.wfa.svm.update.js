@@ -17,7 +17,7 @@ exports.svmUpdateExec = function (req, res) {
       '<userInputValues>' +
       '<userInputEntry value="' + (req.code || '') + '" key="vserver_name"/>' +
       '<userInputEntry value="' + (req.subscriptionCode || '') + '" key="subscription"/>' +
-      '<userInputEntry value="' + (req.password || '') + '" key="password"/>' +
+      // '<userInputEntry value="' + (req.password || '') + '" key="password"/>' +
       '<userInputEntry value="' + (req.nfs || '') + '" key="nfs_enable"/>' +
       '<userInputEntry value="' + (req.iscsi || '') + '" key="iscsi_enable"/>' +
       '<userInputEntry value="' + (req.iscsiAlias || '') + '" key="iscsi_alias"/>' +

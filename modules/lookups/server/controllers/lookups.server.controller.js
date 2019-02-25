@@ -32,10 +32,6 @@ exports.listSUStatus = function (req, res) {
   res.json(Storageunit.schema.path('status').enumValues);
 };
 
-exports.listManaged = function (req, res) {
-  res.json(Server.schema.path('managed').enumValues);
-};
-
 exports.listProtocol = function (req, res) {
   res.json(Storageunit.schema.path('protocol').enumValues);
 };

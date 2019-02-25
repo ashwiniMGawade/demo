@@ -4,7 +4,7 @@
   </div>
 
   <form name="serverForm" class="form-horizontal" ng-submit="update(serverForm.$valid)" novalidate>
-    <div ng-show="server.managed=='Portal'" class="row show-grid" >
+    <div  class="row show-grid" >
       <div class="form-group col-md-2">
         <label for="nfs">NFS</label>
         <input name="nfs" type="checkbox" ng-model="nfs" id="nfs" ng-disabled="server.nfs" class="form-control checkbox-left">
@@ -46,21 +46,6 @@
             <p class="help-block error-text" ng-message="required">Subscription is required.</p>
           </div>
           <p class="help-block">The Subscription this {{labels.server.serverName}} is associated with for billing purposes.<br>The selected Subscription's Code will feature in the Report CSV file for each NetApp Volume contained in this {{labels.server.serverName}}.</p>
-        </div>
-
-        <div class="form-group" ng-class="managed == 'Customer' ? 'required' : ''"  show-errors ng-show="server.managed == 'Customer'">
-          <label for="password">Password</label>
-          <input name="password" type="password" ng-model="server.password" id="password" class="form-control"
-                  ng-minlength="8"
-                  ng-maxlength="16"
-                  autocomplete="new-password"
-                  ng-pattern="/^(?=.*[0-9])(?=.*[a-zA-Z])\w{8,}$/" placeholder="Password">
-          <div ng-messages="serverForm.password.$error" role="alert" ng-bind-html>
-            <p class="help-block error-text" ng-message="minlength">{{labels.server.serverName}} password should be minimum 8 char.</p>
-            <p class="help-block error-text" ng-message="maxlength">{{labels.server.serverName}} password can not be more than 16 char.</p>
-            <p class="help-block error-text" ng-message="pattern">Password must contain no special characters, at least a digit and a letter</p>
-          </div>
-          <p class="help-block">This replaces the existing {{labels.server.serverName}} Password.</p>
         </div>
 
         <div ng-hide="!cifs">

@@ -22,7 +22,7 @@ exports.svmCreateExec = function (req, res) {
       '<userInputEntry value="' + (req.tenantCode || '') + '" key="tenant"/>' +
       '<userInputEntry value="' + (req.subscriptionCode || '') + '" key="subscription"/>' +
       '<userInputEntry value="' + (req.clusterName || '') + '" key="cluster_name"/>' +
-      '<userInputEntry value="' + (req.password || '') + '" key="password"/>' +
+      // '<userInputEntry value="' + (req.password || '') + '" key="password"/>' +
       '</userInputValues>' +
       '<comments>DFaaS Engine SVM Create: ' + req.tenantCode + ' ' + req.subtenantCode + '</comments>' +
       '</workflowInput>',

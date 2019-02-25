@@ -12,22 +12,6 @@ angular.module('servers').controller('ServerListController', ['$scope', '$filter
 
     var reloadCnt = 0 , pollingParams = {} ;
 
-    $http.get('api/lookups/managed')
-      .then(function(response) {
-        $scope.validManagedToAssign = {};
-        angular.forEach(response.data, function(validValue) {       
-          $scope.validManagedToAssign[validValue] = getDisplayValueOfManaged(validValue);
-        });
-      });
-
-    var getDisplayValueOfManaged = function(value) {
-      switch(value) {
-        case 'Portal' : return $scope.labels.server.managedBy.portal|| 'Simple';
-        case 'Customer': return $scope.labels.server.managedBy.customer|| 'Advance'; 
-        default: return '';
-      }
-    };
-
     //Refresh the contents of the page after every 30 seconds
     var refreshData = $interval(function() { 
       reloadCnt++;
@@ -65,8 +49,7 @@ angular.module('servers').controller('ServerListController', ['$scope', '$filter
                        ((data.subscription && data.subscription.name) ? data.subscription.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.tenant && $scope.isRoot) ? data.tenant.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.ipVirtClus) ? data.ipVirtClus.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
-                       ((data.ipMgmt) ? data.ipMgmt.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
-                       ((data.managed) ? getDisplayValueOfManaged(data.managed).toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ;
+                       ((data.ipMgmt) ? data.ipMgmt.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
               } else {
                 return true;
               }

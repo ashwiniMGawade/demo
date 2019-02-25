@@ -12,15 +12,6 @@
               <option value="">Please select a Pod</option>
             </select>
           </div>
-          <div class="form-group" ng-show="server.managed == 'Customer'" show-errors>
-            <label for="ipVirtClus">Cluster IP</label>
-            <input name="ipVirtClus" type="text" ng-model="server.ipVirtClus" id="ipVirtClus" class="form-control" ng-bind-html
-            ng-pattern="/^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$/"
-            >
-            <div ng-messages="serverForm.ipVirtClus.$error" role="alert">            
-              <p class="help-block error-text" ng-message="pattern">Please enter Valid IP Address</p>
-            </div>
-          </div>
           <div class="form-group" show-errors>
             <label for="ipMgmt">Primary IP</label>
             <input name="ipMgmt" type="text" ng-model="server.ipMgmt" id="ipMgmt" class="form-control" ng-bind-html
