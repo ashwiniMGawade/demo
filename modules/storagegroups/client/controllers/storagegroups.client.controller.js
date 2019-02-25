@@ -299,7 +299,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         annotation: (this.annotation) ? $sanitize(this.annotation) : '',
         server_id: $sanitize(this.serverId),
         tier: $sanitize(this.tier),       
-        size_bytes:this.size_bytes,
+        // size_bytes:this.size_bytes,
         snapshot_policy: {
           enabled:this.ssPolicyEnabled ? true: false
         }

@@ -81,17 +81,16 @@
             </span>
           </p>
         </div>        
-        <div class="form-group" show-errors>
+        <!-- <div class="form-group" show-errors>
           <label for="size_bytes">Size (Bytes)</label>
           <input name="size_bytes" type="number" ng-model="size_bytes" id="size_bytes" class="form-control" placeholder="Size (Bytes)"  min="0"  ng-pattern="/^[\d]*$/">
           <div ng-messages="storagegroupForm.size_bytes.$error" role="alert">
             <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-            <!-- <p class="help-block error-text" ng-message="max">Maximum value is 16384.</p> -->
             <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
             <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
           </div>
           <p class="help-block">Size of the volume in bytes</p>
-        </div>
+        </div> -->
         <div class="form-group" show-errors>
           <label for="protection_service_level">Data Protection Service Level</label>
           <select ng-model="protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
