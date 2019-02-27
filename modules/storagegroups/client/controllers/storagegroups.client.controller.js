@@ -10,6 +10,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.labels = featuresSettings.labels;
     $scope.SGAccessRoles = featuresSettings.roles.storagegroup;
     $scope.snapshotAccessRoles = featuresSettings.roles.snapshot;
+
     $http.get('api/lookups/performanceServiceLevels')
       .then(function(response) {
         $scope.validPerformanceSLToAssign = response.data;
@@ -22,6 +23,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
 
     $scope.showReplicaForm = false;
     $scope.showBackupForm = false;
+    $scope.mode = 'fresh';
 
     var flashTimeout = 3000;
 
@@ -117,7 +119,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         serverList = servers;
       } else {
         angular.forEach(servers, function(server) {
-          if (server.tenant && server.tenant._id === tenant && server.managed === 'Portal' && server.status === 'Operational') {
+          if (server.tenant && server.tenant._id === tenant  && server.status === 'Operational') {
              serverList.push(server);
           }
         });
@@ -132,6 +134,8 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         callback();
       });
     };
+
+
 
 
 
@@ -173,6 +177,19 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       });
     }
 
+    var getStoragegroupsForClone = function(sourceServerId) {
+      var storagegroups = Storagegroups.query({'server': sourceServerId});
+      var storagegroupList  = [];
+      storagegroups.$promise.then(function(results) {
+          angular.forEach(results, function(sg) {
+            if (sg.status === 'Operational' && sg.snapshot_policy.enabled==true) {
+               storagegroupList.push(sg);
+            }
+          });
+        });
+      $scope.storagegroups = storagegroupList;
+    } 
+
     // watchers to check the update of value and preselect the dropdown if only one value is present
     if($scope.isRoot) {
       $scope.tenants = Tenants.query();
@@ -198,6 +215,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
      $scope.$watch("serverId", function(newVal, oldVal) {
       if (newVal) {
         getDestinationServers(newVal);
+        getStoragegroupsForClone(newVal)
       }
     });
  
@@ -272,8 +290,6 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.create = function (isValid) {
       $scope.error = null;
 
-      console.log("backupPolicyEnabled", this.backupPolicyEnabled)
-
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'storagegroupForm');
         return false;
@@ -304,6 +320,14 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
           enabled:this.ssPolicyEnabled ? true: false
         }
       });
+
+      if(this.create_from_volume) {
+        storagegroup.create_from_volume=$sanitize(this.create_from_volume.id);
+        storagegroup.clone_snapshot_name=$sanitize(this.clone_snapshot_name);
+        if(this.ssPolicyFromClonnedVolume) {
+          storagegroup.snapshot_policy = this.create_from_volume.snapshot_policy;
+        }
+      }
 
       if ( this.protection_service_level) {
         storagegroup.protection_service_level = $sanitize(this.protection_service_level)
@@ -387,10 +411,21 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       });
     };
 
+    $scope.toggleSnapshotPolicyClone = function() {
+      if (this.mode !== 'fresh') {         
+            this.ssPolicyEnabled = this.ssPolicyFromClonnedVolume ? false: this.ssPolicyEnabled
+          }
+      }
+
+    $scope.toggleSnapshotPolicy = function() {
+      if (this.mode !== 'fresh') {         
+            this.ssPolicyFromClonnedVolume = this.ssPolicyEnabled ? false : this.ssPolicyFromClonnedVolume
+          }
+      }
     // Create new SnapShots
     $scope.createSnapshot = function (storagegroup) {
       $scope.error = null;
-      var storagegroupId = storagegroup.storagegroupId;
+      var storagegroupId = storagegroup.id;
       var snapshots = new Snapshots({
         storagegroupId : storagegroupId
       });

@@ -39,11 +39,11 @@ angular.module('storagegroups').controller('SnapshotsListController', ['$scope',
         counts: [],
         getData: function($defer, params) {
           Snapshots.query({storagegroupId : $scope.storagegroupId}, function (data) {
-            $scope.snapshots = data;
+            $scope.snapshots = data.records;
 
             var filteredData = $filter('filter')($scope.snapshots, function(data) {
               if ($scope.search) {
-                return ((data.code) ? data.code.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
+                return ((data.name) ? data.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
               } else {
                 return true;
               }

@@ -66,6 +66,13 @@
           </div>
           <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
         </div>
+        <div class="form-group" show-errors>
+          <label for="mode">Volume creation mode</label>
+          <select ng-model="mode" class="form-control capitalize" id="mode" name="mode" class="form-control">
+            <option value="fresh" selected="selected">Fresh Volume</option>
+            <option value="exisitingVolume">Create from exisitng volume and snapshot policy</option>
+          </select>          
+        </div>
         <div class="form-group required" show-errors>
           <label for="tier">Performance Service Level</label>
           <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
@@ -91,11 +98,30 @@
           </div>
           <p class="help-block">Size of the volume in bytes</p>
         </div> -->
-        <div class="form-group" show-errors>
+        <div class="form-group" show-errors ng-if="mode=='fresh'">
           <label for="protection_service_level">Data Protection Service Level</label>
-          <select ng-model="protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
+          <select ng-model="$parent.protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
             <option value="">Please select the Data Protection Service Level</option>
           </select>                   
+        </div>
+
+        <div class="form-group required" show-errors ng-if="mode!=='fresh'">
+          <label for="create_from_volume">Create from Storagegroup</label>
+          <select name="create_from_volume" ng-model="$parent.create_from_volume" id="create_from_volume" class="form-control" ng-options="volume as volume.name for volume in storagegroups |orderBy: 'name'" ng-disabled="isRoot && (!tenantId || !servers)" required>
+            <option value="">Please select a storagegroup</option>
+          </select>
+          <div ng-messages="storagegroupForm.create_from_volume.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storagegroup name is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="mode!=='fresh'">
+          <label for="clone_snapshot_name">Snapshot Name</label>
+          <input type="text" name="clone_snapshot_name" ng-model="$parent.clone_snapshot_name" id="clone_snapshot_name" class="form-control"  ng-disabled="create_from_volume==''" required>
+          </select>
+          <div ng-messages="storagegroupForm.clone_snapshot_name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Snapshot name is required.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -387,11 +413,22 @@
       </div>
     </div>
 
+     <div class="row show-grid mLeft0" ng-if="mode!=='fresh'">
+      <div class="col-md-6">
+        <div class="form-group col-md-2">
+          <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
+        </div>
+        <div class="form-group col-md-10">
+          <label style="margin-top: 12px;"> Copy snapshot policy from source volume</label>
+        </div>
+      </div>
+    </div>
+
     <!-- snapshot policy-->
     <div class="row show-grid mLeft0">
       <div class="col-md-6">
         <div class="form-group col-md-2">
-          <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left">
+          <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left" ng-change="toggleSnapshotPolicy()">
         </div>
         <div class="form-group col-md-10">
           <label style="margin-top: 12px;">Enable Snapshot Policy</label>
