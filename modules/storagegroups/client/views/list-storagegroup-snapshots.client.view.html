@@ -14,7 +14,7 @@
   <div class="table-responsive" ng-show="tableParams.total(value)">
     <table ng-table="tableParams" class="table table-bordered table-striped">
       <tr ng-repeat="snapshot in $data">
-        <td ng-bind="snapshot.code" title="'Code'" sortable="'code'"></td>
+        <td ng-bind="snapshot.name" title="'Name'" sortable="'name'"></td>
         <td ng-if="(snapshotAccessRoles.delete | intersect : authentication.user.roles) > 0">
           <button type="button" class="btn btn-xs btn-primary" ng-click="deleteSnapshot(snapshot.code);">Delete</button></td>
         <!--<td>-->
