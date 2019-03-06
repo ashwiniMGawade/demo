@@ -173,7 +173,7 @@
       <div class="col-md-6">       
         <div class="form-group required" show-errors>
           <label for="backup_destination_server_id">Backup Destination Server Id</label>
-          <select name="backup_destination_server_id" ng-model="$parent.backup_destination_server_id" id="backup_destination_server_id" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required ng-disabled="!servers">
+          <select name="backup_destination_server_id" ng-model="$parent.backup_destination_server_id" id="backup_destination_server_id" class="form-control" ng-options="server.serverId as server.name for server in peeredServer | orderBy: 'name'" required ng-disabled="!peeredServer">
             <option value="">Please select a Backup Destination Server</option>
           </select>
           <div ng-messages="storagegroupForm.backup_destination_server_id.$error" role="alert">
