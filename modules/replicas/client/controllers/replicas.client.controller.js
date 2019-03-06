@@ -59,6 +59,39 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
       });
     }
 
+    var checkBackupPolicyErrors = function(scopeVar) {
+      if (scopeVar.backupPolicyEnabled && !(scopeVar.backupHourlyScheduleEnabled || scopeVar.backupDailyScheduleEnabled || scopeVar.backupWeeklyScheduleEnabled || scopeVar.backupMonthlyScheduleEnabled)) {
+        throwFlashErrorMessage("Please enable at least one backup schedule with keep > 0");
+        return false;
+      }
+
+      if (scopeVar.backupHourlyScheduleEnabled && scopeVar.backup_hourly_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Hourly schedule: Keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.backupDailyScheduleEnabled && scopeVar.backup_daily_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Daily schedule: Keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.backupWeeklyScheduleEnabled && scopeVar.backup_weekly_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Weekly schedule: Keep should be greater than 0");
+        return false;
+      }
+
+      if (scopeVar.backupMonthlyScheduleEnabled && scopeVar.backup_monthly_schedule.keep == 0) {
+        throwFlashErrorMessage("Backup Monthly schedule: Keep should be greater than 0");
+        return false;
+      }
+      //need to remove the line once the modification is done in model
+      if (scopeVar.backupDailyScheduleEnabled) {
+        scopeVar.backup_daily_schedule.hour = $sanitize(scopeVar.backup_daily_schedule.hour);
+      }
+
+      return true
+    }
+
     // Create new Replica
     $scope.create = function (isValid) {
 
@@ -66,6 +99,12 @@ angular.module('replicas').controller('ReplicasController', ['$scope', '$statePa
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'replicaForm');
+        return false;
+      }
+
+      var backupPolicyResponse = checkBackupPolicyErrors(this);
+
+      if (!backupPolicyResponse) {
         return false;
       }
 

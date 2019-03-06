@@ -349,7 +349,11 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
           minute: this.backup_schedule && this.backup_schedule.minute ? this.backup_schedule.minute : 0
         };
         storagegroup.backup_policy =  {
-          enabled:this.backupPolicyEnabled ? true: false
+          enabled:this.backupPolicyEnabled ? true: false,
+          hourly: {schedule: $scope.defaultHourlySchedule, keep: 0},
+          daily: {schedule: $scope.defaultDailySchedule, keep: 0},
+          monthly: {schedule: $scope.defaultMonthlySchedule, keep: 0},
+          weekly: {schedule: $scope.defaultWeeklySchedule, keep: 0}
         }
       }
 
@@ -374,18 +378,22 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
 
       if (this.backupPolicyEnabled) {
         if (this.backupHourlyScheduleEnabled) {
-          storagegroup.backup_policy.hourly_schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
+          storagegroup.backup_policy.hourly.schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
+          storagegroup.backup_policy.hourly.keep  = this.backup_hourly_schedule.keep || 0;
         }
 
         if (this.backupDailyScheduleEnabled) {
-          storagegroup.backup_policy.daily_schedule = this.backup_daily_schedule ? this.backup_daily_schedule : this.defaultDailySchedule;
+          storagegroup.backup_policy.daily.schedule = this.backup_daily_schedule ? this.backup_daily_schedule : this.defaultDailySchedule;
+          storagegroup.backup_policy.daily.keep  = this.backup_hourly_schedule.keep || 0;
         }
         if (this.backupWeeklyScheduleEnabled) {
-          storagegroup.backup_policy.weekly_schedule = this.backup_weekly_schedule ? this.backup_weekly_schedule : this.defaultWeeklySchedule;
+          storagegroup.backup_policy.weekly.schedule = this.backup_weekly_schedule ? this.backup_weekly_schedule : this.defaultWeeklySchedule;
+          storagegroup.backup_policy.weekly.keep  = this.backup_hourly_schedule.keep || 0;
         }
 
         if (this.backupMonthlyScheduleEnabled) {
-          storagegroup.backup_policy.monthly_schedule = this.backup_monthly_schedule ? this.backup_monthly_schedule : this.defaultMonthlySchedule;
+          storagegroup.backup_policy.monthly.schedule = this.backup_monthly_schedule ? this.backup_monthly_schedule : this.defaultMonthlySchedule;
+          storagegroup.backup_policy.monthly.keep  = this.backup_hourly_schedule.keep || 0;
         }       
         
       }

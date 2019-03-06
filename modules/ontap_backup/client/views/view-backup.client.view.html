@@ -4,17 +4,20 @@
   </div>
   <div class="col-md-6">
     <table class="table table-striped">
-      <tr><th>Source Site</th><td ng-bind="backup.source_site_id" class="capitalize"></td></tr>
-      <tr><th>Source Server</th><td ng-bind="backup.source_server_id" class="capitalize"></td></tr>
-      <tr><th>Source Volume</th><td ng-bind="backup.source_volume_id" class="capitalize"></td></tr>
-      <tr><th>Destination Site</th><td ng-bind="backup.destination_site_id" class="capitalize"></td></tr>
-      <tr><th>Destination Server</th><td ng-bind="backup.destination_server_id" class="capitalize"></td></tr>
-      <tr><th>Destination Volume</th><td ng-bind="backup.destination_volume_id" class="capitalize"></td></tr>
+      <tr><th>Source Site</th><td ng-bind="backup.source_site.name" class="capitalize"></td></tr>
+      <tr><th>Source Server</th><td ng-bind="backup.source_server.name" class="capitalize"></td></tr>
+      <tr><th>Source Volume</th><td ng-bind="backup.source_volume.name" class="capitalize"></td></tr>
+      <tr><th>Destination Site</th><td ng-bind="backup.destination_site.name" class="capitalize"></td></tr>
+      <tr><th>Destination Server</th><td ng-bind="backup.destination_server.name" class="capitalize"></td></tr>
+      <tr><th>Destination Volume</th><td ng-bind="backup.destination_volume.name" class="capitalize"></td></tr>
       <tr><th>Status</th><td ng-bind="backup.status"></td></tr>
       <tr><th>Volume Replication Status</th><td ng-bind="backup.state"></td></tr>
       <tr><th>Backup Schedule:</th>
         <td>Hour : {{backup.schedule.hour}}</td>        
         <td>Minute: {{backup.schedule.minute}}</td>
+      </tr>
+      <tr><th>Backup Policy</th>
+        <td ng-bind="detailedbackupDesc"></td>
       </tr>
       
       

@@ -16,12 +16,12 @@ angular.module('backups').controller('BackupsListController', ['$scope', '$filte
             $scope.backups = data;
             var filteredData = $filter('filter')($scope.backups, function(data) {    
               if ($scope.search) {
-                return ((data.source_site_id) ? data.source_site_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                        ((data.source_server_id) ? data.source_server_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                        ((data.source_volume_id) ? data.source_volume_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                        ((data.destination_site_id) ? data.destination_site_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                        ((data.destination_server_id) ? data.destination_server_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
-                        ((data.destination_volume_id) ? data.destination_volume_id.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                return ((data.source_site.name) ? data.source_site.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.source_server.name) ? data.source_server.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.source_volume.name) ? data.source_volume.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.destination_site.name) ? data.destination_site.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.destination_server.name) ? data.destination_server.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
+                        ((data.destination_volume.name) ? data.destination_volume.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 || 
                        ((data.status) ? data.status.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.state) ? data.state.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1;
               } else {
