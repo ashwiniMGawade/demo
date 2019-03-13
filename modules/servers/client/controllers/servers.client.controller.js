@@ -1,8 +1,8 @@
 'use strict';
 
 // Servers controller
-angular.module('servers').controller('ServersController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Servers', 'Subtenants', 'Sites', 'Pods', 'Subscriptions', 'modalService', 'Flash', 'Tenants', '$sanitize', 
-  function ($scope, $stateParams, $location, $http, Authentication, Servers, Subtenants, Sites, Pods, Subscriptions, modalService, Flash, Tenants, $sanitize) {
+angular.module('servers').controller('ServersController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Servers', 'Tags', 'Subtenants', 'Sites', 'Pods', 'Subscriptions', 'modalService', 'Flash', 'Tenants', '$sanitize', 
+  function ($scope, $stateParams, $location, $http, Authentication, Servers, Tags, Subtenants, Sites, Pods, Subscriptions, modalService, Flash, Tenants, $sanitize) {
     $scope.authentication = Authentication;
     $scope.sites = Sites;
     $scope.subtenants = Subtenants;
@@ -12,6 +12,8 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
     $scope.isL1ops = Authentication.user.roles.indexOf('l1ops') !== -1;
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
     $scope.labels = featuresSettings.labels;
+    $scope.tags = [{      
+    }];
     $scope.serverAccessRoles = featuresSettings.roles.server;
     $scope.popoverMsg = "Please enter a passphrase or password with greater than 8 characters and maximum of 16 characters, no special characters, at least a digit and a letter."
     
@@ -55,9 +57,32 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
       }
     });
 
+    $scope.addTag = function() {
+      $scope.tags.push({});
+    }
+
+    $scope.removeTag = function(index) {
+      $scope.tags.splice(index, 1);
+    }
+
+    var prepareTagsObjectFromScope = function(scopeTags) {
+      var tags = [];
+      angular.forEach(scopeTags, function(tag) {
+        var obj = {};
+        obj[tag.attr] = tag.val
+        tags.push(obj)
+      });
+
+      return tags;
+    }
    
     // Create new Server
     $scope.create = function (isValid) {
+      
+      var tags = prepareTagsObjectFromScope(this.tags);
+
+      console.log(tags);
+
       $scope.error = null;
 
       if (!isValid) {
@@ -76,10 +101,19 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
         subscriptionId: $sanitize(this.subscriptionId)
       });
 
+      
+
       // Redirect to list page after save
       server.$create(function (response) {
         $location.path('servers');
         Flash.create('success', '<strong ng-non-bindable>Submitted the ' + $scope.labels.server.serverName + ' Create request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
+
+        if (tags.length > 0) {
+          var tag = new Tags({'Tags': tags, objectId: response._id });
+          tag.$create(function(response){
+            console.log("response of tags", response)
+          });
+        }
 
         // Clear form fields
         $scope.name = '';
@@ -124,6 +158,8 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
     // Update existing Server
     $scope.update = function (isValid) {
       $scope.error = null;
+      var tags = prepareTagsObjectFromScope(this.tags);
+      console.log(tags);
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'serverForm');
@@ -140,6 +176,14 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
       server.$update(function () {
         $location.path('servers');
         Flash.create('success', '<strong ng-non-bindable>Submitted the ' + $scope.labels.server.serverName + ' Update request.<br>Please wait for the Status to return to Operational.</strong>', 10000, { class: '', id: '' }, true);
+
+        if (tags.length > 0) {
+          var tag = new Tags({'Tags': tags, objectId: server._id });
+          tag.$update(function(response){
+            console.log("response of tags update", response)
+          });
+        }
+
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.message);
         server.cifs = Servers.get({ serverId: $stateParams.serverId}).cifs;
@@ -167,6 +211,26 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
           if($scope.subscriptions.length === 1 && !$scope.subscriptionId){
             $scope.subscriptionId = $scope.subscriptions[0].subscriptionId;
           }
+        });
+
+        //Get tags information
+        Tags.get({
+          objectId: $stateParams.serverId
+        }, function(data) {
+          data = data[0];
+          if (data.tags.length > 0) {
+            $scope.tags = [];
+            angular.forEach(data.tags, function(tagVal, tagKey) {
+              var obj = {};
+
+              obj.attr = Object.keys(tagVal)[0];
+              obj.val = tagVal[obj.attr];
+              $scope.tags.push(obj);
+            });
+            console.log($scope.tags)            
+          }
+        }, function(error) {
+            throwFlashErrorMessage(error.data.message);
         });
       }, function(error){
         $location.path('servers');
