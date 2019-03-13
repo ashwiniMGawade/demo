@@ -36,6 +36,11 @@
       <tr ng-show="server.iscsi"><th>iSCSI Alias</th><td ng-bind="server.iscsiAlias"></td></tr>
       <tr ng-show="server.iscsi"><th>iSCSI IPs</th><td ng-bind="server.ipsSan"></td></tr>
       <tr ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0 || (serverAccessRoles.delete | intersect : authentication.user.roles)> 0">
+        <tr><th>Tags</th>
+          <td> 
+            <li ng-repeat="tag in tags">{{tag.attr}}: {{ tag.val}} </li>
+          </td>
+        </tr>
         <th>Actions</th>
         <td>
           <button type="button" ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0" class="btn btn-xl btn-primary" ng-disabled="server.status!=='Operational'" ui-sref="servers.edit({serverId: server.serverId})">Edit</button>
