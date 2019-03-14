@@ -1,13 +1,15 @@
 'use strict';
 
 // Storagegroups controller
-angular.module('storagegroups').controller('StoragegroupsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Storagegroups', 'Snapshots', 'Servers', 'modalService', 'Flash', 'Tenants', '$sanitize',  function ($scope, $stateParams, $location, $http, Authentication, Storagegroups, Snapshots, Servers, modalService, Flash, Tenants, $sanitize) {
+angular.module('storagegroups').controller('StoragegroupsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Storagegroups', 'Tags', 'Snapshots', 'Servers', 'modalService', 'Flash', 'Tenants', '$sanitize',  function ($scope, $stateParams, $location, $http, Authentication, Storagegroups, Tags, Snapshots, Servers, modalService, Flash, Tenants, $sanitize) {
     $scope.authentication = Authentication;
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
     $scope.isL1ops = Authentication.user.roles.indexOf('l1ops') !== -1;
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
     $scope.isUser = Authentication.user.roles.indexOf('user') !== -1;
     $scope.labels = featuresSettings.labels;
+    $scope.tags = [{      
+    }];
     $scope.SGAccessRoles = featuresSettings.roles.storagegroup;
     $scope.snapshotAccessRoles = featuresSettings.roles.snapshot;
 
@@ -136,6 +138,25 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     };
 
 
+    $scope.addTag = function() {
+      $scope.tags.push({});
+    }
+
+    $scope.removeTag = function(index) {
+      $scope.tags.splice(index, 1);
+    }
+
+    var prepareTagsObjectFromScope = function(scopeTags) {
+      var tags = [];
+      angular.forEach(scopeTags, function(tag) {
+        var obj = {};
+        obj[tag.attr] = tag.val
+        tags.push(obj)
+      });
+
+      return tags;
+    }
+   
 
 
 
@@ -306,6 +327,8 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       if (!backupPolicyResponse) {
         return false;
       }
+
+      var tags = prepareTagsObjectFromScope(this.tags);
       
       //var formattedSanpShotPolicy = formatSnapShotPolicy();
       // Create new Storagegroup object
@@ -414,6 +437,15 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $scope.serverId = '';
         $scope.tier = '';
         $scope.snapshot_policy = {};
+
+        if (tags.length > 0) {
+          var tag = new Tags({'Tags': tags, objectId: response.object_id });
+          tag.$create(function(response){
+            console.log("response of tags", response)
+          });
+        }
+
+
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.user_message || errorResponse.data.error || "Something went wrong!");
       });
@@ -491,7 +523,8 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
           return false;
         }
       }
-     
+      
+      var tags = prepareTagsObjectFromScope(this.tags);
       
       var storagegroup = $scope.storagegroup;
       storagegroup.storagegroupId = storagegroup.id;
@@ -518,9 +551,15 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
 
 
-      storagegroup.$update(function () {
+      storagegroup.$update(function (response) {
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Update request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
+        if (tags.length > 0) {
+          var tag = new Tags({'Tags': tags, objectId: response.object_id });
+          tag.$update(function(response){
+            console.log("response of tags update", response)
+          });
+        }
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
       });
@@ -555,6 +594,27 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
           prepareDetailedSnapShotPolicy();
           
         }
+
+        //Get tags information
+        Tags.get({
+          objectId: $stateParams.storagegroupId
+        }, function(data) {
+          data = data[0];
+          if (data.tags.length > 0) {
+            $scope.tags = [];
+            angular.forEach(data.tags, function(tagVal, tagKey) {
+              var obj = {};
+
+              obj.attr = Object.keys(tagVal)[0];
+              obj.val = tagVal[obj.attr];
+              $scope.tags.push(obj);
+            });
+            console.log($scope.tags)            
+          }
+        }, function(error) {
+            //throwFlashErrorMessage(error.data.message);
+        });
+
       }, function(error){
         $location.path('storagegroups');
         throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");

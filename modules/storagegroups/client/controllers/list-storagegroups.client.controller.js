@@ -31,11 +31,20 @@ angular.module('storagegroups').controller('StoragegroupListController', ['$scop
       }, {
         counts: [],
         getData: function($defer, params) {
-          Storagegroups.query({}, function (data) {
+          var pollingParams={};
+          if ((/^(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+)*(?:;(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+))+)*)*$/).test($scope.search)){
+            var searchedTags = $scope.search.split(";");
+            angular.forEach(searchedTags, function(tag) {
+              var tagData = tag.split("=");
+              pollingParams[tagData[0]] = tagData[1];
+            })
+            console.log(pollingParams);
+          }
+          Storagegroups.query(pollingParams, function (data) {
             $scope.storagegroups = data;
 
             var filteredData = $filter('filter')($scope.storagegroups, function(data) {
-              if ($scope.search) {
+              if ($scope.search && !(/^(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+)*(?:;(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+))+)*)*$/).test($scope.search)) {
                 return ((data.name) ? data.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                   ((data.code) ? data.code.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                   ((data.server) ? data.server.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||

@@ -33,14 +33,24 @@ angular.module('servers').controller('ServerListController', ['$scope', '$filter
       }, {
         counts: [],
         getData: function($defer, params) {
+          pollingParams={};
           if (reloadCnt >= 1){
             pollingParams.ispolling = 1;
           }
+          if ((/^(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+)*(?:;(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+))+)*)*$/).test($scope.search)){
+             var searchedTags = $scope.search.split(";");
+            angular.forEach(searchedTags, function(tag) {
+              var tagData = tag.split("=");
+              pollingParams[tagData[0]] = tagData[1];
+            })
+          }
+
+          console.log(pollingParams);
           Servers.query(pollingParams, function (data) {
             $scope.servers = data;
 
             var filteredData = $filter('filter')($scope.servers, function(data) {
-              if ($scope.search) {
+              if ($scope.search && !(/^(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+)*(?:;(([a-zA-Z\-0-9\._]+=[a-zA-Z\-0-9\._]+))+)*)*$/).test($scope.search)) {
                 return ((data.name) ? data.name.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.code) ? data.code.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
                        ((data.status) ? data.status.toString().toLowerCase().indexOf($scope.search.toLowerCase()): '-1') > -1 ||
