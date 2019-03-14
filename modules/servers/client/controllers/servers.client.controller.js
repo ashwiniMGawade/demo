@@ -230,7 +230,7 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
             console.log($scope.tags)            
           }
         }, function(error) {
-            throwFlashErrorMessage(error.data.message);
+            //throwFlashErrorMessage(error.data.message);
         });
       }, function(error){
         $location.path('servers');

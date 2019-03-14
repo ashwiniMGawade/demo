@@ -112,9 +112,9 @@
           <label for="name">Tags</label>
           <br/>
           <div ng-repeat="(key, value) in tags" class="row" style="margin-left:0;">
-            <div class="col-md-4 form-group" show-errors>
+            <div class="col-md-5 form-group" show-errors>
               <label for="name">Key</label>
-              <input name="tags{{key}}" type="text" ng-model="value['attr']" id="name" class="form-control" placeholder="Tag key"
+              <input name="tags{{key}}" type="text" ng-model="value['attr']" id="name" class="form-control" placeholder="Key"
                     ng-maxlength="64"
                     ng-minlength="3"
                     ng-pattern="/^[a-zA-Z0-9-]*$/"
@@ -126,10 +126,9 @@
                 <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
               </div>
             </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-4 form-group" show-errors>
+            <div class="col-md-5 form-group" show-errors>
               <label for="name">Value</label>
-              <input name="tagValues{{key}}" type="text" ng-model="value['val']" id="name" class="form-control" placeholder="Tag Value"
+              <input name="tagValues{{key}}" type="text" ng-model="value['val']" id="name" class="form-control" placeholder="Value"
                     ng-maxlength="64"
                     ng-minlength="3"
                     ng-pattern="/^[a-zA-Z0-9-]*$/"
