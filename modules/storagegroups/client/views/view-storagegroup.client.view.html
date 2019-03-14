@@ -28,6 +28,11 @@
       <tr><th>Presented (GB)</th><td ng-bind="storagegroup.sizePresented"></td></tr>
       <tr><th>Used (GB)</th><td ng-bind="storagegroup.sizeUsed"></td></tr>
       <tr><th>Snapshot (GB)</th><td ng-bind="storagegroup.sizeSnapshot"></td></tr>
+      <tr><th>Tags</th>
+        <td> 
+          <li ng-if="tags[0].attr" ng-repeat="tag in tags">{{tag.attr}}: {{ tag.val}} </li>
+        </td>
+      </tr>
       <tr>
         <th>Actions</th>
         <td>
