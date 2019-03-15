@@ -97,6 +97,31 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
     }
 
+
+    $scope.openSnapshotTab = function (evt, sname) {
+
+      // Declare all variables
+      var i, tabcontent, tablinks;
+
+      $scope[sname.toLowerCase()+'ScheduleEnabled'] = true;
+
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(sname).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+
     
     function prepareDetailedSnapShotPolicy(){
       $scope.detailedSnapShotDesc = "";
@@ -344,7 +369,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }
       });
 
-      if(this.create_from_volume) {
+      if(this.create_from_volume && this.mode !='fresh') {
         storagegroup.create_from_volume=$sanitize(this.create_from_volume.id);
         storagegroup.clone_snapshot_name=$sanitize(this.clone_snapshot_name);
         if(this.ssPolicyFromClonnedVolume) {
