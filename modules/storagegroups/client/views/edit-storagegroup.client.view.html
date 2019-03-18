@@ -19,16 +19,6 @@
             <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces, underscore and dashes are allowed</p>
           </div>
         </div>
-        <div class="form-group" show-errors>
-          <label for="annotation">Annotation</label>
-          <input name="annotation" type="text" ng-model="storagegroup.annotation" id="annotation" class="form-control"
-                  ng-maxlength="256"
-                  ng-pattern="/^[a-zA-Z0-9 -_]*$/" placeholder="Annotation" ng-bind-html>
-          <div ng-messages="storagegroupForm.annotation.$error" role="alert">
-            <p class="help-block error-text" ng-message="maxlength">Annotation should be maximum 256 characters long.</p>
-            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, underscore, spaces and dashes are allowed</p>
-          </div>
-        </div>
         <div class="form-group required" show-errors>
           <label for="tier">Performance Service Level</label>
           <select name="tier" ng-model="storagegroup.tier" id="tier" class="form-control" required>
