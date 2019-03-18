@@ -722,6 +722,12 @@ a.disabled {
 /* Create an active/current tablink class */
 .tab a.active {
   background-color: #ccc;
+  border: 1px solid #00000036;
+  border-bottom: none;
+}
+
+.tab a.green {
+  background-color: #0080007a
 }
 
 /* Style the tab content */
