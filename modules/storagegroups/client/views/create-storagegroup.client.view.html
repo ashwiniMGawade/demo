@@ -45,6 +45,14 @@
             </span>
           </p>
         </div> 
+        <div class="row" ng-if="mode!=='fresh'">
+          <div class="form-group col-md-2">
+            <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
+          </div>
+          <div class="form-group col-md-10">
+            <label style="margin-top: 12px;">Copy snapshot policy from source volume</label>
+          </div>
+        </div>
         <div class="form-group" show-errors ng-show="mode=='fresh'">
           <label for="protection_service_level">Data Protection Service Level</label>
           <select ng-model="$parent.protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
@@ -138,14 +146,6 @@
           </select>
           <div ng-messages="storagegroupForm.create_from_volume.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Storagegroup name is required.</p>
-          </div>
-        </div>
-        <div class="row" ng-if="mode!=='fresh'">
-          <div class="form-group col-md-2">
-            <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
-          </div>
-          <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Copy snapshot policy from source volume</label>
           </div>
         </div>
       </div>

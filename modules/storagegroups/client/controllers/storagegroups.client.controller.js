@@ -106,16 +106,16 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       $scope[sname.toLowerCase()+'ScheduleEnabled'] = !$scope[sname.toLowerCase()+'ScheduleEnabled'];
 
       if (sname == 'Hourly') {
-        $scope.hourly_schedule = $scope.defaultHourlySchedule;
+        $scope.hourly_schedule = $scope.hourly_schedule || $scope.defaultHourlySchedule;
       }
       if (sname == 'Daily') {
-        $scope.daily_schedule = $scope.defaultDailySchedule;
+        $scope.daily_schedule = $scope.daily_schedule || $scope.defaultDailySchedule;
       }
       if (sname == 'Weekly') {
-        $scope.weekly_schedule = $scope.defaultWeeklySchedule;
+        $scope.weekly_schedule = scope.weekly_schedule || $scope.defaultWeeklySchedule;
       }
       if (sname == 'Monthly') {
-        $scope.monthly_schedule = $scope.defaultMonthlySchedule;
+        $scope.monthly_schedule = $scope.monthly_schedule|| $scope.defaultMonthlySchedule;
       }
 
       // Get all elements with class="tabcontent" and hide them
@@ -137,7 +137,6 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       if ($scope[sname.toLowerCase()+'ScheduleEnabled'] == true) {
         evt.currentTarget.className += " green";
       } else {
-        console.log("called here")
         evt.currentTarget.className = evt.currentTarget.className.replace(" green", "");
       }
     }
@@ -150,20 +149,20 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       $scope[sname+'ScheduleEnabled'] = !$scope[sname+'ScheduleEnabled'];
 
       if (sname == 'backupHourly') {
-        $scope.backup_hourly_schedule = $scope.defaultHourlySchedule;
-        $scope.backup_hourly_schedule.keep = 0;
+        $scope.backup_hourly_schedule = $scope.backup_hourly_schedule || $scope.defaultHourlySchedule;
+        $scope.backup_hourly_schedule.keep = $scope.backup_hourly_schedule.keep || 0;
       }
       if (sname == 'backupDaily') {
-        $scope.backup_daily_schedule = $scope.defaultDailySchedule;
-        $scope.backup_daily_schedule.keep = 0;
+        $scope.backup_daily_schedule = $scope.backup_daily_schedule || $scope.defaultDailySchedule;
+        $scope.backup_daily_schedule.keep = $scope.backup_daily_schedule.keep || 0;
       }
       if (sname == 'backupWeekly') {
-        $scope.backup_weekly_schedule = $scope.defaultWeeklySchedule;
-        $scope.backup_weekly_schedule.keep = 0;
+        $scope.backup_weekly_schedule = $scope.backup_weekly_schedule || $scope.defaultWeeklySchedule;
+        $scope.backup_weekly_schedule.keep = $scope.backup_weekly_schedule.keep || 0;
       }
       if (sname == 'backupMonthly') {
-        $scope.backup_monthly_schedule = $scope.defaultMonthlySchedule;
-        $scope.backup_monthly_schedule.keep = 0;
+        $scope.backup_monthly_schedule = $scope.backup_monthly_schedule || $scope.defaultMonthlySchedule;
+        $scope.backup_monthly_schedule.keep = $scope.backup_monthly_schedule.keep || 0;
       }
       
 
