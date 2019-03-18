@@ -65,7 +65,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     }
 
     $scope.defaultDailySchedule = {
-      "hour": "",
+      "hour": "0",
       "minute": 0,
       "snapshots_to_keep": 0
     }
@@ -80,7 +80,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.defaultMonthlySchedule = {
       "hour": 0,
       "minute": 0,
-      "day_of_month":0,
+      "day_of_month":1,
       "snapshots_to_keep": 0
     }
 
@@ -103,16 +103,29 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       // Declare all variables
       var i, tabcontent, tablinks;
 
-      $scope[sname.toLowerCase()+'ScheduleEnabled'] = true;
+      $scope[sname.toLowerCase()+'ScheduleEnabled'] = !$scope[sname.toLowerCase()+'ScheduleEnabled'];
+
+      if (sname == 'Hourly') {
+        $scope.hourly_schedule = $scope.defaultHourlySchedule;
+      }
+      if (sname == 'Daily') {
+        $scope.daily_schedule = $scope.defaultDailySchedule;
+      }
+      if (sname == 'Weekly') {
+        $scope.weekly_schedule = $scope.defaultWeeklySchedule;
+      }
+      if (sname == 'Monthly') {
+        $scope.monthly_schedule = $scope.defaultMonthlySchedule;
+      }
 
       // Get all elements with class="tabcontent" and hide them
-      tabcontent = document.getElementsByClassName("tabcontent");
+      tabcontent = document.getElementsByClassName("sstabcontent");
       for (i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
       }
 
       // Get all elements with class="tablinks" and remove the class "active"
-      tablinks = document.getElementsByClassName("tablinks");
+      tablinks = document.getElementsByClassName("sstablinks");
       for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
       }
@@ -120,6 +133,62 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       // Show the current tab, and add an "active" class to the button that opened the tab
       document.getElementById(sname).style.display = "block";
       evt.currentTarget.className += " active";
+
+      if ($scope[sname.toLowerCase()+'ScheduleEnabled'] == true) {
+        evt.currentTarget.className += " green";
+      } else {
+        console.log("called here")
+        evt.currentTarget.className = evt.currentTarget.className.replace(" green", "");
+      }
+    }
+
+    $scope.openBackupTab = function (evt, sname) {
+
+      // Declare all variables
+      var i, tabcontent, tablinks;
+
+      $scope[sname+'ScheduleEnabled'] = !$scope[sname+'ScheduleEnabled'];
+
+      if (sname == 'backupHourly') {
+        $scope.backup_hourly_schedule = $scope.defaultHourlySchedule;
+        $scope.backup_hourly_schedule.keep = 0;
+      }
+      if (sname == 'backupDaily') {
+        $scope.backup_daily_schedule = $scope.defaultDailySchedule;
+        $scope.backup_daily_schedule.keep = 0;
+      }
+      if (sname == 'backupWeekly') {
+        $scope.backup_weekly_schedule = $scope.defaultWeeklySchedule;
+        $scope.backup_weekly_schedule.keep = 0;
+      }
+      if (sname == 'backupMonthly') {
+        $scope.backup_monthly_schedule = $scope.defaultMonthlySchedule;
+        $scope.backup_monthly_schedule.keep = 0;
+      }
+      
+
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("backuptabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("backuptablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(sname).style.display = "block";
+      evt.currentTarget.className += " active";
+
+      if ($scope[sname+'ScheduleEnabled'] == true) {
+        evt.currentTarget.className += " green";
+      } else {
+        console.log("called here")
+        evt.currentTarget.className = evt.currentTarget.className.replace(" green", "");
+      }
     }
 
     
@@ -264,7 +333,18 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         getStoragegroupsForClone(newVal)
       }
     });
+
+    $scope.$watch("create_from_volume", function(newVal, oldVal) {
+      if (newVal) {
+        getSnapshots(newVal);
+      }
+    });
  
+    var getSnapshots = function(sg) {
+      Snapshots.query({storagegroupId : sg.id}, function (data) {
+        $scope.snapshots = data.records;
+      });
+    }
 
     var checkSnapshotPolicyErrors = function(scopeVar) {
       if (scopeVar.ssPolicyEnabled && !(scopeVar.hourlyScheduleEnabled || scopeVar.dailyScheduleEnabled || scopeVar.weeklyScheduleEnabled || scopeVar.monthlyScheduleEnabled)) {
