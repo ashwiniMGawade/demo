@@ -49,35 +49,25 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.backupWeeklyScheduleEnabled = false;
     $scope.backupMonthlyScheduleEnabled = false;
 
-    $scope.hourly_schedule = {}
-    $scope.daily_schedule = {}
-    $scope.weekly_schedule = {}
-    $scope.monthly_schedule = {}
-
-    $scope.backup_hourly_schedule = {}
-    $scope.backup_daily_schedule = {}
-    $scope.backup_weekly_schedule = {}
-    $scope.backup_monthly_schedule = {}
-
-    $scope.defaultHourlySchedule = {
+    $scope.defaultHourlySchedule = $scope.hourly_schedule = $scope.backup_hourly_schedule = {
       "minute": 0,
       "snapshots_to_keep": 0
     }
 
-    $scope.defaultDailySchedule = {
+    $scope.daily_schedule = $scope.defaultDailySchedule = $scope.backup_daily_schedule = {
       "hour": "0",
       "minute": 0,
       "snapshots_to_keep": 0
     }
 
-    $scope.defaultWeeklySchedule = {
+    $scope.weekly_schedule = $scope.backup_weekly_schedule = $scope.defaultWeeklySchedule = {
       "hour": 0,
       "minute": 0,
       "day_of_week":0,
       "snapshots_to_keep": 0
     }
 
-    $scope.defaultMonthlySchedule = {
+    $scope.defaultMonthlySchedule = $scope.monthly_schedule = $scope.backup_monthly_schedule = {
       "hour": 0,
       "minute": 0,
       "day_of_month":1,
