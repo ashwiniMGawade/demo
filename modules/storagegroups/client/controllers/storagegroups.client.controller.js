@@ -112,7 +112,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         $scope.daily_schedule = $scope.daily_schedule || $scope.defaultDailySchedule;
       }
       if (sname == 'Weekly') {
-        $scope.weekly_schedule = scope.weekly_schedule || $scope.defaultWeeklySchedule;
+        $scope.weekly_schedule = $scope.weekly_schedule || $scope.defaultWeeklySchedule;
       }
       if (sname == 'Monthly') {
         $scope.monthly_schedule = $scope.monthly_schedule|| $scope.defaultMonthlySchedule;
