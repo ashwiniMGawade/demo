@@ -63,7 +63,7 @@ angular.module('storageunits')
           $scope.servers = servers;
         } else {
           angular.forEach(servers, function(server) {
-            if (server.tenant && server.tenant._id === tenant && server.managed === 'Portal') {
+            if (server.tenant && server.tenant._id === tenant) {
                $scope.servers.push(server);
             }
           });
