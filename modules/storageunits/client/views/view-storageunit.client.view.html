@@ -17,7 +17,13 @@
       <tr><th>Size (GB)</th><td ng-bind="storageunit.sizegb"></td></tr>
       <tr><th>Mount</th><td>{{storageunit.mount}}<div ng-if="storageunit.mount1">   Or   {{storageunit.mount1}}</div></td></tr>
       <tr ng-if="storageunit.protocol === 'nfs' || storageunit.protocol === 'iscsi'"><th>ACL</th><td ng-bind="storageunit.acl"></td></tr>
+      <tr><th>Tags</th>
+        <td> 
+          <li ng-if="tags[0].attr" ng-repeat="tag in tags">{{tag.attr}}: {{ tag.val}} </li>
+        </td>
+      </tr>
       <tr ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0 ||  (SUAccessRoles.update | intersect : authentication.user.roles) > 0">
+
         <th>Actions</th>
         <td>
           <button ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary"

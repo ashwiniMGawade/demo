@@ -42,6 +42,47 @@
             Note: LUN cannot be resized to more than 10x original size</p>
         </div>
 
+        <div class="form-group">
+          <label for="name">Tags</label>
+          <br/>
+          <div ng-repeat="(key, value) in tags" class="row" style="margin-left:0;">
+            <div class="col-md-5 form-group" show-errors>
+              <input name="tags{{key}}" type="text" ng-model="value['attr']" id="name" class="form-control" placeholder="Key"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['val']">
+              <div ng-messages="storageunitForm['tags'+key].$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Tag key should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-5 form-group" show-errors>
+              <input name="tagValues{{key}}" type="text" ng-model="value['val']" id="name" class="form-control" placeholder="Value"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['attr']">
+              <div ng-messages="storageunitForm['tagValues'+key].$error" role="alert">
+                 <p class="help-block error-text" ng-message="required">Tag value should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <span ng-click="addTag()" class="btn btn-primary" ng-show="key==tags.length-1">
+                  <i class="glyphicon glyphicon-plus"></i>
+              </span>
+              <span ng-click="removeTag(key)" class="btn btn-primary" ng-hide="tags.length==1">
+                  <i class="glyphicon glyphicon-minus"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div ng-if="storageunit.protocol === 'nfs'">
           <div class="form-group" show-errors >
               <label for="aclAdd">Access Control List - Add Access</label>

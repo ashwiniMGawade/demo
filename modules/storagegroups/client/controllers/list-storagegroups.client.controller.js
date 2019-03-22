@@ -38,7 +38,6 @@ angular.module('storagegroups').controller('StoragegroupListController', ['$scop
               var tagData = tag.split("=");
               pollingParams[tagData[0]] = tagData[1];
             })
-            console.log(pollingParams);
           }
           Storagegroups.query(pollingParams, function (data) {
             $scope.storagegroups = data;

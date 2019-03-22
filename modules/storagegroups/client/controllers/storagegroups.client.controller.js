@@ -647,12 +647,19 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       storagegroup.$update(function (response) {
         $location.path('storagegroups');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Group Update request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
+       
         if (tags.length > 0) {
           var tag = new Tags({'Tags': tags, objectId: response.object_id });
-          tag.$update(function(response){
+          var operation = '$update';
+          if ($scope.freshTag) {
+            operation = '$create';
+          }
+          tag[operation](function(response){
             console.log("response of tags update", response)
           });
         }
+
+
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.user_message || "Something Went wrong!");
       });
@@ -701,10 +708,12 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
               obj.attr = Object.keys(tagVal)[0];
               obj.val = tagVal[obj.attr];
               $scope.tags.push(obj);
-            });
-            console.log($scope.tags)            
+            });           
           }
         }, function(error) {
+            if(error.data.http_status_code == 404) {
+              $scope.freshTag = true;
+            }
             //throwFlashErrorMessage(error.data.message);
         });
 
