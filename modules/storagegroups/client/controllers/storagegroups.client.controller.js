@@ -451,7 +451,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       } 
 
 
-      if (this.showReplicaForm) {
+      if (this.showReplicaForm && this.mode =='fresh') {
         storagegroup.replica_destination_server_id = $sanitize(this.replica_destination_server_id)
         storagegroup.replica_schedule =  {
           hour: this.replica_schedule && this.replica_schedule.hour ? $sanitize(this.replica_schedule.hour): $sanitize(0),
@@ -459,7 +459,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }
       }
 
-      if (this.showBackupForm) {
+      if (this.showBackupForm && this.mode =='fresh') {
         storagegroup.backup_destination_server_id = $sanitize(this.backup_destination_server_id)
         storagegroup.backup_schedule =  {
           hour: this.backup_schedule && this.backup_schedule.hour ? $sanitize(this.backup_schedule.hour): $sanitize(0),
@@ -493,7 +493,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
 
 
-      if (this.backupPolicyEnabled) {
+      if (this.backupPolicyEnabled && this.mode =='fresh') {
         if (this.backupHourlyScheduleEnabled) {
           storagegroup.backup_policy.hourly.schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
           storagegroup.backup_policy.hourly.keep  = this.backup_hourly_schedule.keep || 0;
