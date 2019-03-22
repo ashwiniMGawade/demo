@@ -179,7 +179,12 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
 
         if (tags.length > 0) {
           var tag = new Tags({'Tags': tags, objectId: server._id });
-          tag.$update(function(response){
+          var operation = '$update';
+
+          if ($scope.freshTag) {
+            operation = '$create';
+          }
+          tag[operation](function(response){
             console.log("response of tags update", response)
           });
         }
@@ -226,10 +231,12 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
               obj.attr = Object.keys(tagVal)[0];
               obj.val = tagVal[obj.attr];
               $scope.tags.push(obj);
-            });
-            console.log($scope.tags)            
+            });          
           }
         }, function(error) {
+            if(error.data.http_status_code == 404) {
+              $scope.freshTag = true;
+            }
             //throwFlashErrorMessage(error.data.message);
         });
       }, function(error){
