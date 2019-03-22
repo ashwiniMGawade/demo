@@ -429,7 +429,6 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       var storagegroup = new Storagegroups({
         name: $sanitize(this.name),
         code: $sanitize(this.code),
-        annotation: (this.annotation) ? $sanitize(this.annotation) : '',
         server_id: $sanitize(this.serverId),
         tier: $sanitize(this.tier),       
         // size_bytes:this.size_bytes,
@@ -446,7 +445,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         }
       }
 
-      if ( this.protection_service_level) {
+      if ( this.protection_service_level && this.mode =='fresh') {
         storagegroup.protection_service_level = $sanitize(this.protection_service_level)
       } 
 
