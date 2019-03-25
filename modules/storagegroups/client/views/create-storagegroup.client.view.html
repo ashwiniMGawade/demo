@@ -161,6 +161,7 @@
          
           <select name="clone_snapshot_name" ng-model="$parent.clone_snapshot_name" id="clone_snapshot_name" class="form-control" ng-options="sp.name as sp.name for sp in snapshots |orderBy: 'name'" ng-disabled="(!snapshots)|| create_from_volume==''" 
           required>
+            <option value="">Please select snapshot</option>
           </select>
           <div ng-messages="storagegroupForm.clone_snapshot_name.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Snapshot name is required.</p>
