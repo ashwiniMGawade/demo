@@ -59,6 +59,11 @@ angular.module('storagegroups').factory('Snapshots', ['$resource', '$window',
         headers: authHeader,
         url: goAPIHost + '/volumes/:storagegroupId/snapshots/:snapshotId'
       },
+      'remove': {
+        method: 'DELETE',
+        headers: authHeader,
+        url: goAPIHost + '/volumes/:storagegroupId/snapshots/:snapshotId'
+      },
       'query': {
         method: 'GET',
         isArray: true,
