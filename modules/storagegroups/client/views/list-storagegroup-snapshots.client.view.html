@@ -16,7 +16,7 @@
       <tr ng-repeat="snapshot in $data">
         <td ng-bind="snapshot.name" title="'Name'" sortable="'name'"></td>
         <td ng-if="(snapshotAccessRoles.delete | intersect : authentication.user.roles) > 0">
-          <button type="button" class="btn btn-xs btn-primary" ng-click="deleteSnapshot(snapshot.code);">Delete</button></td>
+          <button type="button" class="btn btn-xs btn-primary" ng-click="deleteSnapshot(snapshot.name);">Delete</button></td>
         <!--<td>-->
           <!--<button type="button" class="btn btn-xs btn-primary" ng-click="restoreSnapshot(snapshot.name);">Restore</button></td>-->
         <!--<td>-->
