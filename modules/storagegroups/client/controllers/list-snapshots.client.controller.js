@@ -39,7 +39,7 @@ angular.module('storagegroups').controller('SnapshotsListController', ['$scope',
         counts: [],
         getData: function($defer, params) {
           Snapshots.query({storagegroupId : $scope.storagegroupId}, function (data) {
-            $scope.snapshots = data.records;
+            $scope.snapshots = data;
 
             var filteredData = $filter('filter')($scope.snapshots, function(data) {
               if ($scope.search) {
