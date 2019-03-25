@@ -31,28 +31,30 @@
           <p class="help-block">Name to refer to the NetApp Volume in this portal</p>
         </div>
         <div class="form-group required" show-errors>
-          <label for="tier">Performance Service Level</label>
-          <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
-            <option value="">Please select the Performance Service Level</option>
-          </select>
-          <div ng-messages="storagegroupForm.tier.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+                  ng-minlength="3"
+                  ng-maxlength="32"
+                  ng-pattern="/^[a-z][a-z0-9_]*$/"
+                  required>
+          <div ng-messages="storagegroupForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Code is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Code is must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Code is should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and underscores are allowed <br>First character must be alphabetical</p>
           </div>
-          <p class="help-block">The Performance Service Level of storage the NetApp Volume is to reside on:
-            <span ng-repeat="SL in validPerformanceSLToAssign">
-              <span class="capitalize">{{SL.name}}</span>
-              ( {{SL.max_iops_per_tb}} IOPS/TB)
-            </span>
-          </p>
-        </div> 
-        <div class="row" ng-if="mode!=='fresh'">
+          <p class="help-block">The name of the NetApp Volume configured in the {{labels.server.serverName}}.<br>It is mandatory for the Storage Group Code be unique within a {{labels.server.serverName}}.<br>It can be useful (but not mandatory) for the Storage Group Code be unique across the entire environment. This promotes ease-of-management and allows future replication between {{labels.server.serverName}}s without naming issues.</p>
+        </div>
+
+        <div class="row">
           <div class="form-group col-md-2">
-            <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
+            <input name="mode" type="checkbox" ng-model="existingVolumeModeEnabled" id="mode" class="form-control checkbox-left" ng-change="toggleMode()">
           </div>
           <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Copy snapshot policy from source volume</label>
+            <label style="margin-top: 12px;">Create from exisitng volume and snapshot policy</label>
           </div>
-        </div>
+        </div>         
+        
         <div class="form-group" show-errors ng-show="mode=='fresh'">
           <label for="protection_service_level">Data Protection Service Level</label>
           <select ng-model="$parent.protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
@@ -72,21 +74,7 @@
           </div>
           <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
         </div>
-        <div class="form-group required" show-errors>
-          <label for="code">Code</label>
-          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
-                  ng-minlength="3"
-                  ng-maxlength="32"
-                  ng-pattern="/^[a-z][a-z0-9_]*$/"
-                  required>
-          <div ng-messages="storagegroupForm.code.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Code is required.</p>
-            <p class="help-block error-text" ng-message="minlength">Code is must be minimum 3 characters long.</p>
-            <p class="help-block error-text" ng-message="maxlength">Code is should be maximum 32 characters long.</p>
-            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and underscores are allowed <br>First character must be alphabetical</p>
-          </div>
-          <p class="help-block">The name of the NetApp Volume configured in the {{labels.server.serverName}}.<br>It is mandatory for the Storage Group Code be unique within a {{labels.server.serverName}}.<br>It can be useful (but not mandatory) for the Storage Group Code be unique across the entire environment. This promotes ease-of-management and allows future replication between {{labels.server.serverName}}s without naming issues.</p>
-        </div>
+        
         <div class="form-group" style="margin-bottom:0px;">
           <label for="name">Tags</label>
           <br/>
@@ -127,13 +115,22 @@
             </div>
           </div>
         </div>
-        <div class="form-group" show-errors>
-          <label for="mode">Volume creation mode</label>
-          <select ng-model="mode" class="form-control capitalize" id="mode" name="mode" class="form-control">
-            <option value="fresh" selected="selected">Fresh Volume</option>
-            <option value="exisitingVolume">Create from exisitng volume and snapshot policy</option>
-          </select>          
-        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="tier">Performance Service Level</label>
+          <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
+            <option value="">Please select the Performance Service Level</option>
+          </select>
+          <div ng-messages="storagegroupForm.tier.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
+          </div>
+          <p class="help-block">The Performance Service Level of storage the NetApp Volume is to reside on:
+            <span ng-repeat="SL in validPerformanceSLToAssign">
+              <span class="capitalize">{{SL.name}}</span>
+              ( {{SL.max_iops_per_tb}} IOPS/TB)
+            </span>
+          </p>
+        </div>               
       </div> 
       
     </div>
@@ -146,6 +143,14 @@
           </select>
           <div ng-messages="storagegroupForm.create_from_volume.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Storagegroup name is required.</p>
+          </div>
+        </div>
+        <div class="row" ng-if="mode!=='fresh'">
+          <div class="form-group col-md-2">
+            <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
+          </div>
+          <div class="form-group col-md-10">
+            <label style="margin-top: 12px;">Copy snapshot policy from source volume</label>
           </div>
         </div>
       </div>

@@ -87,6 +87,14 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       }
     }
 
+    $scope.toggleMode = function() {
+      if ($scope.existingVolumeModeEnabled) {
+        $scope.mode = 'exisitingVolume';
+      } else {
+        $scope.mode = 'fresh';
+      }
+    }
+
 
     $scope.openSnapshotTab = function (evt, sname) {
 
