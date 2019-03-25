@@ -65,18 +65,18 @@ angular.module('storagegroups').controller('SnapshotsListController', ['$scope',
       });
     };
     // Delete SnapShots
-    $scope.deleteSnapshot = function (snapshotCode) {
+    $scope.deleteSnapshot = function (snapshotName) {
       $scope.error = null;
       var snapshots = new Snapshots({
         storagegroupId : $scope.storagegroupId,
-        snapshotId : snapshotCode
+        snapshotId : snapshotName
       });
 
       var modalOptions = {
         closeButtonText: 'Cancel',
         actionButtonText: 'Ok',
         headerText: 'Delete Snapshot?',
-        bodyText: [ 'Are you sure you want to delete the snapshot '+ snapshotCode +' ?' ]
+        bodyText: [ 'Are you sure you want to delete the snapshot '+ snapshotName +' ?' ]
       };
 
       // Redirect after save
