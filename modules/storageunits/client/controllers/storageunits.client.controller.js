@@ -208,8 +208,7 @@ angular.module('storageunits')
               obj.attr = Object.keys(tagVal)[0];
               obj.val = tagVal[obj.attr];
               $scope.tags.push(obj);
-            });
-            console.log($scope.tags)            
+            });           
           }
         }, function(error) {
             if(error.data.http_status_code == 404) {
@@ -251,8 +250,6 @@ angular.module('storageunits')
           if ($scope.freshTag) {
             operation = '$create';
           }
-
-          console.log("operation performed= ", operation);
           tag[operation](function(response){
             console.log("response of tags update", response)
           });
