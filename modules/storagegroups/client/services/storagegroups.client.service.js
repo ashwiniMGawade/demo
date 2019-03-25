@@ -61,6 +61,7 @@ angular.module('storagegroups').factory('Snapshots', ['$resource', '$window',
       },
       'query': {
         method: 'GET',
+        isArray: true,
         headers: authHeader,
         url:goAPIHost + '/volumes/:storagegroupId/snapshots'
       }
