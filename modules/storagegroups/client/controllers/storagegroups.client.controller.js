@@ -339,7 +339,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
  
     var getSnapshots = function(sg) {
       Snapshots.query({storagegroupId : sg.id}, function (data) {
-        $scope.snapshots = data.records;
+        $scope.snapshots = data;
       });
     }
 
