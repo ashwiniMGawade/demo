@@ -1,6 +1,6 @@
 <section ng-controller="StoragegroupsController" ng-init="findOne()" ng-show="storagegroup.id">
   <div class="page-header">
-    <h1>Storage Group: <span ng-bind="storagegroup.name" class="capitalize"></span></h1>
+    <h1>Volume: <span ng-bind="storagegroup.name" class="capitalize"></span></h1>
   </div>
   <div class="col-md-7">
     <table class="table table-striped">
@@ -48,7 +48,7 @@
     </table>
     <div>
       <p class="help-block">Please allow up to 15 minutes for Size information to be updated.</p>
-      <p class="help-block">The Allocated size is capacity configured for usage by both active data & Snapshots.<br>The Presented size is the sum of all Storage Units contained in the Storage Group.<br>The Used size is the total capacity utilised by the clients, including Snapshots.<br>The Snapshot size is the total capacity utilised by all Snapshots.</p>
+      <p class="help-block">The Allocated size is capacity configured for usage by both active data & Snapshots.<br>The Presented size is the sum of all Storage Units contained in the Volume.<br>The Used size is the total capacity utilised by the clients, including Snapshots.<br>The Snapshot size is the total capacity utilised by all Snapshots.</p>
     </div>
   </div>
 </section>

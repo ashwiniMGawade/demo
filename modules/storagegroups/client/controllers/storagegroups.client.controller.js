@@ -349,22 +349,22 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         return false;
       }
 
-      if (scopeVar.hourlyScheduleEnabled && scopeVar.hourly_schedule.snapshots_to_keep == 0) {
+      if (scopeVar.ssPolicyEnabled && scopeVar.hourlyScheduleEnabled && scopeVar.hourly_schedule.snapshots_to_keep == 0) {
         throwFlashErrorMessage("Hourly schedule: Snapshots to keep should be greater than 0");
         return false;
       }
 
-      if (scopeVar.dailyScheduleEnabled && scopeVar.daily_schedule.snapshots_to_keep == 0) {
+      if (scopeVar.ssPolicyEnabled && scopeVar.dailyScheduleEnabled && scopeVar.daily_schedule.snapshots_to_keep == 0) {
         throwFlashErrorMessage("Daily schedule: Snapshots to keep should be greater than 0");
         return false;
       }
 
-      if (scopeVar.weeklyScheduleEnabled && scopeVar.weekly_schedule.snapshots_to_keep == 0) {
+      if (scopeVar.ssPolicyEnabled && scopeVar.weeklyScheduleEnabled && scopeVar.weekly_schedule.snapshots_to_keep == 0) {
         throwFlashErrorMessage("Weekly schedule: Snapshots to keep should be greater than 0");
         return false;
       }
 
-      if (scopeVar.monthlyScheduleEnabled && scopeVar.monthly_schedule.snapshots_to_keep == 0) {
+      if (scopeVar.ssPolicyEnabled && scopeVar.monthlyScheduleEnabled && scopeVar.monthly_schedule.snapshots_to_keep == 0) {
         throwFlashErrorMessage("Monthly schedule: Snapshots to keep should be greater than 0");
         return false;
       }
@@ -382,22 +382,22 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         return false;
       }
 
-      if (scopeVar.backupHourlyScheduleEnabled && scopeVar.backup_hourly_schedule.keep == 0) {
+      if (scopeVar.backupPolicyEnabled && scopeVar.backupHourlyScheduleEnabled && scopeVar.backup_hourly_schedule.keep == 0) {
         throwFlashErrorMessage("Backup Hourly schedule: Keep should be greater than 0");
         return false;
       }
 
-      if (scopeVar.backupDailyScheduleEnabled && scopeVar.backup_daily_schedule.keep == 0) {
+      if (scopeVar.backupPolicyEnabled && scopeVar.backupDailyScheduleEnabled && scopeVar.backup_daily_schedule.keep == 0) {
         throwFlashErrorMessage("Backup Daily schedule: Keep should be greater than 0");
         return false;
       }
 
-      if (scopeVar.backupWeeklyScheduleEnabled && scopeVar.backup_weekly_schedule.keep == 0) {
+      if (scopeVar.backupPolicyEnabled && scopeVar.backupWeeklyScheduleEnabled && scopeVar.backup_weekly_schedule.keep == 0) {
         throwFlashErrorMessage("Backup Weekly schedule: Keep should be greater than 0");
         return false;
       }
 
-      if (scopeVar.backupMonthlyScheduleEnabled && scopeVar.backup_monthly_schedule.keep == 0) {
+      if (scopeVar.backupPolicyEnabled && scopeVar.backupMonthlyScheduleEnabled && scopeVar.backup_monthly_schedule.keep == 0) {
         throwFlashErrorMessage("Backup Monthly schedule: Keep should be greater than 0");
         return false;
       }
@@ -414,7 +414,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       $scope.error = null;
 
       if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'storagegroupForm');
+        $scope.$broadcast('show-errors-check-validity', 'volumeForm');
         return false;
       }
 
@@ -562,7 +562,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       if (this.mode !== 'fresh') {         
             this.ssPolicyFromClonnedVolume = this.ssPolicyEnabled ? false : this.ssPolicyFromClonnedVolume
           }
-      }
+    }
     // Create new SnapShots
     $scope.createSnapshot = function (storagegroup) {
       $scope.error = null;
@@ -613,7 +613,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       $scope.error = null;
 
       if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'storagegroupForm');
+        $scope.$broadcast('show-errors-check-validity', 'volumeForm');
         return false;
       }
 
