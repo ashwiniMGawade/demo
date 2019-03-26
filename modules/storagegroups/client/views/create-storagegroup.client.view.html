@@ -1,9 +1,9 @@
 <section ng-controller="StoragegroupsController" ng-init="find()">
   <div class="page-header">
-    <h1>New Storage Group</h1>
-    <p class="help-block">A Storage Group (a.k.a. NetApp Volume), as opposed to a Storage Unit (NFS Export, CIFS Share or iSCSI LUN), is to be created in the following cases:<br>To group Storage Units together facilitating a consistent application-wide recovery point (Snapshot)</p>
+    <h1>New Volume</h1>
+    <p class="help-block">A Volume (a.k.a. NetApp Volume), as opposed to a Storage Unit (NFS Export, CIFS Share or iSCSI LUN), is to be created in the following cases:<br>To group Storage Units together facilitating a consistent application-wide recovery point (Snapshot)</p>
   </div>
-  <form name="storagegroupForm" class="form-horizontal" ng-submit="create(storagegroupForm.$valid)" novalidate>
+  <form name="volumeForm" class="form-horizontal" ng-submit="create(volumeForm.$valid)" novalidate>
     <div class="row show-grid">
       <div class="col-md-5">
         <div class="form-group required" show-errors ng-if="isRoot">
@@ -11,7 +11,7 @@
           <select name="tenantId" ng-model="$parent.tenantId" id="tenantId" class="form-control" ng-options="tenant.tenantId as tenant.name for tenant in tenants | orderBy: 'name'" required>
             <option value="">Please select a tenant</option>
           </select>
-          <div ng-messages="storagegroupForm.tenantId.$error" role="alert">
+          <div ng-messages="volumeForm.tenantId.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Tenant name is required.</p>
           </div>
         </div>  
@@ -22,7 +22,7 @@
                   ng-maxlength="64"
                   ng-pattern="/^[a-zA-Z0-9\ \-\_]*$/"
                   required>
-          <div ng-messages="storagegroupForm.name.$error" role="alert">
+          <div ng-messages="volumeForm.name.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Name is required.</p>
             <p class="help-block error-text" ng-message="minlength">Storage Group name must be minimum 3 characters long.</p>
             <p class="help-block error-text" ng-message="maxlength">Storage Group name should be maximum 64 characters long.</p>
@@ -37,13 +37,24 @@
                   ng-maxlength="32"
                   ng-pattern="/^[a-z][a-z0-9_]*$/"
                   required>
-          <div ng-messages="storagegroupForm.code.$error" role="alert">
+          <div ng-messages="volumeForm.code.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Code is required.</p>
             <p class="help-block error-text" ng-message="minlength">Code is must be minimum 3 characters long.</p>
             <p class="help-block error-text" ng-message="maxlength">Code is should be maximum 32 characters long.</p>
             <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and underscores are allowed <br>First character must be alphabetical</p>
           </div>
           <p class="help-block">The name of the NetApp Volume configured in the {{labels.server.serverName}}.<br>It is mandatory for the Storage Group Code be unique within a {{labels.server.serverName}}.<br>It can be useful (but not mandatory) for the Storage Group Code be unique across the entire environment. This promotes ease-of-management and allows future replication between {{labels.server.serverName}}s without naming issues.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="serverId">{{labels.server.serverName}}</label>
+          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers |orderBy: 'name'" ng-disabled="isRoot && (!tenantId || !servers)" required>
+            <option value="">Please select a {{labels.server.serverName}}</option>
+          </select>
+          <div ng-messages="volumeForm.serverId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} name is required.</p>
+          </div>
+          <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
         </div>
 
         <div class="row">
@@ -53,28 +64,31 @@
           <div class="form-group col-md-10">
             <label style="margin-top: 12px;">Create from exisitng volume and snapshot policy</label>
           </div>
-        </div>         
+        </div>   
+
+        <div class="form-group required" show-errors>
+          <label for="tier">Performance Service Level</label>
+          <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
+            <option value="">Please select the Performance Service Level</option>
+          </select>
+          <div ng-messages="volumeForm.tier.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
+          </div>
+          <p class="help-block">The Performance Service Level of storage the NetApp Volume is to reside on:
+            <span ng-repeat="SL in validPerformanceSLToAssign">
+              <span class="capitalize">{{SL.name}}</span>
+              ( {{SL.max_iops_per_tb}} IOPS/TB)
+            </span>
+          </p>
+        </div>       
         
         <div class="form-group" show-errors ng-show="mode=='fresh'">
           <label for="protection_service_level">Data Protection Service Level</label>
           <select ng-model="$parent.protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
             <option value="">Please select the Data Protection Service Level</option>
           </select>                   
-        </div>    
-      </div>
-      <div class="col-md-1"></div>
-      <div class="col-md-5">
-        <div class="form-group required" show-errors>
-          <label for="serverId">{{labels.server.serverName}}</label>
-          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers |orderBy: 'name'" ng-disabled="isRoot && (!tenantId || !servers)" required>
-            <option value="">Please select a {{labels.server.serverName}}</option>
-          </select>
-          <div ng-messages="storagegroupForm.serverId.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} name is required.</p>
-          </div>
-          <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
-        </div>
-        
+        </div> 
+
         <div class="form-group" style="margin-bottom:0px;">
           <label for="name">Tags</label>
           <br/>
@@ -85,7 +99,7 @@
                     ng-minlength="3"
                     ng-pattern="/^[a-zA-Z0-9-]*$/"
                     ng-required="value['val']">
-              <div ng-messages="storagegroupForm['tags'+key].$error" role="alert">
+              <div ng-messages="volumeForm['tags'+key].$error" role="alert">
                 <p class="help-block error-text" ng-message="required">Tag key should not be blank.</p>
                 <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
                 <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
@@ -98,7 +112,7 @@
                     ng-minlength="3"
                     ng-pattern="/^[a-zA-Z0-9-]*$/"
                     ng-required="value['attr']">
-              <div ng-messages="storagegroupForm['tagValues'+key].$error" role="alert">
+              <div ng-messages="volumeForm['tagValues'+key].$error" role="alert">
                  <p class="help-block error-text" ng-message="required">Tag value should not be blank.</p>
                 <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
                 <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
@@ -114,48 +128,17 @@
               </span>
             </div>
           </div>
-        </div>
+        </div> 
 
-        <div class="form-group required" show-errors>
-          <label for="tier">Performance Service Level</label>
-          <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
-            <option value="">Please select the Performance Service Level</option>
-          </select>
-          <div ng-messages="storagegroupForm.tier.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
-          </div>
-          <p class="help-block">The Performance Service Level of storage the NetApp Volume is to reside on:
-            <span ng-repeat="SL in validPerformanceSLToAssign">
-              <span class="capitalize">{{SL.name}}</span>
-              ( {{SL.max_iops_per_tb}} IOPS/TB)
-            </span>
-          </p>
-        </div>               
-      </div> 
-      
-    </div>
-    <div class="row show-grid">
-      <div class="col-md-5">
         <div class="form-group required" show-errors ng-if="mode!=='fresh'">
-          <label for="create_from_volume">Create from Storagegroup</label>
+          <label for="create_from_volume">Create from Volume</label>
           <select name="create_from_volume" ng-model="$parent.create_from_volume" id="create_from_volume" class="form-control" ng-options="volume as volume.name for volume in storagegroups |orderBy: 'name'" ng-disabled="isRoot && (!tenantId || !servers)" required>
-            <option value="">Please select a storagegroup</option>
+            <option value="">Please select a volume</option>
           </select>
-          <div ng-messages="storagegroupForm.create_from_volume.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Storagegroup name is required.</p>
+          <div ng-messages="volumeForm.create_from_volume.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Volume name is required.</p>
           </div>
         </div>
-        <div class="row" ng-if="mode!=='fresh'">
-          <div class="form-group col-md-2">
-            <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
-          </div>
-          <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Copy snapshot policy from source volume</label>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-1"></div>
-      <div class="col-md-5" >
         <div class="form-group required" show-errors ng-if="mode!=='fresh'">
           <label for="clone_snapshot_name">Snapshot Name</label>
          
@@ -163,128 +146,161 @@
           required>
             <option value="">Please select snapshot</option>
           </select>
-          <div ng-messages="storagegroupForm.clone_snapshot_name.$error" role="alert">
+          <div ng-messages="volumeForm.clone_snapshot_name.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Snapshot name is required.</p>
           </div>
-        </div>      
-      </div>
-    </div>
+        </div>  
+        
 
-     
-    <div class="row show-grid" >
-      <!----Replica form--->
-      <div class="col-md-5" ng-if="showReplicaForm && mode=='fresh'">       
-        <div class="form-group required" show-errors>
-          <label for="replica_destination_server_id">Replica Destination Server Id</label>
-          <select name="replica_destination_server_id" ng-model="$parent.replica_destination_server_id" id="replica_destination_server_id" class="form-control" ng-options="server.serverId as server.name for server in peeredServer | orderBy: 'name'" required ng-disabled="peeredServer.length==0">
-            <option value="">Please select a Replica Destination Server</option>
-          </select>
-          <div ng-messages="storagegroupForm.replica_destination_server_id.$error" role="alert">
-            <p class="help-block error-text" ng-message="required"> Replica Destination Server is required.</p>
-          </div>
-        </div>
-        <div class="row show-grid">
-          <div class="col-md-4">
-            <label for="policySchedule">Replica schedule:
-            </label> 
-          </div>           
-          <div class="form-group col-md-4" show-errors>
-            <!-- <label for="hour">Hour</label> -->
-            <input name="replicaScheduleHour" type="text" ng-model="$parent.replica_schedule.hour" id="hour" class="form-control"
-                    placeholder="Hour"
-                    ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
-                    >
-
-            <div ng-messages="storagegroupForm.replicaScheduleHour.$error" role="alert">
-              <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
+        <!--replica form -->
+        <div ng-if="showReplicaForm && mode=='fresh'">
+          <div class="form-group required" show-errors>
+            <label for="replica_destination_server_id">Replica Destination Server Id</label>
+            <select name="replica_destination_server_id" ng-model="$parent.replica_destination_server_id" id="replica_destination_server_id" class="form-control" ng-options="server.serverId as server.name for server in peeredServer | orderBy: 'name'" required ng-disabled="peeredServer.length==0">
+              <option value="">Please select a Replica Destination Server</option>
+            </select>
+            <div ng-messages="volumeForm.replica_destination_server_id.$error" role="alert">
+              <p class="help-block error-text" ng-message="required"> Replica Destination Server is required.</p>
             </div>
-            <p class="help-block">Please enter coma separated string of numbers between 0 to 23. Each number should occure only once</p>
           </div>
-          <div class="form-group col-md-4" show-errors>
-            <!-- <label for="minute">Minute</label> -->
-            <input name="replicaScheduleMinute" type="number" ng-model="$parent.replica_schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
-            <div ng-messages="storagegroupForm.replicaScheduleMinute.$error" role="alert">
-              <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-              <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-              <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-              <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-            </div>              
-          </div>
-        </div>
-      </div>
+          <div class="row show-grid">
+            <div class="col-md-4">
+              <label for="policySchedule">Replica schedule:
+              </label> 
+            </div>           
+            <div class="form-group col-md-4" show-errors>
+              <!-- <label for="hour">Hour</label> -->
+              <input name="replicaScheduleHour" type="text" ng-model="$parent.replica_schedule.hour" id="hour" class="form-control"
+                      placeholder="Hour"
+                      ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
+                      >
 
-      <div class="col-md-1" ng-if="showReplicaForm && mode=='fresh'"></div>
-
-      <!----Backup form--->
-      <div class="col-md-5" ng-if="showBackupForm && mode=='fresh'">       
-        <div class="form-group required" show-errors>
-          <label for="backup_destination_server_id">Backup Destination Server Id</label>
-          <select name="backup_destination_server_id" ng-model="$parent.backup_destination_server_id" id="backup_destination_server_id" class="form-control" ng-options="server.serverId as server.name for server in peeredServer | orderBy: 'name'" required ng-disabled="!peeredServer">
-            <option value="">Please select a Backup Destination Server</option>
-          </select>
-          <div ng-messages="storagegroupForm.backup_destination_server_id.$error" role="alert">
-            <p class="help-block error-text" ng-message="required"> Backup Destination Server is required.</p>
-          </div>
-        </div>
-        <div class="row show-grid">
-          <div class="col-md-4">
-            <label for="policySchedule">Backup schedule:
-            </label>
-          </div>            
-          <div class="form-group col-md-4" show-errors>
-            <!-- <label for="hour">Hour</label> -->
-            <input name="backupScheduleHour" type="text" ng-model="$parent.backup_schedule.hour" id="hour" class="form-control"
-                    placeholder="Hour"
-                    ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
-                    >
-
-            <div ng-messages="storagegroupForm.backupScheduleHour.$error" role="alert">
-              <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
+              <div ng-messages="volumeForm.replicaScheduleHour.$error" role="alert">
+                <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
+              </div>
+              <p class="help-block">Please enter coma separated string of numbers between 0 to 23. Each number should occure only once</p>
             </div>
-            <p class="help-block">Please enter coma separated string of numbers between 0 to 23. Each number should occure only once</p>
+            <div class="form-group col-md-4" show-errors>
+              <!-- <label for="minute">Minute</label> -->
+              <input name="replicaScheduleMinute" type="number" ng-model="$parent.replica_schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
+              <div ng-messages="volumeForm.replicaScheduleMinute.$error" role="alert">
+                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+              </div>              
+            </div>
           </div>
-          <div class="form-group col-md-4" show-errors>
-            <!-- <label for="minute">Minute</label> -->
-            <input name="backupScheduleMinute" type="number" ng-model="$parent.backup_schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
-            <div ng-messages="storagegroupForm.backupScheduleMinute.$error" role="alert">
-              <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-              <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-              <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-              <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-            </div>              
+        </div>
+
+        <div ng-if="showBackupForm && mode=='fresh'">
+          <div class="form-group required" show-errors>
+            <label for="backup_destination_server_id">Backup Destination Server Id</label>
+            <select name="backup_destination_server_id" ng-model="$parent.backup_destination_server_id" id="backup_destination_server_id" class="form-control" ng-options="server.serverId as server.name for server in peeredServer | orderBy: 'name'" required ng-disabled="!peeredServer">
+              <option value="">Please select a Backup Destination Server</option>
+            </select>
+            <div ng-messages="volumeForm.backup_destination_server_id.$error" role="alert">
+              <p class="help-block error-text" ng-message="required"> Backup Destination Server is required.</p>
+            </div>
+          </div>
+          <div class="row show-grid">
+            <div class="col-md-4">
+              <label for="policySchedule">Backup schedule:
+              </label>
+            </div>            
+            <div class="form-group col-md-4" show-errors>
+              <!-- <label for="hour">Hour</label> -->
+              <input name="backupScheduleHour" type="text" ng-model="$parent.backup_schedule.hour" id="hour" class="form-control"
+                      placeholder="Hour"
+                      ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/"
+                      >
+
+              <div ng-messages="volumeForm.backupScheduleHour.$error" role="alert">
+                <p class="help-block error-text" ng-message="pattern">Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
+              </div>
+              <p class="help-block">Please enter coma separated string of numbers between 0 to 23. Each number should occure only once</p>
+            </div>
+            <div class="form-group col-md-4" show-errors>
+              <!-- <label for="minute">Minute</label> -->
+              <input name="backupScheduleMinute" type="number" ng-model="$parent.backup_schedule.minute" id="minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/">
+              <div ng-messages="volumeForm.backupScheduleMinute.$error" role="alert">
+                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+              </div>              
+            </div>
           </div>
         </div>
       </div>
-
-    </div>
-   
-
-   
-    <!-- snapshot policy-->
-    <div class="row show-grid ">
-      <div class="col-md-5">
-        <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-5">  
+        <div class="row" ng-if="mode!=='fresh'">
           <div class="form-group col-md-2">
-            <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left" ng-change="toggleSnapshotPolicy()">
+            <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
           </div>
           <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Enable Snapshot Policy</label>
-            <p class="faint-text">If enabled, make snapshots automatically according to the schedules.</p>
+            <label style="margin-top: 12px;">Copy snapshot policy from source volume</label>
           </div>
-        </div>
-        <div ng-show="ssPolicyEnabled">
-          <div class="tab">
-            <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Hourly')">Hourly</a>
-            <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Daily')">Daily</a>
-            <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Weekly')">Weekly</a>
-            <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Monthly')">Monthly</a>
+        </div>      
+        <div>
+          <div class="row">
+            <div class="form-group col-md-2">
+              <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left" ng-change="toggleSnapshotPolicy()">
+            </div>
+            <div class="form-group col-md-10">
+              <label style="margin-top: 12px;">Enable Snapshot Policy</label>
+              <p class="faint-text">If enabled, make snapshots automatically according to the schedules.</p>
+            </div>
           </div>
-          <div id="Hourly" class="tabcontent sstabcontent">
-            <p class="faint-text">If enabled (In Green) and (snapshotsToKeep > 0), make a snapshot every hour e.g. at 04:00, 05:00, 06:00</p>
+          <div ng-show="ssPolicyEnabled" class="row" style="padding:10px;">
+            <div class="tab">
+              <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Hourly')">Hourly</a>
+              <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Daily')">Daily</a>
+              <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Weekly')">Weekly</a>
+              <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Monthly')">Monthly</a>
+            </div>
+            <div id="Hourly" class="tabcontent sstabcontent">
+              <p class="faint-text">If enabled (In Green) and (snapshotsToKeep > 0), make a snapshot every hour e.g. at 04:00, 05:00, 06:00</p>
+                <div class="form-group" show-errors>
+                  <label for="minute">Minute</label>
+                  <input name="hourly_schedule_minute" type="number" ng-model="hourly_schedule.minute" id="hourly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="hourlyScheduleEnabled">
+                  <div ng-messages="volumeForm.hourly_schedule_minute.$error" role="alert">
+                   
+                    <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                    <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                    <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                    <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                    <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                  </div>              
+                </div>
+                <div class="form-group" show-errors>
+                  <label for="snapshots_to_keep">Snapshots To Keep</label>
+                  <input name="hourly_schedule_snapshots_to_keep" type="number" ng-model="hourly_schedule.snapshots_to_keep" id="hourly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="hourlyScheduleEnabled">
+                  <div ng-messages="volumeForm.hourly_schedule_snapshots_to_keep.$error" role="alert">
+                   
+                    <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                    <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                    <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                    <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                    <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                  </div>              
+                </div>
+            </div>
+            <div id="Daily" class="tabcontent sstabcontent">
+              <p class="faint-text">If enabled (In Green) and (snapshotsToKeep > 0), make a snapshot every day. Defaults to midnight.</p>
+              <div class="form-group" show-errors>
+                <label for="hour">Hour</label>
+                <input name="daily_schedule_hour" type="text" ng-model="daily_schedule.hour" id="daily_schedule_hour" class="form-control" placeholder="hour" ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/" ng-required="dailyScheduleEnabled">
+                <div ng-messages="volumeForm.daily_schedule_hour.$error" role="alert" >
+                  <p class="help-block error-text" ng-message="pattern">>Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
               <div class="form-group" show-errors>
                 <label for="minute">Minute</label>
-                <input name="hourly_schedule_minute" type="number" ng-model="hourly_schedule.minute" id="hourly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="hourlyScheduleEnabled">
-                <div ng-messages="storagegroupForm.hourly_schedule_minute.$error" role="alert">
+                <input name="daily_schedule_minute" type="number" ng-model="daily_schedule.minute" id="daily_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="dailyScheduleEnabled">
+                <div ng-messages="volumeForm.daily_schedule_minute.$error" role="alert">
                  
                   <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
                   <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
@@ -295,8 +311,8 @@
               </div>
               <div class="form-group" show-errors>
                 <label for="snapshots_to_keep">Snapshots To Keep</label>
-                <input name="hourly_schedule_snapshots_to_keep" type="number" ng-model="hourly_schedule.snapshots_to_keep" id="hourly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="hourlyScheduleEnabled">
-                <div ng-messages="storagegroupForm.hourly_schedule_snapshots_to_keep.$error" role="alert">
+                <input name="daily_schedule_snapshots_to_keep" type="number" ng-model="daily_schedule.snapshots_to_keep" id="daily_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="dailyScheduleEnabled">
+                <div ng-messages="volumeForm.daily_schedule_snapshots_to_keep.$error" role="alert" ng-required="dailyScheduleEnabled">
                  
                   <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
                   <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
@@ -305,518 +321,291 @@
                   <p class="help-block error-text" ng-message="required">Please enter value.</p>
                 </div>              
               </div>
-          </div>
-          <div id="Daily" class="tabcontent sstabcontent">
-            <p class="faint-text">If enabled (In Green) and (snapshotsToKeep > 0), make a snapshot every day. Defaults to midnight.</p>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="daily_schedule_hour" type="text" ng-model="daily_schedule.hour" id="daily_schedule_hour" class="form-control" placeholder="hour" ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/" ng-required="dailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.daily_schedule_hour.$error" role="alert" >
-                <p class="help-block error-text" ng-message="pattern">>Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
             </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="daily_schedule_minute" type="number" ng-model="daily_schedule.minute" id="daily_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="dailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.daily_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
+            <div id="Weekly" class="tabcontent sstabcontent" >
+              <p class="faint-text">If enabled (In Green) and  (snapshotsToKeep > 0), make a snapshot every week on a specific day, defaults to Sunday at midnight</p>
+              <div class="form-group " show-errors>
+                <label for="dayOfWeek">Day of the week</label>
+                <select ng-model="weekly_schedule['day_of_week']" name="weekly_schedule_day" id="weekly_schedule_day" class="form-control capitalize" ng-options="dayOfWeek.id as dayOfWeek.name for dayOfWeek in weeksArray" ng-required="weeklyScheduleEnabled">
+                  <option value="">Please select the Day of the week</option>
+                </select>
+                <div ng-messages="volumeForm.weekly_schedule_day.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>  
+              </div>
+              <div class="form-group" show-errors>
+                <label for="hour">Hour</label>
+                <input name="weekly_schedule_hour" type="number" ng-model="weekly_schedule.hour" id="weekly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
+                <div ng-messages="volumeForm.weekly_schedule_hour.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>    
+              </div>
+              <div class="form-group" show-errors>
+                <label for="minute">Minute</label>
+                <input name="weekly_schedule_minute" type="number" ng-model="weekly_schedule.minute" id="weekly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
+                <div ng-messages="volumeForm.weekly_schedule_minute.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="snapshots_to_keep">Snapshots To Keep</label>
+                <input name="weekly_schedule_snapshots_to_keep" type="number" ng-model="weekly_schedule.snapshots_to_keep" id="weekly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
+                <div ng-messages="volumeForm.weekly_schedule_snapshots_to_keep.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>          
             </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="daily_schedule_snapshots_to_keep" type="number" ng-model="daily_schedule.snapshots_to_keep" id="daily_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="dailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.daily_schedule_snapshots_to_keep.$error" role="alert" ng-required="dailyScheduleEnabled">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-          <div id="Weekly" class="tabcontent sstabcontent" >
-            <p class="faint-text">If enabled (In Green) and  (snapshotsToKeep > 0), make a snapshot every week on a specific day, defaults to Sunday at midnight</p>
-            <div class="form-group " show-errors>
-              <label for="dayOfWeek">Day of the week</label>
-              <select ng-model="weekly_schedule['day_of_week']" name="weekly_schedule_day" id="weekly_schedule_day" class="form-control capitalize" ng-options="dayOfWeek.id as dayOfWeek.name for dayOfWeek in weeksArray" ng-required="weeklyScheduleEnabled">
-                <option value="">Please select the Day of the week</option>
-              </select>
-              <div ng-messages="storagegroupForm.weekly_schedule_day.$error" role="alert">
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>  
-            </div>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="weekly_schedule_hour" type="number" ng-model="weekly_schedule.hour" id="weekly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.weekly_schedule_hour.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="weekly_schedule_minute" type="number" ng-model="weekly_schedule.minute" id="weekly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.weekly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="weekly_schedule_snapshots_to_keep" type="number" ng-model="weekly_schedule.snapshots_to_keep" id="weekly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.weekly_schedule_snapshots_to_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>          
-          </div>
-          <div id="Monthly" class="tabcontent sstabcontent">
-            <p class="faint-text">If enabled (In Green) and (snapshotsToKeep > 0), make a snapshot every month on a specific day, defaults to the first day of the month at midnight</p>
-            <div class="form-group" show-errors>
-              <label for="dayOfWeek">Day of the month</label>
-               <input name="monthly_schedule_day" type="number" ng-model="monthly_schedule.day_of_month" id="monthly_schedule_day" class="form-control" placeholder="day" min="0" max="31" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_day.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 31.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="monthly_schedule_hour" type="number" ng-model="monthly_schedule.hour" id="monthly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_hour.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="monthly_schedule_minute" type="number" ng-model="monthly_schedule.minute" id="monthly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="monthly_schedule_snapshots_to_keep" type="number" ng-model="monthly_schedule.snapshots_to_keep" id="monthly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_snapshots_to_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>          
-          </div>
-        </div>
-      </div>
-      <div class="col-md-1"></div>
-      <div class="col-md-5" ng-if="showBackupForm && mode=='fresh'">
-        <div class="row">
-          <div class="form-group col-md-2">
-            <input name="backupPolicyEnabled" type="checkbox" ng-model="$parent.backupPolicyEnabled" id="backupPolicyEnabled" class="form-control checkbox-left">
-          </div>
-          <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Enable Backup Policy</label>
-            <p class="faint-text">If enabled, creats backups automatically according to the schedules.</p>
-          </div>
-        </div>
-        <div ng-show="$parent.backupPolicyEnabled"">
-          <div class="tab">
-            <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupHourly')">Hourly</a>
-            <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupDaily')">Daily</a>
-            <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupWeekly')">Weekly</a>
-            <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupMonthly')">Monthly</a>
-          </div>
-          <div id="backupHourly" class="tabcontent backuptabcontent">
-            <p class="faint-text">If enabled (In Green) and (Keep > 0), create a backup every hour e.g. at 04:00, 05:00, 06:00</p>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="backup_hourly_schedule_minute" type="number" ng-model="$parent.backup_hourly_schedule.minute" id="backup_hourly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupHourlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_hourly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="keep">Keep</label>
-              <input name="backup_hourly_schedule_keep" type="number" ng-model="$parent.backup_hourly_schedule.keep" id="backup_hourly_schedule_keep" class="form-control" placeholder="Keep" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupHourlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_hourly_schedule_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>            
-          </div>
-          <div id="backupDaily" class="tabcontent backuptabcontent">
-            <p class="faint-text">If enabled (In Green) and (Keep > 0),create a backup every day. Defaults to midnight.</p>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="backup_daily_schedule_hour" type="text" ng-model="$parent.backup_daily_schedule.hour" id="backup_daily_schedule_hour" class="form-control" placeholder="hour" ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/" ng-required="$parent.backupDailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_daily_schedule_hour.$error" role="alert" >
-                <p class="help-block error-text" ng-message="pattern">>Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="backup_daily_schedule_minute" type="number" ng-model="$parent.backup_daily_schedule.minute" id="backup_daily_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupDailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_daily_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="keep">Keep</label>
-              <input name="backup_daily_schedule_keep" type="number" ng-model="$parent.backup_daily_schedule.keep" id="backup_daily_schedule_keep" class="form-control" placeholder="Keeps" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupDailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_daily_schedule_keep.$error" role="alert" ng-required="backupDailyScheduleEnabled">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-          <div id="backupWeekly" class="tabcontent backuptabcontent" >
-            <p class="faint-text">If enabled (Keep > 0), create a backup every week on a specific day, defaults to Sunday at midnight</p>
-            <div class="form-group " show-errors>
-              <label for="dayOfWeek">Day of the week</label>
-              <select ng-model="$parent.backup_weekly_schedule['day_of_week']" name="backup_weekly_schedule_day" id="backup_weekly_schedule_day" class="form-control capitalize" ng-options="dayOfWeek.id as dayOfWeek.name for dayOfWeek in weeksArray" ng-required="$parent.backupWeeklyScheduleEnabled">
-                <option value="">Please select the Day of the week</option>
-              </select>
-              <div ng-messages="storagegroupForm.backup_weekly_schedule_day.$error" role="alert">
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>  
-            </div>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="backup_weekly_schedule_hour" type="number" ng-model="$parent.backup_weekly_schedule.hour" id="backup_weekly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="$parent.backupWeeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_weekly_schedule_hour.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="backup_weekly_schedule_minute" type="number" ng-model="$parent.backup_weekly_schedule.minute" id="backup_weekly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupWeeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_weekly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="keep">Keep</label>
-              <input name="backup_weekly_schedule_keep" type="number" ng-model="$parent.backup_weekly_schedule.keep" id="backup_weekly_schedule_keep" class="form-control" placeholder="Keeps" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupWeeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_weekly_schedule_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-          <div id="backupMonthly" class="tabcontent backuptabcontent">
-            <p class="faint-text">If enabled (In Green) and (Keep > 0), create a backup every month on a specific day, defaults to the first day of the month at midnight</p>
-            <div class="form-group" show-errors>
-              <label for="dayOfWeek">Day of the month</label>
-               <input name="backup_monthly_schedule_day" type="number" ng-model="$parent.backup_monthly_schedule.day_of_month" id="backup_monthly_schedule_day" class="form-control" placeholder="day" min="0" max="31" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_monthly_schedule_day.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 31.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="backup_monthly_schedule_hour" type="number" ng-model="$parent.backup_monthly_schedule.hour" id="backup_monthly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_monthly_schedule_hour.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="backup_monthly_schedule_minute" type="number" ng-model="$parent.backup_monthly_schedule.minute" id="backup_monthly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_monthly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="keep">Keep</label>
-              <input name="backup_monthly_schedule_keep" type="number" ng-model="$parent.backup_monthly_schedule.keep" id="backup_monthly_schedule_keep" class="form-control" placeholder="Keeps" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.backup_monthly_schedule_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
+            <div id="Monthly" class="tabcontent sstabcontent">
+              <p class="faint-text">If enabled (In Green) and (snapshotsToKeep > 0), make a snapshot every month on a specific day, defaults to the first day of the month at midnight</p>
+              <div class="form-group" show-errors>
+                <label for="dayOfWeek">Day of the month</label>
+                 <input name="monthly_schedule_day" type="number" ng-model="monthly_schedule.day_of_month" id="monthly_schedule_day" class="form-control" placeholder="day" min="0" max="31" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
+                <div ng-messages="volumeForm.monthly_schedule_day.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 31.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>    
+              </div>
+              <div class="form-group" show-errors>
+                <label for="hour">Hour</label>
+                <input name="monthly_schedule_hour" type="number" ng-model="monthly_schedule.hour" id="monthly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
+                <div ng-messages="volumeForm.monthly_schedule_hour.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>    
+              </div>
+              <div class="form-group" show-errors>
+                <label for="minute">Minute</label>
+                <input name="monthly_schedule_minute" type="number" ng-model="monthly_schedule.minute" id="monthly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
+                <div ng-messages="volumeForm.monthly_schedule_minute.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="snapshots_to_keep">Snapshots To Keep</label>
+                <input name="monthly_schedule_snapshots_to_keep" type="number" ng-model="monthly_schedule.snapshots_to_keep" id="monthly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
+                <div ng-messages="volumeForm.monthly_schedule_snapshots_to_keep.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>          
             </div>
           </div>
         </div>
-      </div>
+        <div ng-if="showBackupForm && mode=='fresh'">
+          <div class="row">
+            <div class="form-group col-md-2">
+              <input name="backupPolicyEnabled" type="checkbox" ng-model="$parent.backupPolicyEnabled" id="backupPolicyEnabled" class="form-control checkbox-left">
+            </div>
+            <div class="form-group col-md-10">
+              <label style="margin-top: 12px;">Enable Backup Policy</label>
+              <p class="faint-text">If enabled, creats backups automatically according to the schedules.</p>
+            </div>
+          </div>
+          <div ng-show="$parent.backupPolicyEnabled" class="row" style="padding:10px;">
+            <div class="tab">
+              <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupHourly')">Hourly</a>
+              <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupDaily')">Daily</a>
+              <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupWeekly')">Weekly</a>
+              <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupMonthly')">Monthly</a>
+            </div>
+            <div id="backupHourly" class="tabcontent backuptabcontent">
+              <p class="faint-text">If enabled (In Green) and (Keep > 0), create a backup every hour e.g. at 04:00, 05:00, 06:00</p>
+              <div class="form-group" show-errors>
+                <label for="minute">Minute</label>
+                <input name="backup_hourly_schedule_minute" type="number" ng-model="$parent.backup_hourly_schedule.minute" id="backup_hourly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupHourlyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_hourly_schedule_minute.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="keep">Keep</label>
+                <input name="backup_hourly_schedule_keep" type="number" ng-model="$parent.backup_hourly_schedule.keep" id="backup_hourly_schedule_keep" class="form-control" placeholder="Keep" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupHourlyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_hourly_schedule_keep.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>            
+            </div>
+            <div id="backupDaily" class="tabcontent backuptabcontent">
+              <p class="faint-text">If enabled (In Green) and (Keep > 0),create a backup every day. Defaults to midnight.</p>
+              <div class="form-group" show-errors>
+                <label for="hour">Hour</label>
+                <input name="backup_daily_schedule_hour" type="text" ng-model="$parent.backup_daily_schedule.hour" id="backup_daily_schedule_hour" class="form-control" placeholder="hour" ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/" ng-required="$parent.backupDailyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_daily_schedule_hour.$error" role="alert" >
+                  <p class="help-block error-text" ng-message="pattern">>Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="minute">Minute</label>
+                <input name="backup_daily_schedule_minute" type="number" ng-model="$parent.backup_daily_schedule.minute" id="backup_daily_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupDailyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_daily_schedule_minute.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="keep">Keep</label>
+                <input name="backup_daily_schedule_keep" type="number" ng-model="$parent.backup_daily_schedule.keep" id="backup_daily_schedule_keep" class="form-control" placeholder="Keeps" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupDailyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_daily_schedule_keep.$error" role="alert" ng-required="backupDailyScheduleEnabled">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+            </div>
+            <div id="backupWeekly" class="tabcontent backuptabcontent" >
+              <p class="faint-text">If enabled (Keep > 0), create a backup every week on a specific day, defaults to Sunday at midnight</p>
+              <div class="form-group " show-errors>
+                <label for="dayOfWeek">Day of the week</label>
+                <select ng-model="$parent.backup_weekly_schedule['day_of_week']" name="backup_weekly_schedule_day" id="backup_weekly_schedule_day" class="form-control capitalize" ng-options="dayOfWeek.id as dayOfWeek.name for dayOfWeek in weeksArray" ng-required="$parent.backupWeeklyScheduleEnabled">
+                  <option value="">Please select the Day of the week</option>
+                </select>
+                <div ng-messages="volumeForm.backup_weekly_schedule_day.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>  
+              </div>
+              <div class="form-group" show-errors>
+                <label for="hour">Hour</label>
+                <input name="backup_weekly_schedule_hour" type="number" ng-model="$parent.backup_weekly_schedule.hour" id="backup_weekly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="$parent.backupWeeklyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_weekly_schedule_hour.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>    
+              </div>
+              <div class="form-group" show-errors>
+                <label for="minute">Minute</label>
+                <input name="backup_weekly_schedule_minute" type="number" ng-model="$parent.backup_weekly_schedule.minute" id="backup_weekly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupWeeklyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_weekly_schedule_minute.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="keep">Keep</label>
+                <input name="backup_weekly_schedule_keep" type="number" ng-model="$parent.backup_weekly_schedule.keep" id="backup_weekly_schedule_keep" class="form-control" placeholder="Keeps" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupWeeklyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_weekly_schedule_keep.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+            </div>
+            <div id="backupMonthly" class="tabcontent backuptabcontent">
+              <p class="faint-text">If enabled (In Green) and (Keep > 0), create a backup every month on a specific day, defaults to the first day of the month at midnight</p>
+              <div class="form-group" show-errors>
+                <label for="dayOfWeek">Day of the month</label>
+                 <input name="backup_monthly_schedule_day" type="number" ng-model="$parent.backup_monthly_schedule.day_of_month" id="backup_monthly_schedule_day" class="form-control" placeholder="day" min="0" max="31" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_monthly_schedule_day.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 31.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>    
+              </div>
+              <div class="form-group" show-errors>
+                <label for="hour">Hour</label>
+                <input name="backup_monthly_schedule_hour" type="number" ng-model="$parent.backup_monthly_schedule.hour" id="backup_monthly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_monthly_schedule_hour.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>    
+              </div>
+              <div class="form-group" show-errors>
+                <label for="minute">Minute</label>
+                <input name="backup_monthly_schedule_minute" type="number" ng-model="$parent.backup_monthly_schedule.minute" id="backup_monthly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_monthly_schedule_minute.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+              <div class="form-group" show-errors>
+                <label for="keep">Keep</label>
+                <input name="backup_monthly_schedule_keep" type="number" ng-model="$parent.backup_monthly_schedule.keep" id="backup_monthly_schedule_keep" class="form-control" placeholder="Keeps" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="$parent.backupMonthlyScheduleEnabled">
+                <div ng-messages="volumeForm.backup_monthly_schedule_keep.$error" role="alert">
+                 
+                  <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
+                  <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
+                  <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+                  <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+                  <p class="help-block error-text" ng-message="required">Please enter value.</p>
+                </div>              
+              </div>
+            </div>
+          </div>
+        </div>            
+      </div>       
     </div>
-      <!-- <div class="col-md-6" ng-show="ssPolicyEnabled">
-        <div>
-          <div class="form-group col-md-2">
-            <input name="hourlyScheduleEnabled" type="checkbox" ng-model="hourlyScheduleEnabled" id="hourlyScheduleEnabled" class="form-control checkbox-left">
-          </div>
-          <label for="hourlyPolicySchedule">Hourly schedule:
-          </label>
-           <p class="faint-text">If enabled (snapshotsToKeep > 0), make a snapshot every hour e.g. at 04:00, 05:00, 06:00</p>
-          <div ng-show="hourlyScheduleEnabled">
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="hourly_schedule_minute" type="number" ng-model="hourly_schedule.minute" id="hourly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="hourlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.hourly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="hourly_schedule_snapshots_to_keep" type="number" ng-model="hourly_schedule.snapshots_to_keep" id="hourly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="hourlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.hourly_schedule_snapshots_to_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="form-group col-md-2">
-            <input name="dailyScheduleEnabled" type="checkbox" ng-model="dailyScheduleEnabled" id="dailyScheduleEnabled" class="form-control checkbox-left" >
-          </div>
-          <label for="DailypolicySchedule">Daily schedule:
-          </label>
-          <p class="faint-text">If enabled (snapshotsToKeep > 0), make a snapshot every day. Defaults to midnight.</p>
-          <div ng-show="dailyScheduleEnabled">
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="daily_schedule_hour" type="text" ng-model="daily_schedule.hour" id="daily_schedule_hour" class="form-control" placeholder="hour" ng-pattern="/^(?!.*(\b(?:[0-9]|1\d|2[0-3])\b).*\b\1\b)(?:[0-9]|1\d|2[0-3])(?:,(?:[0-9]|1\d|2[0-3]))*$/" ng-required="dailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.daily_schedule_hour.$error" role="alert" >
-                <p class="help-block error-text" ng-message="pattern">>Only coma separated numbers between 0, 23 are allowed. Each number should occure only once</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="daily_schedule_minute" type="number" ng-model="daily_schedule.minute" id="daily_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="dailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.daily_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="daily_schedule_snapshots_to_keep" type="number" ng-model="daily_schedule.snapshots_to_keep" id="daily_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="dailyScheduleEnabled">
-              <div ng-messages="storagegroupForm.daily_schedule_snapshots_to_keep.$error" role="alert" ng-required="dailyScheduleEnabled">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="form-group col-md-2">
-            <input name="weeklyScheduleEnabled" type="checkbox" ng-model="weeklyScheduleEnabled" id="weeklyScheduleEnabled" class="form-control checkbox-left" >
-          </div>
-          <label for="WeeklyypolicySchedule">Weekly schedule:
-          </label>
-          <p class="faint-text">If enabled (snapshotsToKeep > 0), make a snapshot every week on a specific day, defaults to Sunday at midnight</p>
-          <div ng-show="weeklyScheduleEnabled">
-            <div class="form-group " show-errors>
-              <label for="dayOfWeek">Day of the week</label>
-              <select ng-model="weekly_schedule['day_of_week']" name="weekly_schedule_day" id="weekly_schedule_day" class="form-control capitalize" ng-options="dayOfWeek.id as dayOfWeek.name for dayOfWeek in weeksArray" ng-required="weeklyScheduleEnabled">
-                <option value="">Please select the Day of the week</option>
-              </select>
-              <div ng-messages="storagegroupForm.weekly_schedule_day.$error" role="alert">
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>  
-            </div>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="weekly_schedule_hour" type="number" ng-model="weekly_schedule.hour" id="weekly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.weekly_schedule_hour.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="weekly_schedule_minute" type="number" ng-model="weekly_schedule.minute" id="weekly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.weekly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="weekly_schedule_snapshots_to_keep" type="number" ng-model="weekly_schedule.snapshots_to_keep" id="weekly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="weeklyScheduleEnabled">
-              <div ng-messages="storagegroupForm.weekly_schedule_snapshots_to_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="form-group col-md-2">
-            <input name="monthlyScheduleEnabled" type="checkbox" ng-model="monthlyScheduleEnabled" id="monthlyScheduleEnabled" class="form-control checkbox-left" >
-          </div>
-          <label for="MonthlypolicySchedule">Monthly schedule:
-          </label>
-          <p class="faint-text">If enabled (snapshotsToKeep > 0), make a snapshot every month on a specific day, defaults to the first day of the month at midnight</p>
-          <div ng-show="monthlyScheduleEnabled">
-            <div class="form-group" show-errors>
-              <label for="dayOfWeek">Day of the month</label>
-               <input name="monthly_schedule_day" type="number" ng-model="monthly_schedule.day_of_month" id="monthly_schedule_day" class="form-control" placeholder="day" min="0" max="31" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_day.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 31.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="hour">Hour</label>
-              <input name="monthly_schedule_hour" type="number" ng-model="monthly_schedule.hour" id="monthly_schedule_hour" class="form-control" placeholder="hour" min="0" max="23" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_hour.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 23.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>    
-            </div>
-            <div class="form-group" show-errors>
-              <label for="minute">Minute</label>
-              <input name="monthly_schedule_minute" type="number" ng-model="monthly_schedule.minute" id="monthly_schedule_minute" class="form-control" placeholder="minute" min="0" max="59" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_minute.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 59.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-            <div class="form-group" show-errors>
-              <label for="snapshots_to_keep">Snapshots To Keep</label>
-              <input name="monthly_schedule_snapshots_to_keep" type="number" ng-model="monthly_schedule.snapshots_to_keep" id="monthly_schedule_snapshots_to_keep" class="form-control" placeholder="Snapshots" min="0" max="255" ng-pattern="/^[\d]*$/" ng-required="monthlyScheduleEnabled">
-              <div ng-messages="storagegroupForm.monthly_schedule_snapshots_to_keep.$error" role="alert">
-               
-                <p class="help-block error-text" ng-message="min">Minimum value is 0.</p>
-                <p class="help-block error-text" ng-message="max">Maximum value is 255.</p>
-                <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
-                <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
-                <p class="help-block error-text" ng-message="required">Please enter value.</p>
-              </div>              
-            </div>
-          </div>
-        </div>
-      </div> -->
-   
-    </br>
+    
    
     <div class="row show-grid">
       <div class="col-md-6">

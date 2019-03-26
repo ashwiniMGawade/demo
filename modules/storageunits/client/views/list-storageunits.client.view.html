@@ -22,7 +22,7 @@
         <td ng-if="isRoot || isL1ops" ng-bind="storageunit.tenant.name" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
         <td ng-bind="storageunit.subtenant.name" title="'Subtenant'" sortable="'subtenant.name'" class="breakword"></td>
         <td ng-bind="storageunit.server.name" ng-attr-title="{{labels.server.serverName}}" title="labels.server.serverName" sortable="'server.name'" class="breakword"></td>
-        <td ng-bind="storageunit.storagegroup.name" title="'Storage Group'" sortable="'storagegroup.name'" class="breakword"></td>        
+        <td ng-bind="storageunit.storagegroup.name" title="'Volume'" sortable="'storagegroup.name'" class="breakword"></td>        
         <td ng-bind="storageunit.status" title="'Status'" sortable="'status'"></td>
         <td ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="storageunit.status!=='Operational'" ui-sref="storageunits.edit({storageunitId: storageunit.storageunitId})">Edit</button></td>
 
