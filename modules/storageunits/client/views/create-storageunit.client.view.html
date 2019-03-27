@@ -78,14 +78,14 @@
           <p class="help-block">The {{labels.server.serverName}} in which the Storage Unit is to reside in.</p>
         </div>
         <div class="form-group required" show-errors>
-          <label for="storagegroupId">Storage Group</label>
+          <label for="storagegroupId">Volume</label>
           <select name="storagegroupId" ng-model="storagegroupId" id="storagegroupId" class="form-control" ng-options="storagegroup.id as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required ng-disabled="!serverId || storagegroups.length == 0">
-            <option value="">Please select a storage group</option>
+            <option value="">Please select a Volume</option>
           </select>
           <div ng-messages="storageunitForm.storagegroupId.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Storage Group name is required.</p>
+            <p class="help-block error-text" ng-message="required">Volume name is required.</p>
           </div>
-          <p class="help-block">The Storage Group in which the Storage Unit is to reside in.</p>
+          <p class="help-block">The Volume in which the Storage Unit is to reside in.</p>
         </div>
 
         <div class="form-group required" show-errors>

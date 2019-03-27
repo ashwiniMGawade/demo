@@ -23,7 +23,6 @@
           <label for="tier">Performance Service Level</label>
           <select name="tier" ng-model="storagegroup.tier" id="tier" class="form-control" required>
             <option ng-repeat="SL in validPerformanceSLToAssign | orderBy:'name'" value="{{SL.name}}" ng-selected="{{trim(storagegroup.tier)==SL.name ? 'selected' : ''}}" class="capitalize">{{SL.name}}</option>
-            <option value="">Please select the Performance Service Level</option>
           </select>
           <div ng-messages="volumeForm.tier.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
@@ -77,16 +76,13 @@
     <div class="row show-grid"  ng-show="storagegroup.volume_type!='mirror'">
       <div class="col-md-5">
         <div class="row">
-          <div class="form-group col-md-2">
-            <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left">
-          </div>
           <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Enable Snapshot Policy</label>
-            <p class="faint-text">If enabled, make snapshots automatically according to the schedules.</p>
+              <label style="margin-top: 12px;" > Snapshot Policy</label>
+              <p><a style="cursor:pointer;" ng-click="toggleSnapshotPolicyView()">Click to view/edit</a></p>
           </div>
         </div>
       
-         <div ng-show="ssPolicyEnabled" class="row">
+         <div ng-show="showSSpolicy" class="row">
             <div class="tab">
               <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Hourly')" ng-class="hourlyScheduleEnabled ? 'green active':''">Hourly</a>
               <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Daily')" ng-class="dailyScheduleEnabled ? 'green active':''">Daily</a>
