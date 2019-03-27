@@ -57,19 +57,11 @@
           <p class="help-block">The {{labels.server.serverName}} the NetApp Volume is to reside in</p>
         </div>
 
-        <div class="row">
-          <div class="form-group col-md-2">
-            <input name="mode" type="checkbox" ng-model="existingVolumeModeEnabled" id="mode" class="form-control checkbox-left" ng-change="toggleMode()">
-          </div>
-          <div class="form-group col-md-10">
-            <label style="margin-top: 12px;">Create from exisitng volume and snapshot policy</label>
-          </div>
-        </div>   
+        
 
         <div class="form-group required" show-errors>
           <label for="tier">Performance Service Level</label>
           <select ng-model="tier" ng-options="SL.name as SL.name for SL in validPerformanceSLToAssign" class="form-control capitalize" id="tier" name="tier" class="form-control" required>
-            <option value="">Please select the Performance Service Level</option>
           </select>
           <div ng-messages="volumeForm.tier.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Performance Service Level is required.</p>
@@ -80,58 +72,31 @@
               ( {{SL.max_iops_per_tb}} IOPS/TB)
             </span>
           </p>
-        </div>       
+        </div> 
+
+        <div class="row">
+          <div class="form-group col-md-2">
+            <input name="mode" type="checkbox" ng-model="existingVolumeModeEnabled" id="mode" class="form-control checkbox-left" ng-change="toggleMode()">
+          </div>
+          <div class="form-group col-md-10">
+            <label style="margin-top: 12px;">Create volume from snapshot</label>
+          </div>
+        </div>         
         
         <div class="form-group" show-errors ng-show="mode=='fresh'">
           <label for="protection_service_level">Data Protection Service Level</label>
           <select ng-model="$parent.protection_service_level" ng-options="SL.name as SL.name.replace('_', ' ') for SL in validProtectionSLToAssign" class="form-control capitalize" id="protection_service_level" name="protection_service_level" class="form-control" ng-change="setVarsAsPerDPlevel(validProtectionSLToAssign|filter:{name:protection_service_level})">
-            <option value="">Please select the Data Protection Service Level</option>
+            <option value="">None</option>
           </select>                   
-        </div> 
+        </div>         
+      </div>
+      <div class="col-md-1"></div>
+    </div>
 
-        <div class="form-group" style="margin-bottom:0px;">
-          <label for="name">Tags</label>
-          <br/>
-          <div ng-repeat="(key, value) in tags" class="row" style="margin-left:0;">
-            <div class="col-md-5 form-group" show-errors>
-              <input name="tags{{key}}" type="text" ng-model="value['attr']" id="name" class="form-control" placeholder="Key"
-                    ng-maxlength="64"
-                    ng-minlength="3"
-                    ng-pattern="/^[a-zA-Z0-9-]*$/"
-                    ng-required="value['val']">
-              <div ng-messages="volumeForm['tags'+key].$error" role="alert">
-                <p class="help-block error-text" ng-message="required">Tag key should not be blank.</p>
-                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
-                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
-                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
-              </div>
-            </div>
-            <div class="col-md-5 form-group" show-errors>
-              <input name="tagValues{{key}}" type="text" ng-model="value['val']" id="name" class="form-control" placeholder="Value"
-                    ng-maxlength="64"
-                    ng-minlength="3"
-                    ng-pattern="/^[a-zA-Z0-9-]*$/"
-                    ng-required="value['attr']">
-              <div ng-messages="volumeForm['tagValues'+key].$error" role="alert">
-                 <p class="help-block error-text" ng-message="required">Tag value should not be blank.</p>
-                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
-                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
-                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <span ng-click="addTag()" class="btn btn-primary" ng-show="key==tags.length-1">
-                  <i class="glyphicon glyphicon-plus"></i>
-              </span>
-              <span ng-click="removeTag(key)" class="btn btn-primary" ng-hide="tags.length==1">
-                  <i class="glyphicon glyphicon-minus"></i>
-              </span>
-            </div>
-          </div>
-        </div> 
-
+    <div class="row show-grid">
+      <div class="col-md-5">
         <div class="form-group required" show-errors ng-if="mode!=='fresh'">
-          <label for="create_from_volume">Create from Volume</label>
+          <label for="create_from_volume">Source Volume</label>
           <select name="create_from_volume" ng-model="$parent.create_from_volume" id="create_from_volume" class="form-control" ng-options="volume as volume.name for volume in storagegroups |orderBy: 'name'" ng-disabled="isRoot && (!tenantId || !servers)" required>
             <option value="">Please select a volume</option>
           </select>
@@ -232,9 +197,50 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group" style="margin-bottom:0px;">
+          <label for="name">Tags</label>
+          <br/>
+          <div ng-repeat="(key, value) in tags" class="row" style="margin-left:0;">
+            <div class="col-md-5 form-group" show-errors>
+              <input name="tags{{key}}" type="text" ng-model="value['attr']" id="name" class="form-control" placeholder="Key"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['val']">
+              <div ng-messages="volumeForm['tags'+key].$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Tag key should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-5 form-group" show-errors>
+              <input name="tagValues{{key}}" type="text" ng-model="value['val']" id="name" class="form-control" placeholder="Value"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['attr']">
+              <div ng-messages="volumeForm['tagValues'+key].$error" role="alert">
+                 <p class="help-block error-text" ng-message="required">Tag value should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <span ng-click="addTag()" class="btn btn-primary" ng-show="key==tags.length-1">
+                  <i class="glyphicon glyphicon-plus"></i>
+              </span>
+              <span ng-click="removeTag(key)" class="btn btn-primary" ng-hide="tags.length==1">
+                  <i class="glyphicon glyphicon-minus"></i>
+              </span>
+            </div>
+          </div>
+        </div> 
       </div>
       <div class="col-md-1"></div>
-      <div class="col-md-5">  
+      <div class="col-md-5">
         <div class="row" ng-if="mode!=='fresh'">
           <div class="form-group col-md-2">
             <input name="ssPolicyFromClonnedVolume" type="checkbox" ng-model="$parent.ssPolicyFromClonnedVolume" id="ssPolicyFromClonnedVolume" class="form-control checkbox-left" ng-change="$parent.toggleSnapshotPolicyClone()">
@@ -245,15 +251,12 @@
         </div>      
         <div>
           <div class="row">
-            <div class="form-group col-md-2">
-              <input name="ssPolicyEnabled" type="checkbox" ng-model="ssPolicyEnabled" id="ssPolicyEnabled" class="form-control checkbox-left" ng-change="toggleSnapshotPolicy()">
-            </div>
             <div class="form-group col-md-10">
-              <label style="margin-top: 12px;">Enable Snapshot Policy</label>
-              <p class="faint-text">If enabled, make snapshots automatically according to the schedules.</p>
+              <label style="margin-top: 12px;" > Snapshot Policy</label>
+              <p><a  style="cursor:pointer;" ng-click="toggleSnapshotPolicyView()">Click to view/edit</a></p>
             </div>
           </div>
-          <div ng-show="ssPolicyEnabled" class="row" style="padding:10px;">
+          <div ng-show="showSSpolicy" class="row" style="padding:10px;">
             <div class="tab">
               <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Hourly')">Hourly</a>
               <a class="tablinks btn sstablinks" ng-click="openSnapshotTab($event, 'Daily')">Daily</a>
@@ -425,15 +428,12 @@
         </div>
         <div ng-if="showBackupForm && mode=='fresh'">
           <div class="row">
-            <div class="form-group col-md-2">
-              <input name="backupPolicyEnabled" type="checkbox" ng-model="$parent.backupPolicyEnabled" id="backupPolicyEnabled" class="form-control checkbox-left">
-            </div>
             <div class="form-group col-md-10">
-              <label style="margin-top: 12px;">Enable Backup Policy</label>
-              <p class="faint-text">If enabled, creats backups automatically according to the schedules.</p>
-            </div>
+              <label style="margin-top: 12px;" > Backup Policy</label>
+              <p><a  style="cursor:pointer;" ng-click="toggleBackupPolicyView()">Click to view/edit</a></p>
+            </div>            
           </div>
-          <div ng-show="$parent.backupPolicyEnabled" class="row" style="padding:10px;">
+          <div ng-show="$parent.showBKpolicy" class="row" style="padding:10px;">
             <div class="tab">
               <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupHourly')">Hourly</a>
               <a class="tablinks btn backuptablinks" ng-click="openBackupTab($event, 'backupDaily')">Daily</a>
@@ -602,8 +602,8 @@
               </div>
             </div>
           </div>
-        </div>            
-      </div>       
+        </div> 
+      </div>
     </div>
     
    
