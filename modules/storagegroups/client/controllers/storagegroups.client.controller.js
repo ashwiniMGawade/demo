@@ -511,11 +511,11 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         tier: $sanitize(this.tier),       
         // size_bytes:this.size_bytes,
         snapshot_policy: {
-          enabled: !dp && !(this.hourlyScheduleEnabled || this.dailyScheduleEnabled || this.weeklyScheduleEnabled || this.monthlyScheduleEnabled) ? false : true,
-          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : (!dp ? this.defaultHourlySchedule: this.ssdefaultHourlySchedule),
-          daily_schedule : this.daily_schedule ? this.daily_schedule : (!dp ? this.defaultDailySchedule : this.ssdefaultDailySchedule),
-          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : (!dp ? this.defaultWeeklySchedule : this.ssdefaultWeeklySchedule),
-          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : (!dp ? this.defaultMonthlySchedule : this.ssdefaultMonthlySchedule),
+          enabled: !this.dp && !(this.hourlyScheduleEnabled || this.dailyScheduleEnabled || this.weeklyScheduleEnabled || this.monthlyScheduleEnabled) ? false : true,
+          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : (!this.dp ? this.defaultHourlySchedule: this.ssdefaultHourlySchedule),
+          daily_schedule : this.daily_schedule ? this.daily_schedule : (!this.dp ? this.defaultDailySchedule : this.ssdefaultDailySchedule),
+          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : (!this.dp ? this.defaultWeeklySchedule : this.ssdefaultWeeklySchedule),
+          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : (!this.dp ? this.defaultMonthlySchedule : this.ssdefaultMonthlySchedule),
         }
       });
 
@@ -692,11 +692,11 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       var storagegroup = $scope.storagegroup;
       storagegroup.storagegroupId = storagegroup.id;
       storagegroup.snapshot_policy = {
-          enabled: !dp && !(this.hourlyScheduleEnabled || this.dailyScheduleEnabled || this.weeklyScheduleEnabled || this.monthlyScheduleEnabled) ? false : true,
-          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : (!dp ? this.defaultHourlySchedule: this.ssdefaultHourlySchedule),
-          daily_schedule : this.daily_schedule ? this.daily_schedule : (!dp ? this.defaultDailySchedule : this.ssdefaultDailySchedule),
-          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : (!dp ? this.defaultWeeklySchedule : this.ssdefaultWeeklySchedule),
-          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : (!dp ? this.defaultMonthlySchedule : this.ssdefaultMonthlySchedule)
+          enabled: !this.dp && !(this.hourlyScheduleEnabled || this.dailyScheduleEnabled || this.weeklyScheduleEnabled || this.monthlyScheduleEnabled) ? false : true,
+          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : (!this.dp ? this.defaultHourlySchedule: this.ssdefaultHourlySchedule),
+          daily_schedule : this.daily_schedule ? this.daily_schedule : (!this.dp ? this.defaultDailySchedule : this.ssdefaultDailySchedule),
+          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : (!this.dp ? this.defaultWeeklySchedule : this.ssdefaultWeeklySchedule),
+          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : (!this.dp ? this.defaultMonthlySchedule : this.ssdefaultMonthlySchedule)
       }
 
 
