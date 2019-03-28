@@ -23,11 +23,11 @@
           </td>
       </tr>
       <tr><th>SnapshotPolicy</th><td><pre>{{detailedSnapShotDesc}}</pre></td></tr>
-      <tr><th>Annotation</th><td ng-bind="storagegroup.annotation"></td></tr>
+      <!-- <tr><th>Annotation</th><td ng-bind="storagegroup.annotation"></td></tr>
       <tr><th>Allocated (GB)</th><td ng-bind="storagegroup.sizeVolume"></td></tr>
       <tr><th>Presented (GB)</th><td ng-bind="storagegroup.sizePresented"></td></tr>
       <tr><th>Used (GB)</th><td ng-bind="storagegroup.sizeUsed"></td></tr>
-      <tr><th>Snapshot (GB)</th><td ng-bind="storagegroup.sizeSnapshot"></td></tr>
+      <tr><th>Snapshot (GB)</th><td ng-bind="storagegroup.sizeSnapshot"></td></tr> -->
       <tr><th>Tags</th>
         <td> 
           <li ng-if="tags[0].attr" ng-repeat="tag in tags">{{tag.attr}}: {{ tag.val}} </li>
@@ -48,7 +48,7 @@
     </table>
     <div>
       <p class="help-block">Please allow up to 15 minutes for Size information to be updated.</p>
-      <p class="help-block">The Allocated size is capacity configured for usage by both active data & Snapshots.<br>The Presented size is the sum of all Storage Units contained in the Volume.<br>The Used size is the total capacity utilised by the clients, including Snapshots.<br>The Snapshot size is the total capacity utilised by all Snapshots.</p>
+      <!-- <p class="help-block">The Allocated size is capacity configured for usage by both active data & Snapshots.<br>The Presented size is the sum of all Storage Units contained in the Volume.<br>The Used size is the total capacity utilised by the clients, including Snapshots.<br>The Snapshot size is the total capacity utilised by all Snapshots.</p> -->
     </div>
   </div>
 </section>

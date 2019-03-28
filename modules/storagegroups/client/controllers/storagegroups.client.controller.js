@@ -51,30 +51,59 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.backupWeeklyScheduleEnabled = false;
     $scope.backupMonthlyScheduleEnabled = false;
 
-    $scope.defaultHourlySchedule = $scope.hourly_schedule = {
+    $scope.defaultHourlySchedule = {
+       "minute": 0,
+      "snapshots_to_keep": 0
+    }
+
+    $scope.defaultDailySchedule = {
+      "hour": "0",
+      "minute": 0,
+      "snapshots_to_keep": 0
+    }
+
+    $scope.defaultWeeklySchedule = {
+      "hour": 0,
+      "minute": 0,
+      "day_of_week":0,
+      "snapshots_to_keep": 0
+    }
+
+    $scope.defaultMonthlySchedule =  {
+      "hour": 0,
+      "minute": 0,
+      "day_of_month":1,
+      "snapshots_to_keep": 0
+    }
+
+
+
+    $scope.sshourly_schedule = {
       "minute": 20,
       "snapshots_to_keep": 0
     }
 
-    $scope.daily_schedule = $scope.defaultDailySchedule = {
+    $scope.ssdaily_schedule = {
       "hour": "0,4,8,12",
       "minute": 30,
       "snapshots_to_keep": 28
     }
 
-    $scope.weekly_schedule =  $scope.defaultWeeklySchedule = {
+    $scope.ssweekly_schedule =  {
       "hour": 0,
       "minute": 5,
       "day_of_week":0,
       "snapshots_to_keep": 1
     }
 
-    $scope.defaultMonthlySchedule = $scope.monthly_schedule =  {
+    $scope.ssmonthly_schedule =  {
       "hour": 20,
       "minute": 45,
       "day_of_month":15,
       "snapshots_to_keep": 1
     }
+
+
 
     $scope.backup_hourly_schedule = {
       "minute": 0,
@@ -289,6 +318,18 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     $scope.setVarsAsPerDPlevel = function (dp) {
       $scope.showReplicaForm = false;
       $scope.showBackupForm = false;
+
+      if (!dp) {
+        $scope.hourly_schedule = $scope.hourly_schedule ? $scope.hourly_schedule : $scope.defaultHourlySchedule;
+        $scope.daily_schedule = $scope.daily_schedule ? $scope.daily_schedule : $scope.defaultDailySchedule;
+        $scope.weekly_schedule = $scope.weekly_schedule ? $scope.weekly_schedule : $scope.defaultWeeklySchedule;
+        $scope.monthly_schedule = $scope.monthly_schedule ? $scope.monthly_schedule : $scope.defaultMonthlySchedule
+      } else {
+        $scope.hourly_schedule = $scope.hourly_schedule ? $scope.hourly_schedule : $scope.ssdefaultHourlySchedule;
+        $scope.daily_schedule = $scope.daily_schedule ? $scope.daily_schedule : $scope.ssdefaultDailySchedule;
+        $scope.weekly_schedule = $scope.weekly_schedule ? $scope.weekly_schedule : $scope.ssdefaultWeeklySchedule;
+        $scope.monthly_schedule = $scope.monthly_schedule ? $scope.monthly_schedule : $scope.ssdefaultMonthlySchedule
+      }
       if(dp[0].has_mirror) {
         $scope.showReplicaForm = true;
         getDestinationServers($scope.serverId)
@@ -296,8 +337,6 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       if(dp[0].has_vault) {
         $scope.showBackupForm = true;
       }
-
-
     }
 
     var getDestinationServers = function(sourceServerId) {
@@ -379,7 +418,7 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
     }
 
     var checkSnapshotPolicyErrors = function(scopeVar) {
-      // if (!(scopeVar.hourlyScheduleEnabled || scopeVar.dailyScheduleEnabled || scopeVar.weeklyScheduleEnabled || scopeVar.monthlyScheduleEnabled)) {
+      // if (!scopeVar.dp && !(scopeVar.hourlyScheduleEnabled || scopeVar.dailyScheduleEnabled || scopeVar.weeklyScheduleEnabled || scopeVar.monthlyScheduleEnabled)) {
       //   throwFlashErrorMessage("Please enable at least one schedule with Snapshots to keep > 0");
       //   return false;
       // }
@@ -472,11 +511,11 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
         tier: $sanitize(this.tier),       
         // size_bytes:this.size_bytes,
         snapshot_policy: {
-          enabled:true,
-          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : this.defaultHourlySchedule,
-          daily_schedule : this.daily_schedule ? this.daily_schedule : this.defaultDailySchedule,
-          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : this.defaultWeeklySchedule,
-          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : this.defaultMonthlySchedule,
+          enabled: !dp && !(this.hourlyScheduleEnabled || this.dailyScheduleEnabled || this.weeklyScheduleEnabled || this.monthlyScheduleEnabled) ? false : true,
+          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : (!dp ? this.defaultHourlySchedule: this.ssdefaultHourlySchedule),
+          daily_schedule : this.daily_schedule ? this.daily_schedule : (!dp ? this.defaultDailySchedule : this.ssdefaultDailySchedule),
+          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : (!dp ? this.defaultWeeklySchedule : this.ssdefaultWeeklySchedule),
+          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : (!dp ? this.defaultMonthlySchedule : this.ssdefaultMonthlySchedule),
         }
       });
 
@@ -653,11 +692,11 @@ angular.module('storagegroups').controller('StoragegroupsController', ['$scope',
       var storagegroup = $scope.storagegroup;
       storagegroup.storagegroupId = storagegroup.id;
       storagegroup.snapshot_policy = {
-          enabled:true,
-          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : this.defaultHourlySchedule,
-          daily_schedule : this.daily_schedule ? this.daily_schedule : this.defaultDailySchedule,
-          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : this.defaultWeeklySchedule,
-          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : this.defaultMonthlySchedule,
+          enabled: !dp && !(this.hourlyScheduleEnabled || this.dailyScheduleEnabled || this.weeklyScheduleEnabled || this.monthlyScheduleEnabled) ? false : true,
+          hourly_schedule : this.hourly_schedule ? this.hourly_schedule : (!dp ? this.defaultHourlySchedule: this.ssdefaultHourlySchedule),
+          daily_schedule : this.daily_schedule ? this.daily_schedule : (!dp ? this.defaultDailySchedule : this.ssdefaultDailySchedule),
+          weekly_schedule : this.weekly_schedule ? this.weekly_schedule : (!dp ? this.defaultWeeklySchedule : this.ssdefaultWeeklySchedule),
+          monthly_schedule : this.monthly_schedule ? this.monthly_schedule : (!dp ? this.defaultMonthlySchedule : this.ssdefaultMonthlySchedule)
       }
 
 
