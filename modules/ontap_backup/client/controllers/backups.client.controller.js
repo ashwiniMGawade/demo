@@ -4,15 +4,24 @@
 angular.module('backups').controller('BackupsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Backups', 'Storagegroups', 'Servers', 'modalService', 'Flash', '$sanitize',
   function ($scope, $stateParams, $location, Authentication, Backups, Storagegroups, Servers, modalService, Flash, $sanitize) {
     $scope.authentication = Authentication;
-    $scope.storagegroups = Storagegroups.query();
+    var storagegroups = Storagegroups.query();
     var servers = Servers.query();
     $scope.backupAccessRoles = featuresSettings.roles.backup;
 
     $scope.servers = [];
+    $scope.storagegroups = [];
     servers.$promise.then(function(results) {
       angular.forEach(results, function(server) {
         if (server.status == "Operational") {
             $scope.servers.push(server);
+        }
+      });
+    });
+
+    storagegroups.$promise.then(function(results) {
+      angular.forEach(results, function(sg) {
+        if (sg.status == "Operational" && sg.volume_type == 'primary') {
+            $scope.storagegroups.push(sg);
         }
       });
     });
@@ -88,10 +97,10 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
       "keep": 0
     }
 
-    $scope.backup_hourly_schedule = {}
-    $scope.backup_daily_schedule = {}
-    $scope.backup_weekly_schedule = {}
-    $scope.backup_monthly_schedule = {}
+    // $scope.backup_hourly_schedule = {}
+    // $scope.backup_daily_schedule = {}
+    // $scope.backup_weekly_schedule = {}
+    // $scope.backup_monthly_schedule = {}
 
     
     var flashTimeout = 3000;
@@ -108,7 +117,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
     }
 
     var checkBackupPolicyErrors = function(scopeVar) {
-      if (scopeVar.backupPolicyEnabled && !(scopeVar.backupHourlyScheduleEnabled || scopeVar.backupDailyScheduleEnabled || scopeVar.backupWeeklyScheduleEnabled || scopeVar.backupMonthlyScheduleEnabled)) {
+      if (!(scopeVar.backupHourlyScheduleEnabled || scopeVar.backupDailyScheduleEnabled || scopeVar.backupWeeklyScheduleEnabled || scopeVar.backupMonthlyScheduleEnabled)) {
         throwFlashErrorMessage("Please enable at least one backup schedule with keep > 0");
         return false;
       }
@@ -138,6 +147,60 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
       }
 
       return true
+    }
+
+    $scope.showBKpolicy = false;
+
+    $scope.toggleBackupPolicyView = function() {
+      $scope.showBKpolicy = !$scope.showBKpolicy;
+    }
+
+    $scope.openBackupTab = function (evt, sname) {
+
+      // Declare all variables
+      var i, tabcontent, tablinks;
+
+      $scope[sname+'ScheduleEnabled'] = !$scope[sname+'ScheduleEnabled'];
+
+      if (sname == 'backupHourly') {
+        $scope.backup_hourly_schedule = $scope.backup_hourly_schedule || $scope.defaultHourlySchedule;
+        $scope.backup_hourly_schedule.keep = $scope.backup_hourly_schedule.keep || 0;
+      }
+      if (sname == 'backupDaily') {
+        $scope.backup_daily_schedule = $scope.backup_daily_schedule || $scope.defaultDailySchedule;
+        $scope.backup_daily_schedule.keep = $scope.backup_daily_schedule.keep || 0;
+      }
+      if (sname == 'backupWeekly') {
+        $scope.backup_weekly_schedule = $scope.backup_weekly_schedule || $scope.defaultWeeklySchedule;
+        $scope.backup_weekly_schedule.keep = $scope.backup_weekly_schedule.keep || 0;
+      }
+      if (sname == 'backupMonthly') {
+        $scope.backup_monthly_schedule = $scope.backup_monthly_schedule || $scope.defaultMonthlySchedule;
+        $scope.backup_monthly_schedule.keep = $scope.backup_monthly_schedule.keep || 0;
+      }
+      
+
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("backuptabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("backuptablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(sname).style.display = "block";
+      evt.currentTarget.className += " active";
+
+      if ($scope[sname+'ScheduleEnabled'] == true) {
+        evt.currentTarget.className += " green";
+      } else {
+        evt.currentTarget.className = evt.currentTarget.className.replace(" green", "");
+      }
     }
 
 
@@ -179,7 +242,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
           minute:this.minute ? this.minute : 0
         },
         policy: {
-          enabled:backupPolicyEnabled? true: false,
+          enabled: true,
           hourly:{schedule: $scope.defaultHourlySchedule, keep: 0},
           daily: {schedule: $scope.defaultDailySchedule, keep: 0},
           weekly: {schedule: $scope.defaultWeeklySchedule,keep: 0},
@@ -189,7 +252,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
 
 
 
-      if (this.backupPolicyEnabled) {
+      
         if (this.backupHourlyScheduleEnabled) {
           backup.policy.hourly.schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
           backup.policy.hourly.keep  = this.backup_hourly_schedule.keep || 0;
@@ -207,9 +270,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
         if (this.backupMonthlyScheduleEnabled) {
           backup.policy.monthly.schedule = this.backup_monthly_schedule ? this.backup_monthly_schedule : this.defaultMonthlySchedule;
           backup.policy.monthly.keep  = this.backup_hourly_schedule.keep || 0;
-        }       
-        
-      }
+        } 
 
 
       // Redirect after save
@@ -271,15 +332,13 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
       delete backup.status;
       //delete backup.id;
 
-      if ($scope.backupPolicyEnabled ) {
-         var ssResponse = checkBackupPolicyErrors(this);
+     
+      var ssResponse = checkBackupPolicyErrors(this);
 
-        if (!ssResponse) {
-          return false;
-        }
+      if (!ssResponse) {
+        return false;
       }
 
-      if (this.backupPolicyEnabled) {
         if (this.backupHourlyScheduleEnabled) {
           backup.policy.hourly.schedule = this.backup_hourly_schedule ? this.backup_hourly_schedule : this.defaultHourlySchedule;
           backup.policy.hourly.keep  = this.backup_hourly_schedule.keep || 0;
@@ -297,9 +356,7 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
         if (this.backupMonthlyScheduleEnabled) {
           backup.policy.monthly.schedule = this.backup_monthly_schedule ? this.backup_monthly_schedule : this.defaultMonthlySchedule;
           backup.policy.monthly.keep  = this.backup_hourly_schedule.keep || 0;
-        }       
-        
-      }
+        }  
 
       backup.$update(function () {
         $location.path('backups');
@@ -340,7 +397,6 @@ angular.module('backups').controller('BackupsController', ['$scope', '$statePara
         $scope.backup.backupId = $scope.backup.id;
 
         if(data.policy.enabled || data.policy.hourly.keep || data.policy.daily.keep || data.policy.weekly.keep || data.policy.monthly.keep){
-          $scope.backupPolicyEnabled = true;
           $scope.backup_hourly_schedule = data.policy.hourly.schedule;          
           $scope.backup_daily_schedule = data.policy.daily.schedule;
           $scope.backup_monthly_schedule = data.policy.monthly.schedule;

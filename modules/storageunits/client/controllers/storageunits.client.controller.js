@@ -49,7 +49,7 @@ angular.module('storageunits')
       var storagegroups = Storagegroups.query({'file-server' : server});
       storagegroups.$promise.then(function(results) {
         angular.forEach(storagegroups, function(storagegroup) {
-          if (storagegroup.server && storagegroup.server.id === server && storagegroup.status === 'Operational') {
+          if (storagegroup.server && storagegroup.server.id === server && storagegroup.status === 'Operational' && storagegroup.volume_type == 'primary') {
             $scope.storagegroups.push(storagegroup);
           }
         });
@@ -81,6 +81,8 @@ angular.module('storageunits')
     $scope.removeTag = function(index) {
       $scope.tags.splice(index, 1);
     }
+
+    
 
     var prepareTagsObjectFromScope = function(scopeTags) {
       var tags = [];
