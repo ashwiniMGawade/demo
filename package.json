@@ -83,7 +83,7 @@
     "imagemin-pngquant": "~5.1.0",
     "ip": "^1.1.2",
     "jasmine-core": "~2.7.0",
-    "lodash": "~4.17.4",
+    "lodash": "~4.17.13",
     "lusca": "~1.5.1",
     "method-override": "^2.3.10",
     "moment": "^2.13.0",
