@@ -38,6 +38,7 @@
     "seed:test": "gulp seed:test"
   },
   "dependencies": {
+    "@netapp/luci": "^3.1.0",
     "acl": "^0.4.11",
     "amazon-s3-uri": "0.0.3",
     "async": "~2.5.0",

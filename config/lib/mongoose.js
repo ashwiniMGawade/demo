@@ -36,6 +36,7 @@ module.exports.connect = function (callback) {
     })
     .catch(function (err) {
       console.error(chalk.red('Could not connect to MongoDB!'));
+      console.log("err is", err)
       console.log(err);
     });
 

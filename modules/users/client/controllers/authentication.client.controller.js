@@ -34,8 +34,8 @@ angular.module('users')
         return false;
       }      
 
-      $http.post('/api/auth/ldap', $scope.credentials).success(function (response) {
-        // If successful we assign the response to the global user model
+      $http.post('/api/auth/signin', $scope.credentials).success(function (response) { //'/api/auth/ldap',
+        // If successful we assign the response to the global user model 
         $scope.authentication.user = response;
         Authentication.setHeader($scope.credentials.username, $scope.credentials.password)
         //$scope.authentication.user[""]

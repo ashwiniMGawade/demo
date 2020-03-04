@@ -10,7 +10,8 @@ module.exports = {
         'public/lib/bootstrap/dist/css/bootstrap.css',
         'public/lib/bootstrap/dist/css/bootstrap-theme.css',
         'public/lib/angular-ui-notification/dist/angular-ui-notification.css',
-        'public/lib/ng-table/dist/ng-table.css'
+        'public/lib/ng-table/dist/ng-table.css',
+        'public/assets/css/fonts/447892/DDDB34F581F073045.css'
         // endbower
       ],
       js: [
