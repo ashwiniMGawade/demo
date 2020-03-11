@@ -169,6 +169,11 @@ flash-message .alert .close{
   border-color: #d6e9c6;
 }
 
+.text-success {
+  color: #3c763d !important;
+  font-weight: bold !important;
+}
+
 .alert-success hr {
   border-top-color: #c9e2b3;
 }
@@ -276,8 +281,8 @@ button.close {
   font-size:14px;
 }
 .navbar-custom {
-  background-image: linear-gradient(to bottom,#2f83ce 0,#00529c 100%);
-  background: -webkit-linear-gradient(top, #2f83ce, #00529c);
+  background-image: linear-gradient(to bottom,#1E4A93 0,#00529c 100%);
+  background: -webkit-linear-gradient(top, #1E4A93, #00529c);
   border-color: #00529c;
 }
 .navbar-custom .navbar-brand {

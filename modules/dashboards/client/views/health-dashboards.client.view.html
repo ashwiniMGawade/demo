@@ -1,0 +1,257 @@
+<section>
+    <div class="luci-navigation-container luci-navigation-container--navigation-vertical-is-active">      
+        <div class="luci-navigation-container__row">
+            <div aria-hidden="false" id=fixed-vertical-navigation-example class="luci-navigation-container__navigation-vertical">
+                <div class="luci-navigation-container__navigation-vertical-wrapper">
+                    <nav class="luci-navigation" id="fixed-vertical-nagivation-example-navigation">
+                        <ul class="luci-navigation__list">
+                            <li class="luci-navigation__item">
+                                <a ui-sref="dashboards.details({type:'clusters'})" ui-sref-active="luci-navigation__link--is-active" class="luci-navigation__link">Clusters </a>
+                            </li>
+                            <li class="luci-navigation__item">
+                                <a ui-sref="dashboards.details({type:'nodes'})" ui-sref-active="luci-navigation__link--is-active" class="luci-navigation__link ">Nodes </a>
+                            </li>
+                            <li class="luci-navigation__item">
+                                <a  ui-sref="dashboards.details({type:'aggregates'})" ui-sref="dashboards.aggregates" ui-sref-active="luci-navigation__link--is-active" class="luci-navigation__link">Aggregates </a>
+                            </li>
+                            <li class="luci-navigation__item">
+                                <a   ui-sref="dashboards.details({type:'svms'})" ui-sref-active="luci-navigation__link--is-active"class="luci-navigation__link">SVMs </a>
+                            </li>
+                            <li class="luci-navigation__item">
+                                <a  ui-sref="dashboards.details({type:'volumes'})" ui-sref-active="luci-navigation__link--is-active" class="luci-navigation__link">Volumes </a>
+                            </li>
+                            <li class="luci-navigation__item">
+                                <a  ui-sref="dashboards.details({type:'luns'})" ui-sref-active="luci-navigation__link--is-active" class="luci-navigation__link">Luns </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="luci-navigation-container__body">
+                <div class="luci-navigation-container__body-container row">
+                    <h3 class="capitalize">{{type}}</h3>
+                    <div class="luci-grid" style="margin:0;">
+                        <span class="luci-grid__col luci-grid__col-8"></span>
+                        <span  class="luci-grid__col luci-grid__col-4"><input class="luci-form__input " type="text" ng-model="search" placeholder="Search">  </span>
+                    </div>
+                    <div class="luci-table">
+                        <table class="luci-table__table">
+                            <thead>
+                                <tr ng-if="type=='clusters'">
+                                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster_name')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')">Cluster Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('system_health')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('system_health')"> System Health</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ="getSortingClass('communication')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('communication')"> Communication</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('os_version')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('os_version')"> OS version</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ha_configured')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('ha_configured')"> HA Configured</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('node_count')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('node_count')"> Node Count</span>
+                                    </th>
+                                </tr>
+                                <tr ng-if="type=='nodes'">
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster_name')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')"> Cluster Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('node_name')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('node_name')"> Node Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('node_model')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('node_model')"> Node Model</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('os_version')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('os_version')"> OS version</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('node_healthy')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('node_healthy')"> Healthy</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ha_status')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('ha_status')"> HA Status</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('failover_enabled')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('failover_enabled')">Failover Enabled</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('takeover_possible')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('takeover_possible')"> TakeOver Possible</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('RMDA_connection')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('RMDA_connection')"> RMDA Connection</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('flash_optimized')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('flash_optimized')"> Flash Optimized</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('up_time')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('up_time')"> Up Time</span>
+                                    </th>
+                                    <!--  <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('aggregate_total_capacity')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('aggregate_total_capacity')"> Aggregate Total Capacity</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('aggregate_used_capacity')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('aggregate_used_capacity')"> Aggregate Used Capacity</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('totao_raw_capacity')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('totao_raw_capacity')">Total Raw Capacity</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('used_raw_capacity')" scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label"  ng-click="orderByFn('used_raw_capacity')">Used Raw Capacity</span>
+                                    </th> -->
+                                </tr>
+                                <tr ng-if="type=='aggregates'">
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('aggregate_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('aggregate_name')"> Aggregate Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('node_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('node_name')"> Node Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('state')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('state')"> State</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('type')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('type')"> Type</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('available_data_capacity')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('available_data_capacity')"> Available Data Capacity</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('total_data_capacity')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('total_data_capacity')"> Total Data Capacity</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('committed_capacity')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('committed_capacity')">Committed Capacity</span>
+                                    </th>
+                                </tr>
+                                <tr ng-if="type=='svms'">
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('svm_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('svm_name')"> SVM Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')"> Cluster Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ops_status')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('ops_status')"> Status</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('protocols')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('protocols')"> Protocols</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('language')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('language')"> Language</span>
+                                    </th>
+                                </tr>
+                                <tr ng-if="type=='volumes'">
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('volume_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('volume_name')"> Volume Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('aggregate_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('aggregate_name')"> Aggregate Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('vserver_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('vserver_name')"> Vserver Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')"> Cluster Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('error_status')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('error_status')"> Error Status</span>
+                                    </th>
+                                </tr>
+                                <tr ng-if="type=='luns'">
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('path')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('path')"> Path</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('volume_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('volume_name')"> Volume Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('aggregate_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('aggregate_name')"> Aggregate Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('vserver_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('vserver_name')"> Vserver Name</span>
+                                    </th>
+                                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster_name')"  scope="col" aria-sort="true" tabindex="0">
+                                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')"> Cluster Name</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>                              
+                                <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--warning" style="text-align:center;font-weight: bold;" colspan="10">No Records Found!</td></tr>
+                                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='clusters'" class="capitalize">
+                                    <td ng-bind="row.cluster_name"></td>
+                                    <td ng-bind="row.system_health"></td>
+                                    <td ng-bind="row.communicaion" ng-class="row.communicaion=='Good'? 'text-success': 'text-danger'"></td>
+                                    <td ng-bind="row.os_version"></td>
+                                    <td ng-bind="row.ha_configured"></td>
+                                    <td ng-bind="row.node_count"></td>
+                                </tr>
+                                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='nodes'" class="capitalize">
+                                    <td ng-bind="row.cluster_name"></td>
+                                    <td ng-bind="row.node_name"></td>
+                                    <td ng-bind="row.node_model"></td>
+                                    <td ng-bind="row.os_version"></td>
+                                    <td ng-bind="row.node_healthy" ng-class="row.node_healthy=='Yes'? 'text-success': 'text-danger'"></td>
+                                    <td ng-bind="row.ha_status" ng-class="row.ha_status=='Yes'? 'text-success': 'text-danger'"></td>
+                                    <td ng-bind="row.failover_enabled"></td>
+                                    <td ng-bind="row.takeover_possible"></td>
+                                    <td ng-bind="row.RMDA_connection"></td>
+                                    <td ng-bind="row.flash_optimized"></td>
+                                    <td ng-bind="row.up_time"></td>
+                                    <!-- <td ng-bind="row.aggregate_total_capacity"></td>
+                                    <td ng-bind="row.aggregate_used_capacity"></td>
+                                    <td ng-bind="row.total_raw_capacity"></td>
+                                    <td ng-bind="row.used_raw_capacity"></td> -->
+                                </tr>
+                                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='aggregates'" class="capitalize">
+                                    <td ng-bind="row.aggregate_name"></td>
+                                    <td ng-bind="row.node_name"></td>
+                                    <td ng-bind="row.state" ng-class="row.state=='online'? 'text-success': 'text-danger'"></td>
+                                    <td ng-bind="row.type"></td>
+                                    <td ng-bind="row.available_data_capacity"></td>
+                                    <td ng-bind="row.total_data_capacity"></td>
+                                    <td ng-bind="row.committed_capacity"></td>
+                                </tr>
+                                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='svms'" class="capitalize">
+                                    <td ng-bind="row.svm_name"></td>
+                                    <td ng-bind="row.cluster_name"></td>
+                                    <td ng-bind="row.ops_status" ng-class="row.ops_status=='running'? 'text-success': 'text-danger'"></td>
+                                    <td ng-bind="row.protocols"></td>
+                                    <td ng-bind="row.language"></td>
+                                </tr>
+                                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='volumes'" class="capitalize">
+                                    <td ng-bind="row.volume_name"></td>
+                                    <td ng-bind="row.aggregate_name"></td>
+                                    <td ng-bind="row.vserver_name"></td>
+                                    <td ng-bind="row.cluster_name"></td>
+                                    <td ng-bind="row.error_status"></td>
+                                </tr>
+                                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='luns'" class="capitalize">
+                                    <td ng-bind="row.path"></td>
+                                    <td ng-bind="row.volume_name"></td>
+                                    <td ng-bind="row.aggregate_name"></td>
+                                    <td ng-bind="row.vserver_name"></td>
+                                    <td ng-bind="row.cluster_name"></td>                                  
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="text-align:center; padding:10px;" ng-show="isLoading"><img src='/modules/core/client/img/loaders/loader.gif'></div>
+                      </div>
+                      
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>Graphs</h2>
+      </div>
+    </div>
+  </div>
+</section> 

@@ -1,4 +1,4 @@
-<section ng-init="refreshGraphs()">
+<!--<section ng-init="refreshGraphs()">
   <div class="page-header">
     <div class="row">
       <div class="col-md-8">
@@ -12,7 +12,7 @@
         <div class="form-group dashboardradio">
           <label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="tenant">All</label>
           <!--label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="top5">Top 5</label-->
-          <label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="custom">Custom</label>
+          <!--<label class="radio-inline"><input type="radio" name="scope" ng-model="scope" value="custom">Custom</label>
         </div>
         <div class="form-group dashboardradio">
           <label class="radio-inline"><input type="radio" name="from" ng-model="from" value="y">Year</label>
@@ -82,4 +82,85 @@
       </div>
     </div>
   </div>
+</section> --> 
+
+<!-- 
+<section>
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>{{labels.app.title}}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="luci-table">
+    <table class="luci-table__table">
+        <thead>
+            <tr>
+                <th class="" scope="col"> Customer Name </th>
+                <th class="" scope="col"> Hostname </th>
+                <th class="" scope="col"> Model </th>
+                <th class="" scope="col"> Serial Number </th>
+                <th class="" scope="col"> System Age (Years) </th>
+                <th class="" scope="col"> Platform EOA Date </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> Sample Name </td>
+                <td> Test 1 </td>
+                <td> FAS2554 </td>
+                <td>
+                    <a href="#">701517001122</a>
+                </td>
+                <td> 2 </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td> Sample Name </td>
+                <td> Test 2 </td>
+                <td> FAS3170 </td>
+                <td>
+                    <a href="#">700000208098</a>
+                </td>
+                <td> 7 </td>
+                <td> 2/03/2017 </td>
+            </tr>
+            <tr>
+                <td> Sample Name </td>
+                <td> Test 3 </td>
+                <td> FAS3170 </td>
+                <td>
+                    <a href="#">700000212609</a>
+                </td>
+                <td> 7 </td>
+                <td> 4/06/2017 </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  
+</section> -->
+
+<section>
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>{{labels.app.title}}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">Availability
+      <div class = "graph" id="wordCountContainer"></div>
+    </div>
+    <div class="col-md-6">Capacity</div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">Perfromance</div>
+    <div class="col-md-6">Protection</div>
+  </div>
+  
+
 </section>

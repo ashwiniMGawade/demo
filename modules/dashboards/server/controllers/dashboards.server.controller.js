@@ -1,5 +1,6 @@
 'use strict';
 
+
 /**
  * Module dependencies.
  */
@@ -168,3 +169,54 @@ exports.getGraphs = function (req, res) {
     }    
   }
 };
+
+exports.getTestGraph = function(req, res) {
+  res.json([
+    {"name": "Healthy", "wc": 10},
+    {"name": "At Risk", "wc": 90 },
+    {"name": "Have Incidents", "wc": 60 }
+    ]);
+}
+
+exports.getHealthData =function(req, res) {
+  var type = req.params.type
+  var dbWfa = require('./dashboards.server.wfa.db.read');    
+
+  var callback = function(err, results) {
+    if (err) {
+      logger.info(err);
+      respondError(res, 400, err);
+    } else {
+      var resultJson = JSON.stringify(results);
+      resultJson = JSON.parse(resultJson);
+      res.send(resultJson)
+    }      
+  }; 
+
+  if (type == "clusters") {
+    dbWfa.clusterRead(callback);    
+  } 
+
+  if (type == "nodes") {
+    dbWfa.nodeRead(callback);    
+  } 
+
+  if (type == "aggregates") {
+    dbWfa.aggregateRead(callback);    
+  } 
+
+  if (type == "svms") {
+    dbWfa.SVMRead(callback);    
+  } 
+
+  if (type == "volumes") {
+    dbWfa.volumeRead(callback);    
+  } 
+
+  if (type == "luns") {
+    dbWfa.lunRead(callback);    
+  } 
+
+ 
+}
+

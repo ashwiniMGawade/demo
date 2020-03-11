@@ -183,18 +183,18 @@ angular.module('dashboards').controller('DashboardsListController', ['$scope', '
       $interval.cancel(refreshData);
     });
 
-   var graphQueryString = function(){
-     var queryString = "&from="+$scope.from;
+    var graphQueryString = function(){
+      var queryString = "&from="+$scope.from;
 
-     if($scope.scope === 'custom' && $scope.custom.storagegroupId)
-       queryString += "&scope=storagegroup&objectId="+ $scope.custom.storagegroupId;
-     else if($scope.scope === 'custom' && $scope.custom.serverId )
-       queryString += "&scope=server&objectId="+ $scope.custom.serverId;
-     else
-       queryString += "&scope=tenant&objectId="+ $scope.tenantId;
+      if($scope.scope === 'custom' && $scope.custom.storagegroupId)
+        queryString += "&scope=storagegroup&objectId="+ $scope.custom.storagegroupId;
+      else if($scope.scope === 'custom' && $scope.custom.serverId )
+        queryString += "&scope=server&objectId="+ $scope.custom.serverId;
+      else
+        queryString += "&scope=tenant&objectId="+ $scope.tenantId;
 
-    return queryString;
-  };
+      return queryString;
+    };
 
     // Show panels from Grafana
     $scope.refreshGraphs = function (ispolling) {
@@ -233,7 +233,7 @@ angular.module('dashboards').controller('DashboardsListController', ['$scope', '
       }
     };
 
-   var download = function(name) {
+    var download = function(name) {
       var queryString = graphQueryString();
 
       $http({ method: 'GET', url: '/api/storagegraphs?statistic='+name.toLowerCase()+queryString}).
@@ -258,5 +258,110 @@ angular.module('dashboards').controller('DashboardsListController', ['$scope', '
         throwFlashErrorMessage(data.message);
       });
     };
-  }
-]);
+
+
+    //write code to get the data from backend
+    var margin  = {top: 20, right: 20, bottom: 100, left: 60},
+    width   = 300 - margin.left - margin.right,
+    height  = 200 - margin.top - margin.bottom,
+    x       = d3.scale.ordinal().rangeRoundBands([0,width], 0.5),
+    y       = d3.scale.linear().range([height,0]);
+
+    //draw axis
+    var xAxis   = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+    var yAxis   = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(5)
+        .innerTickSize(-width)
+        .outerTickSize(0)
+        .tickPadding(10);
+
+var svg     = d3.select("#wordCountContainer")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  d3.json("api/storagegraphs/test", function (data)
+{
+    x.domain(data.map(function (d)
+    {
+        return d.name;
+    }));
+
+    y.domain([0, d3.max(data, function (d)
+    {
+        return d.wc;
+    })]);
+
+    var barWidth = width / 3;
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, " + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "middle")
+        .attr("dx", "-0.5em")
+        .attr("dy", "-.55em")
+        .attr("y", 30)
+        .attr("transform", "rotate(0)");
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 5)
+        .attr("dy", "0.8em")
+        .attr("text-anchor", "end")
+        // .text("Word Count");
+
+      svg.selectAll("bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("fill", function(d) {
+          if (d.name == "Healthy") {
+            return "green";
+          } else if (d.name == "At Risk") {
+            return "orange";
+          } else {
+            return "red";
+          }
+        }) 
+        .attr("x", function(d)
+        {
+            return x(d.name);
+        })
+        .attr("width", x.rangeBand())
+        .attr("y", function (d)
+        {
+            return y(d.wc);
+        })
+        .attr("height", function (d)
+        {
+            return height - y(d.wc);
+        })
+
+        svg.selectAll("bar")
+        .append("text")
+        .text("test")
+        .attr("y", function(d) {
+          return y(d.wc);
+        })
+         .attr("x", function(d)
+        {
+            return x(d.name);
+        })
+        .attr("width", x.rangeBand()/ 2)
+        .style("text-anchor", "middle")
+
+  
+    
+  })
+  }]);

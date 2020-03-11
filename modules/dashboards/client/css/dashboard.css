@@ -1,0 +1,53 @@
+svg {
+    /* border: 1px solid #000; */
+}
+body, html {
+width: 100%;
+height: 100%;
+margin: 0 auto;
+}
+
+.graph {
+    width: auto;
+}
+
+.tooltip {
+    text-decoration: underline;
+}
+
+.axis {
+    font: 10px Georgia, Arial, sans-serif;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #dadada;
+    shape-rendering: crispEdges;
+}
+
+@media screen and (min-width: 576px)
+{
+    .luci-navigation-container__navigation-vertical-wrapper {
+        top: 51px;
+    }
+}
+
+.luci-table__table th, .luci-table__table td {
+    padding:10px;
+    text-transform: capitalize;
+}
+
+
+
+.luci-navigation-container--navigation-vertical-is-active .luci-navigation-container__navigation-vertical {
+    width: 150px;
+}
+
+.luci-table__table th {
+    white-space: normal;
+}
+
+.luci-form__input {
+    font-family: inherit;
+    line-height:1
+}

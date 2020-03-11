@@ -13,4 +13,10 @@ module.exports = function (app) {
   app.route('/api/storagegraphs').all([auth.loginODIN, dashboardsPolicy.isAllowed])
     .get(dashboards.getGraphs);
 
+  app.route('/api/storagegraphs/test').all([auth.loginODIN, dashboardsPolicy.isAllowed])
+  .get(dashboards.getTestGraph);
+
+  app.route('/api/health/:type').all([auth.loginODIN, dashboardsPolicy.isAllowed])
+  .get(dashboards.getHealthData);
+
 };

@@ -17,7 +17,16 @@ exports.invokeRolesPolicies = function () {
     allows: [{
       resources: '/api/storagegraphs',
       permissions: '*'
-    }]
+    },
+    {
+      resources: '/api/storagegraphs/test',
+      permissions: '*'
+    },
+    {
+      resources: '/api/health/:type',
+      permissions: '*'
+    }
+  ]
   }, {
     roles: ['user','admin','read'],
     allows: [{
@@ -32,6 +41,7 @@ exports.invokeRolesPolicies = function () {
  */
 exports.isAllowed = function (req, res, next) {
   var roles = (req.user) ? req.user.roles : ['guest'];
+  console.log(roles)
 
   if (roles.indexOf('guest') !== -1) {
     return res.status(401).json({
@@ -45,6 +55,7 @@ exports.isAllowed = function (req, res, next) {
       // An authorization error occurred.
       return res.status(500).send('Unexpected authorization error');
     } else {
+      console.log(isAllowed)
       if (isAllowed) {
         // Access granted! Invoke next middleware
         return next();

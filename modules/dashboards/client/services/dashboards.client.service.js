@@ -15,3 +15,16 @@ angular.module('dashboards').factory('Dashboards', ['$resource',
     });
   }
 ]);
+
+
+angular.module('dashboards').factory('Health', ['$resource', '$window',
+  function ($resource, $window) {
+    return $resource('api/health/:type', {
+      type: '@type'
+    }, {
+      'get': {
+        method: 'GET'
+      }
+    });
+  }
+]);
