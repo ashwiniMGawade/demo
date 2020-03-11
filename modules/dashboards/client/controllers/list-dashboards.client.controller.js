@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('dashboards').controller('DashboardsListController', ['$scope', '$filter', '$http', '$interval', 'Authentication', 'Dashboards', 'Sites', 'Subtenants', 'Servers', 'Storagegroups', 'Flash',
-  function ($scope, $filter, $http, $interval, Authentication, Dashboards, Sites, Subtenants, Servers, Storagegroups, Flash) {
+angular.module('dashboards').controller('DashboardsListController', ['$scope', '$location', '$filter', '$http', '$interval', 'Authentication', 'Dashboards', 'Sites', 'Subtenants', 'Servers', 'Storagegroups', 'Flash',
+  function ($scope, $location, $filter, $http, $interval, Authentication, Dashboards, Sites, Subtenants, Servers, Storagegroups, Flash) {
     $scope.authentication = Authentication;
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
     $scope.isPartner = Authentication.user.roles.indexOf('partner') !== -1;
@@ -269,8 +269,8 @@ angular.module('dashboards').controller('DashboardsListController', ['$scope', '
 
     //draw axis
     var xAxis   = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
+        // .scale(x)
+        // .orient("bottom");
     var yAxis   = d3.svg.axis()
         .scale(y)
         .orient("left")
@@ -279,49 +279,78 @@ angular.module('dashboards').controller('DashboardsListController', ['$scope', '
         .outerTickSize(0)
         .tickPadding(10);
 
-var svg     = d3.select("#wordCountContainer")
+  var svg_clusters = d3.select("#clusters")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  d3.json("api/storagegraphs/test", function (data)
-{
-    x.domain(data.map(function (d)
+  var svg_svms = d3.select("#svms")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var svg_aggregates = d3.select("#aggregates")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var svg_nodes = d3.select("#nodes")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.json("api/storagegraphs/test", function (data)
     {
-        return d.name;
-    }));
+      x.domain(data.map(function (d)
+      {
+          return d.name;
+      }));
 
-    y.domain([0, d3.max(data, function (d)
-    {
-        return d.wc;
-    })]);
+      y.domain([0, d3.max(data, function (d)
+      {
+          return d.wc;
+      })]);
 
-    var barWidth = width / 3;
+      var tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) { return "<strong>Count:</strong> <span style='color:red'>" + d.wc + "</span>";});
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0, " + height + ")")
-        .call(xAxis)
-        .selectAll("text")
-        .style("text-anchor", "middle")
-        .attr("dx", "-0.5em")
-        .attr("dy", "-.55em")
-        .attr("y", 30)
-        .attr("transform", "rotate(0)");
+      svg_clusters.call(tip);
 
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 5)
-        .attr("dy", "0.8em")
-        .attr("text-anchor", "end")
-        // .text("Word Count");
+      var barWidth = width / 3;
 
-      svg.selectAll("bar")
+      svg_clusters.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0, " + height + ")")
+          // .call(xAxis)
+          // .selectAll("text")
+          // .style("text-anchor", "middle")
+          // .attr("dx", "-0.5em")
+          // .attr("dy", "-.55em")
+          // .attr("y", 30)
+          // .style("font-size", 10)
+          // .attr("transform", "rotate(0)");
+
+      svg_clusters.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 5)
+          .attr("dy", "0.8em")
+          .attr("text-anchor", "end")
+          // .text("Word Count");
+
+      svg_clusters.selectAll("bar")
         .data(data)
         .enter()
         .append("rect")
@@ -336,7 +365,7 @@ var svg     = d3.select("#wordCountContainer")
         }) 
         .attr("x", function(d)
         {
-            return x(d.name);
+            return x(d.name)-30;
         })
         .attr("width", x.rangeBand())
         .attr("y", function (d)
@@ -347,21 +376,276 @@ var svg     = d3.select("#wordCountContainer")
         {
             return height - y(d.wc);
         })
+        .on("click", function(e) {
+          $location.path('/dashboards/health/clusters');
+          d3.event.stopPropagation();
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
 
-        svg.selectAll("bar")
+      svg_clusters
         .append("text")
-        .text("test")
-        .attr("y", function(d) {
-          return y(d.wc);
-        })
-         .attr("x", function(d)
-        {
-            return x(d.name);
-        })
+        .text("Clusters")
+         .attr("dx", "4.5em")
+        .attr("dy", "4.55em")
+        .attr("y", 10)
+        .style("font-size", 20)
         .attr("width", x.rangeBand()/ 2)
         .style("text-anchor", "middle")
+    })
 
-  
-    
-  })
+    d3.json("api/storagegraphs/test", function (data){
+      x.domain(data.map(function (d)
+      {
+          return d.name;
+      }));
+
+      y.domain([0, d3.max(data, function (d)
+      {
+          return d.wc;
+      })]);
+
+      var tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) { return "<strong>Count:</strong> <span style='color:red'>" + d.wc + "</span>";});
+
+      svg_svms.call(tip);
+      var barWidth = width / 3;
+
+      svg_svms.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0, " + height + ")")
+          // .call(xAxis)
+          // .selectAll("text")
+          // .style("text-anchor", "middle")
+          // .attr("dx", "-0.5em")
+          // .attr("dy", "-.55em")
+          // .attr("y", 30)
+          // .style("font-size", 10)
+          // .attr("transform", "rotate(0)");
+
+      svg_svms.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 5)
+          .attr("dy", "0.8em")
+          .attr("text-anchor", "end")
+          // .text("Word Count");
+
+      svg_svms.selectAll("bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("fill", function(d) {
+          if (d.name == "Healthy") {
+            return "green";
+          } else if (d.name == "At Risk") {
+            return "orange";
+          } else {
+            return "red";
+          }
+        }) 
+        .attr("x", function(d)
+        {
+            return x(d.name)-30;
+        })
+        .attr("width", x.rangeBand())
+        .attr("y", function (d)
+        {
+            return y(d.wc);
+        })
+        .attr("height", function (d)
+        {
+            return height - y(d.wc);
+        })
+        .on("click", function(e) {
+          $location.path('/dashboards/health/svms');
+          d3.event.stopPropagation();
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+
+        svg_svms
+        .append("text")
+        .text("SVMs")
+         .attr("dx", "4.5em")
+        .attr("dy", "4.55em")
+        .attr("y", 10)
+        .style("font-size", 20)
+        .attr("width", x.rangeBand()/ 2)
+        .style("text-anchor", "middle")
+    })
+
+    d3.json("api/storagegraphs/test", function (data){
+      x.domain(data.map(function (d)
+      {
+          return d.name;
+      }));
+
+      y.domain([0, d3.max(data, function (d)
+      {
+          return d.wc;
+      })]);
+
+      var tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) { return "<strong>Count:</strong> <span style='color:red'>" + d.wc + "</span>";});
+
+      svg_aggregates.call(tip);
+      var barWidth = width / 3;
+
+      svg_aggregates.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0, " + height + ")")
+          // .call(xAxis)
+          // .selectAll("text")
+          // .style("text-anchor", "middle")
+          // .attr("dx", "-0.5em")
+          // .attr("dy", "-.55em")
+          // .attr("y", 30)
+          // .style("font-size", 10)
+          // .attr("transform", "rotate(0)");
+
+      svg_aggregates.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 5)
+          .attr("dy", "0.8em")
+          .attr("text-anchor", "end")
+          // .text("Word Count");
+
+      svg_aggregates.selectAll("bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("fill", function(d) {
+          if (d.name == "Healthy") {
+            return "green";
+          } else if (d.name == "At Risk") {
+            return "orange";
+          } else {
+            return "red";
+          }
+        }) 
+        .attr("x", function(d)
+        {
+            return x(d.name)-30;
+        })
+        .attr("width", x.rangeBand())
+        .attr("y", function (d)
+        {
+            return y(d.wc);
+        })
+        .attr("height", function (d)
+        {
+            return height - y(d.wc);
+        })
+        .on("click", function(e) {
+          $location.path('/dashboards/health/aggregates');
+          d3.event.stopPropagation();
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+
+        svg_aggregates
+        .append("text")
+        .text("Aggregates")
+         .attr("dx", "4.5em")
+        .attr("dy", "4.55em")
+        .attr("y", 10)
+        .style("font-size", 20)
+        .attr("width", x.rangeBand()/ 2)
+        .style("text-anchor", "middle")
+    })
+
+    d3.json("api/storagegraphs/test", function (data){
+      x.domain(data.map(function (d)
+      {
+          return d.name;
+      }));
+
+      y.domain([0, d3.max(data, function (d)
+      {
+          return d.wc;
+      })]);
+
+      var tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) { return "<strong>Count:</strong> <span style='color:red'>" + d.wc + "</span>";});
+
+      svg_nodes.call(tip);
+      var barWidth = width / 3;
+
+      svg_nodes.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0, " + height + ")")
+          // .call(xAxis)
+          // .selectAll("text")
+          // .style("text-anchor", "middle")
+          // .attr("dx", "-0.5em")
+          // .attr("dy", "-.55em")
+          // .attr("y", 30)
+          // .style("font-size", 10)
+          // .attr("transform", "rotate(0)");
+
+      svg_nodes.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 5)
+          .attr("dy", "0.8em")
+          .attr("text-anchor", "end")
+          // .text("Word Count");
+
+      svg_nodes.selectAll("bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("fill", function(d) {
+          if (d.name == "Healthy") {
+            return "green";
+          } else if (d.name == "At Risk") {
+            return "orange";
+          } else {
+            return "red";
+          }
+        }) 
+        .attr("x", function(d)
+        {
+            return x(d.name)-30;
+        })
+        .attr("width", x.rangeBand())
+        .attr("y", function (d)
+        {
+            return y(d.wc);
+        })
+        .attr("height", function (d)
+        {
+            return height - y(d.wc);
+        })
+        .on("click", function(e) {
+          $location.path('/dashboards/health/nodes');
+          d3.event.stopPropagation();
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+
+        svg_nodes
+        .append("text")
+        .text("Nodes")
+         .attr("dx", "4.5em")
+        .attr("dy", "4.55em")
+        .attr("y", 10)
+        .style("font-size", 20)
+        .attr("width", x.rangeBand()/ 2)
+        .style("text-anchor", "middle")
+    })
   }]);

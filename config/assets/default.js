@@ -34,6 +34,7 @@ module.exports = {
         'public/lib/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js',
         'public/lib/d3/d3.min.js',
         'public/lib/d3-legend/d3-legend.min.js',
+        'public/assets/js/d3-tip.js',
         'public/lib/angular-sanitize/angular-sanitize.min.js',
         'public/lib/ng-idle/angular-idle.min.js'
         // endbower
