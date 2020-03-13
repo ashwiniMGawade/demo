@@ -50,7 +50,20 @@ angular.module('core.admin').run(['Menus',
       position:3
     });
 
-    
+    Menus.addMenuItem('topbar', {
+      title: 'Netapp Tools',
+      state: 'netappTools',
+      type: 'dropdown',
+      roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+      position:3
+    });    
+
+    Menus.addSubMenuItem('topbar', 'netappTools', {
+          title: 'OCUM',
+          state: 'ocum',
+          roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+          position: 5
+        });
    
   }
 ]);

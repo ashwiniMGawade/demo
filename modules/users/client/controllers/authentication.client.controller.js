@@ -17,11 +17,11 @@ angular.module('users')
    
     // If user is signed in then redirect back home
     if ($scope.authentication.user) {  
-      if ($scope.authentication.user.roles.indexOf('root') === -1 && $scope.authentication.user.roles.indexOf('l1ops') === -1) {
+      // if ($scope.authentication.user.roles.indexOf('root') === -1 && $scope.authentication.user.roles.indexOf('l1ops') === -1) {
         $location.path('/dashboards');
-      } else {
-        $location.path('/');
-      }  
+      // } else {
+      //   $location.path('/');
+      // }  
       
     }
 
@@ -41,13 +41,13 @@ angular.module('users')
         //$scope.authentication.user[""]
         
         // And redirect to the previous or home page if not root or partner user
-        if($state.previous.state.name === 'home' && response.roles.indexOf('root') === -1 && response.roles.indexOf('l1ops') === -1 && response.roles.indexOf('partner') === -1) {
+        // if($state.previous.state.name === 'home' && response.roles.indexOf('root') === -1 && response.roles.indexOf('l1ops') === -1 && response.roles.indexOf('partner') === -1) {
           $state.go('dashboard', $state.previous.params);
-        } else {
-          console.log($state.previous.state.name);
-          $state.go($state.previous.state.name || 'home', $state.previous.params);
-          console.log("going to home");
-        }
+        // } else {
+        //   console.log($state.previous.state.name);
+        //   $state.go($state.previous.state.name || 'home', $state.previous.params);
+        //   console.log("going to home");
+        // }
         
         
       }).error(function (response) {
