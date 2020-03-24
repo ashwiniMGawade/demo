@@ -5,6 +5,7 @@
  */
 var config = require('../config'),
   mongooseService = require('./mongoose'),
+  rabitmqService = require('./rabitmqService'),
   express = require('./express'),
   chalk = require('chalk'),
   seed = require('./mongo-seed');
@@ -48,6 +49,13 @@ module.exports.start = function start(callback) {
       if (config.meanjs['meanjs-version'])
         console.log(chalk.green('MEAN.JS version: ' + config.meanjs['meanjs-version']));
       console.log('--');
+
+      //startring the rabitmq connection
+      // rabitmqService.start();
+
+      // setInterval(function() {
+      //   rabitmqService.publish("", "jobs", new Buffer("work work work"));
+      // }, 1000);
 
       if (callback) callback(app, db, config);
     });

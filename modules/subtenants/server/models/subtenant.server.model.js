@@ -92,8 +92,8 @@ SubtenantSchema.pre('validate', function (next) {
   });
 });
 
-SubtenantSchema.index({ name: 1, tenant: 1 }, { unique: true });
-SubtenantSchema.index({ code: 1, tenant: 1 }, { unique: true });
+// SubtenantSchema.index({ name: 1, tenant: 1 }, { unique: true });
+// SubtenantSchema.index({ code: 1, tenant: 1 }, { unique: true });
 
 SubtenantSchema.plugin(uniqueValidator, { message: 'Name and Code has to be unique.' });
 

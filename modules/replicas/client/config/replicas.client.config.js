@@ -7,7 +7,7 @@ angular.module('replicas').run(['Menus',
     // Add the replicas dropdown item
     Menus.addSubMenuItem('topbar', 'dataProtection', {
       title: 'Replicas',
-      state: 'replicas',
+      state: 'replicas.list',
       type: 'dropdown',
       roles: featuresSettings.roles.replica.list,
       position: 2,

@@ -9,7 +9,7 @@ angular.module('core.admin').run(['Menus',
       state: 'administration',
       type: 'dropdown',
       roles: ['admin', 'root', 'user', 'read', 'partner', 'l1ops'],
-      position:0
+      position:1
     });
 
     // Add the Storage Management dropdown item
@@ -29,7 +29,7 @@ angular.module('core.admin').run(['Menus',
       state: 'storagemanagement',
       type: 'dropdown',
       roles: roles,
-      position:1
+      position:2
     });
 
     // Add the Data protection dropdown item
@@ -38,32 +38,42 @@ angular.module('core.admin').run(['Menus',
       state: 'dataProtection',
       type: 'dropdown',
       roles: ['root', 'partner', 'admin'],
-      position:2
-    });
-   
-    // Add the reports menu item
-    Menus.addMenuItem('topbar', {
-      title: 'Support',
-      state: 'support',
-      type: 'dropdown',
-      roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
       position:3
     });
+
+    Menus.addMenuItem('topbar', {
+      title: 'Health',
+      state: 'health',
+      type: 'dropdown',
+      roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+      position:0
+    });
+
+   
+    // Add the reports menu item
+    // Menus.addMenuItem('topbar', {
+    //   title: 'Support',
+    //   state: 'support',
+    //   type: 'dropdown',
+    //   roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+    //   position:3
+    // });
 
     Menus.addMenuItem('topbar', {
       title: 'Netapp Tools',
-      state: 'netappTools',
+      state: 'netapp_tools',
       type: 'dropdown',
       roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
-      position:3
-    });    
+      position:6
+    });
 
-    Menus.addSubMenuItem('topbar', 'netappTools', {
-          title: 'OCUM',
-          state: 'ocum',
-          roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
-          position: 5
-        });
+
+    Menus.addSubMenuItem('topbar', 'netapp_tools', {
+      title: 'OCUM',
+      state: 'ocum',
+      roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+      position: 7,
+    });
    
   }
 ]);

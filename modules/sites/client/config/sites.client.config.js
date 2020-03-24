@@ -12,7 +12,7 @@ angular.module('sites').run(['Menus',
     // Add the sites dropdown item
     Menus.addSubMenuItem('topbar', 'administration', {
       title: 'Sites',
-      state: 'sites',
+      state: 'sites.list',
       type: 'dropdown',
       roles: featuresSettings.roles.site.list,
       position: 3,

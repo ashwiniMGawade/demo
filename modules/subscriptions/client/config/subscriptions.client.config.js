@@ -7,7 +7,7 @@ angular.module('subscriptions').run(['Menus',
     // Add the Subscriptions dropdown list item
     Menus.addSubMenuItem('topbar', 'administration', {
       title: 'Subscriptions',
-      state: 'subscriptions',
+      state: 'subscriptions.list',
       type: 'dropdown',
       roles: featuresSettings.roles.subscription.list,
       position: 4,

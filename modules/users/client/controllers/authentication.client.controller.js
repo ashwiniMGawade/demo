@@ -18,7 +18,8 @@ angular.module('users')
     // If user is signed in then redirect back home
     if ($scope.authentication.user) {  
       // if ($scope.authentication.user.roles.indexOf('root') === -1 && $scope.authentication.user.roles.indexOf('l1ops') === -1) {
-        $location.path('/dashboards');
+        $location.path('/dashboards'); 
+        // $state.go('dashboard', $state.previous.params);
       // } else {
       //   $location.path('/');
       // }  
@@ -39,10 +40,13 @@ angular.module('users')
         $scope.authentication.user = response;
         Authentication.setHeader($scope.credentials.username, $scope.credentials.password)
         //$scope.authentication.user[""]
+
+        angular.element(document.getElementsByClassName("luci-navigation-container__navigation-vertical")).removeClass("ng-hide");
         
         // And redirect to the previous or home page if not root or partner user
         // if($state.previous.state.name === 'home' && response.roles.indexOf('root') === -1 && response.roles.indexOf('l1ops') === -1 && response.roles.indexOf('partner') === -1) {
-          $state.go('dashboard', $state.previous.params);
+          //$state.go('dashboard', $state.previous.params);
+          $location.path('/dashboards'); 
         // } else {
         //   console.log($state.previous.state.name);
         //   $state.go($state.previous.state.name || 'home', $state.previous.params);

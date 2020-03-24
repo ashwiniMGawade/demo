@@ -15,7 +15,7 @@ angular.module('dashboards').config(['$stateProvider',
         templateUrl: 'modules/dashboards/client/views/list-dashboards.client.view.html',
         controller: 'DashboardsListController',
         data: {
-          roles: ['read', 'user', 'admin', 'partner', 'root', 'l1ops']
+          roles: ['read', 'user', 'admin', 'partner', 'root', 'l1ops'], 
         }
       })
       .state('dashboards.details', {
@@ -23,7 +23,8 @@ angular.module('dashboards').config(['$stateProvider',
         templateUrl: 'modules/dashboards/client/views/health-dashboards.client.view.html',
         controller: 'DashboardsHealthController',
         data: {
-          roles: ['read', 'user', 'admin', 'partner', 'root', 'l1ops']
+          roles: ['read', 'user', 'admin', 'partner', 'root', 'l1ops'],
+          parent: 'health'
         }
       })
       // .state('dashboards.nodes', {

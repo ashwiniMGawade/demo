@@ -7,7 +7,7 @@ angular.module('jobs').run(['Menus',
     // Add the Jobs dropdown list item
     Menus.addSubMenuItem('topbar', 'administration', {
       title: 'Jobs',
-      state: 'jobs',
+      state: 'jobs.list',
       type: 'dropdown',
       roles: featuresSettings.roles.job.list,
       position: 1,

@@ -7,7 +7,7 @@ angular.module('backups').run(['Menus',
     // Add the backup dropdown item
     Menus.addSubMenuItem('topbar', 'dataProtection', {
       title: 'Backup',
-      state: 'backups',
+      state: 'backups.list',
       type: 'dropdown',
       roles: featuresSettings.roles.backup.list,
       position: 2,

@@ -3,7 +3,7 @@ body {
 }
 
 .content {
-  margin-top: 50px;
+  /* margin-top: 50px; */
   padding-bottom: 50px;
 }
 .undecorated-link:hover {
@@ -171,7 +171,7 @@ flash-message .alert .close{
 
 .text-success {
   color: #3c763d !important;
-  font-weight: bold !important;
+  font-weight: 900 !important;
 }
 
 .alert-success hr {

@@ -12,7 +12,11 @@ angular.module('storageunits').factory('Storageunits', ['$resource',
       },
       create: {
         method: 'POST'
-      }
+      },
+      'query': {
+        method: 'GET',
+        isArray: true
+      },
     });
   }
 ]);

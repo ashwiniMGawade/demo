@@ -36,8 +36,8 @@ angular.module('core')
    }    
   };
 })
-.controller('HeaderController', ['$rootScope', '$scope', '$state', '$filter', 'Authentication', 'Menus', '$window', 'Notifications', 'Flash', 'modalService', '$interval', '$sanitize', 'Idle', 'Admin', 'Support', 'Browser',
-  function ($rootScope, $scope, $state, $filter, Authentication, Menus, $window, Notifications, Flash, modalService, $interval, $sanitize, Idle, Admin, Support, Browser) {
+.controller('HeaderController', ['$rootScope', '$scope', '$state', '$filter', 'Authentication', 'Menus', '$window', 'Notifications', 'Flash', 'modalService', '$interval', '$sanitize', 'Idle', 'Admin', 'Support', 'Browser', '$stateParams',
+  function ($rootScope, $scope, $state, $filter, Authentication, Menus, $window, Notifications, Flash, modalService, $interval, $sanitize, Idle, Admin, Support, Browser, $stateParams) {
     
     if (Browser.getBrowser() !== 'chrome' && angular.element(document.getElementsByClassName("alert-warning")).length === 0) {
       Flash.create('warning', '<strong ng-non-bindable>' + $sanitize("Please use Google Chrome for best results on the Virtual Storage portal.") + '</strong>', 900000, { class: '', id: '' }, true);
@@ -51,6 +51,40 @@ angular.module('core')
     $scope.doubleMenus = [];
     // Get the topbar menu
     $scope.menu = Menus.getMenu('topbar');
+
+    // $scope.$on('$viewContentLoaded', function(){
+    //   //Here your view content is fully loaded !!
+    //   console.log("content loaded")
+    //   Luci.Navigation.init();
+    // });
+
+    $scope.getState = function(state, name) {
+      if (state =='dashboards.details') {
+        $state.go(state, {type: angular.lowercase(name)});
+      } else {
+        $state.go(state)
+      }
+    }
+
+    $scope.getChildClass = function(item) { 
+       
+      if ($stateParams.type === angular.lowercase(item.title)) {
+        return 'luci-navigation__link--is-active'
+      } else {
+        var currentStateSplit = $state.current.name.split('.');
+        var itemStateSplit = item.state.split('.')
+        return  ($state.current.name === item.state || currentStateSplit[0] == itemStateSplit[0] ) && $stateParams.type == undefined ? 'luci-navigation__link--is-active': '';
+      }      
+    }
+
+    $scope.getParentClass = function(name) {
+      // console.log("parent", name, $state.current)
+      if ($state.current.data) {
+        return $state.current.data.parent === name ? 'luci-navigation__link--is-active  luci-navigation__link--is-expanded': ''
+      }
+      return  '';
+    }
+
 
     $scope.toggleSubMenu = function($event, toggle) {     
       if (toggle) {        

@@ -7,7 +7,7 @@ angular.module('pods').run(['Menus',
     // Add the pods dropdown item
     Menus.addSubMenuItem('topbar', 'administration', {
       title: 'Pods',
-      state: 'pods',
+      state: 'pods.list',
       type: 'dropdown',
       roles: featuresSettings.roles.pod.list,
       position: 2,

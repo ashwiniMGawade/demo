@@ -188,5 +188,10 @@ module.exports = {
     'bindCredentials': process.env.LDAP_BIND_CREDENTIALS,
     'searchBase': process.env.LDAP_SEARCH_BASE,
     'searchFilterAttr': process.env.LDAP_SEARCH_FILTER_ATTR
+  },
+  rabitmq: {
+    'user': 'admin',
+    'password': 'netapp123',
+    'host': 'amqp://10.216.51.81'
   }
 };

@@ -11,7 +11,8 @@ module.exports = {
         'public/lib/bootstrap/dist/css/bootstrap-theme.css',
         'public/lib/angular-ui-notification/dist/angular-ui-notification.css',
         'public/lib/ng-table/dist/ng-table.css',
-        'public/assets/css/fonts/447892/DDDB34F581F073045.css'
+        'public/assets/css/fonts/447892/DDDB34F581F073045.css',
+        'public/assets/css/luci.css'
         // endbower
       ],
       js: [
@@ -35,6 +36,7 @@ module.exports = {
         'public/lib/d3/d3.min.js',
         'public/lib/d3-legend/d3-legend.min.js',
         'public/assets/js/d3-tip.js',
+        'public/assets/js/luci.js',
         'public/lib/angular-sanitize/angular-sanitize.min.js',
         'public/lib/ng-idle/angular-idle.min.js'
         // endbower

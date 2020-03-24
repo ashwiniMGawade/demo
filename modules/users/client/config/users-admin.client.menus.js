@@ -7,7 +7,7 @@ angular.module('users.admin').run(['Menus',
     // Add the Users dropdown list item
     Menus.addSubMenuItem('topbar', 'administration', {
       title: 'Users',
-      state: 'admin',
+      state: 'admin.users',
       type: 'dropdown',
       roles: featuresSettings.roles.user.list,
       position: 7,

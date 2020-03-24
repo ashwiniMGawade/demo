@@ -9,11 +9,12 @@ angular.module('dashboards').controller('DashboardsHealthController', ['$scope',
     $scope.scope = "tenant";
     $scope.custom = {};
 
+    
     console.log($stateParams)
     $scope.type = $stateParams.type
     console.log($scope.type);
     $scope.data = []
-  
+
     var results = Health.query({"type":$scope.type});
     $scope.isLoading = true;
     results.$promise.then(function(results) {

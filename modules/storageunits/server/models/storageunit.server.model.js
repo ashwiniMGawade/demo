@@ -75,7 +75,7 @@ var StorageunitSchema = new Schema({
   protocol: {
     type: String,
     enum: {
-      values: ['cifs', 'nfs', 'iscsi'],
+      values: ['cifs', 'nfs', 'iscsi', 'fc'],
       message: '`{VALUE}` not a valid value for protocol'
     },
     required: 'Storage Unit protocol required'
