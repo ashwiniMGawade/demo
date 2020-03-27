@@ -31,31 +31,31 @@ var StorageunitSchema = new Schema({
     minlength: [3, 'Storage unit code, Minimum 3 char required'],
     match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit code can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
   },
-  storagegroup: {
-    type: Schema.ObjectId,
-    ref: 'Storagegroup',
-    required: 'Storage group required'
-  },
-  tenant: {
-    type: Schema.ObjectId,
-    ref: 'Tenant'
-  },
-  partner: {
-    type: Schema.ObjectId,
-    ref: 'Tenant'
-  },
-  subscription: {
-    type: Schema.ObjectId,
-    ref: 'Subscription'
-  },
-  subtenant: {
-    type: Schema.ObjectId,
-    ref: 'Subtenant'
-  },
-  server: {
-    type: Schema.ObjectId,
-    ref: 'Server'
-  },
+  // storagegroup: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Storagegroup',
+  //   required: 'Storage group required'
+  // },
+  // tenant: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Tenant'
+  // },
+  // partner: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Tenant'
+  // },
+  // subscription: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Subscription'
+  // },
+  // subtenant: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Subtenant'
+  // },
+  // server: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Server'
+  // },
   sizegb: {
     type: Number,
     min: [100, 'Storage Unit Size should be greater than or equal to 100'],
@@ -72,6 +72,40 @@ var StorageunitSchema = new Schema({
     trim: true
     //match:[/^((((iqn\.[0-9]{4}-[0-9]{2}\.(([a-zA-Z]+[a-zA-Z0-9\-]*)+(.[a-zA-Z]+[a-zA-Z0-9\-]*)*)+(:[a-zA-Z0-9]+))+(,((iqn\.[0-9]{4}-[0-9]{2}\.(([a-zA-Z]+[a-zA-Z0-9\-]*)+(.[a-zA-Z]+[a-zA-Z0-9\-]*)*)+(:[a-zA-Z0-9]+)))+)*)|(((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+((,((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+))*)))$/, 'Please enter valid ACL']
   },
+  readWriteClients: {
+    type: String,
+    trim: true,
+    required: function() { return this.protocol === 'nfs' ? 'Read write clients are required' : false; },
+  },
+  readOnlyClients: {
+    type: String,
+    trim: true,
+    required: function() { return this.protocol === 'nfs' ? 'Read write clients are required' : false; },
+  },
+  igroup: {
+    type: String,
+    trim: true,
+    required: function() { return this.protocol === 'iscsi' || this.protocol === 'fc' ? 'Storage Unit igroup is required' : false; },
+    maxlength: [32, 'Storage unit igroup, Maximum 32 char allowed'],
+    minlength: [3, 'Storage unit igroup, Minimum 3 char required'],
+    match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit igroup can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
+  },
+  application: {
+    type: String,
+    enum: {
+      values: ["Ipru","Omnidocs","Email Archival","Icore","Multiple Apps", "Sysadmin Root Backup", "ISG","Lombard"],
+      message: '`{VALUE}` not a valid value for application'
+    },
+    required: 'Storage Unit application is required'
+  },
+  mapping: {
+    type: String,
+    enum: {
+      values: ["existing","new"],
+      message: '`{VALUE}` not a valid value for Mapping'
+    },
+    required: function() { return this.protocol === 'iscsi' || this.protocol === 'fc' ? 'Storage Unit mapping is required' : false; },
+  },
   protocol: {
     type: String,
     enum: {
@@ -85,7 +119,8 @@ var StorageunitSchema = new Schema({
     enum: {
       values: ['', 'aix', 'hpux', 'hyper_v', 'image', 'linux', 'netware', 'openvms', 'solaris', 'solaris_efi', 'vmware', 'windows', 'windows_2008', 'windows_gpt', 'xen'],
       message: '`{VALUE}` not a valid value for lunOS'
-    }
+    },
+    required: function() { return this.protocol === 'iscsi' || this.protocol === 'fc' ? 'Storage Unit lunos is required' : false; },
   },
   lunId: {
     type: Number,
@@ -115,20 +150,21 @@ StorageunitSchema.pre('save', function (next, done) {
     next();
   } else {
     var self = this;
-    mongoose.model('Storagegroup').findById(self.storagegroup).exec(function (err, storagegroup) {
-      if (err) {
-        logger.info('Storageunit Model: ' + err);
-      } else if (!storagegroup) {
-        logger.info('Storageunit Model: Invalid Storagegroup ID');
-      } else {
-        self.tenant = storagegroup.tenant_id;
-        self.subtenant = storagegroup.subtenant_id;
-        self.server = storagegroup.server;
-        self.partner = storagegroup.partner;
-        self.subscription = storagegroup.subscription;
-      }
-      next();
-    });
+    // mongoose.model('Storagegroup').findById(self.storagegroup).exec(function (err, storagegroup) {
+    //   if (err) {
+    //     logger.info('Storageunit Model: ' + err);
+    //   } else if (!storagegroup) {
+    //     logger.info('Storageunit Model: Invalid Storagegroup ID');
+    //   } else {
+    //     self.tenant = storagegroup.tenant_id;
+    //     self.subtenant = storagegroup.subtenant_id;
+    //     self.server = storagegroup.server;
+    //     self.partner = storagegroup.partner;
+    //     self.subscription = storagegroup.subscription;
+    //   }
+    //   next();
+    // });
+    next();
   }
 });
 
@@ -137,8 +173,9 @@ StorageunitSchema.pre('save', function (next, done) {
  */
 StorageunitSchema.pre('validate', function (next, done) {
   var self = this;
+  next();
 
-  validStoragegroup();
+  // validStoragegroup();
 
   // Only checked with a new object (can not change storage group)
   function validStoragegroup() {

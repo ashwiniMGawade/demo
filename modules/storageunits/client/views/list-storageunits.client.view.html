@@ -27,8 +27,8 @@
       <tr ng-repeat="storageunit in $data">
         <td ng-bind="storageunit.name" title="'Name'" sortable="'name'" class="capitalize breakword"></td>
         <td ng-bind="storageunit.code" title="'Code'" sortable="'code'" class="breakword"></td>
-        <td ng-if="isRoot || isL1ops" ng-bind="storageunit.tenant.name" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
-        <td ng-bind="storageunit.subtenant.name" title="'Subtenant'" sortable="'subtenant.name'" class="breakword"></td>
+        <td ng-bind="storageunit.application" title="'Application'" sortable="'application'" class="breakword"></td>
+        <td ng-bind="storageunit.protocol" title="'Protocol'" sortable="'protocol'" class="breakword" style="text-transform: uppercase;"></td>
         <td ng-bind="storageunit.server.name" ng-attr-title="{{labels.server.serverName}}" title="labels.server.serverName" sortable="'server.name'" class="breakword"></td>
         <td ng-bind="storageunit.storagegroup.name" title="'Volume'" sortable="'storagegroup.name'" class="breakword"></td>        
         <td ng-bind="storageunit.status" title="'Status'" sortable="'status'"></td>

@@ -111,6 +111,7 @@ flash-message{
   position: fixed;
   left:0;
   right:0;
+  top:55px;
   z-index: 10;
 }
 flash-message .alert{

@@ -53,6 +53,13 @@ exports.invokeRolesPolicies = function () {
   acl.allow([{
     roles: roles,
     allows: [{
+      resources: '/api/lookups/applications',
+      permissions: ['get']
+    }]
+  }]);
+  acl.allow([{
+    roles: roles,
+    allows: [{
       resources: '/api/lookups/icrstatus',
       permissions: ['get']
     }]

@@ -40,6 +40,10 @@ exports.listLunOs = function (req, res) {
   res.json(Storageunit.schema.path('lunOs').enumValues);
 };
 
+exports.listApplications = function (req, res) {
+  res.json(Storageunit.schema.path('applications').enumValues);
+};
+
 exports.listICMStatus = function (req, res) {
   res.json(Icr.schema.path('status').enumValues);
 };

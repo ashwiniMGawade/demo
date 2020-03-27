@@ -29,6 +29,10 @@ module.exports = function (app) {
   app.route('/api/lookups/lunos')
     .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listLunOs);
 
+  //All allowed applications in storageunits
+  app.route('/api/lookups/applications')
+  .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listApplications);
+
   //All allowed ICM status
   app.route('/api/lookups/icrstatus')
     .get([auth.loginODIN, lookupsPolicy.isAllowed], lookups.listICMStatus);

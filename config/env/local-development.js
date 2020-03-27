@@ -35,15 +35,15 @@ module.exports = {
 
 module.exports = {
   db: {
-    // uri: process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/mean-dev',
+    // uri: process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/nse-dev',
     // options: {    
     // }
-    uri: "mongodb://dev-kubecluster.ausngs.netapp.au:32680/mean-dev",   //"mongodb://nse-docker01.ausngs.netapp.au/mean-dev",
+    uri: "mongodb://10.216.51.81:27017/mean-dev",   //"mongodb://nse-docker01.ausngs.netapp.au/mean-dev",
     options: {
-      user: "root",
-      pass: "Netapp01!",
+      user: "nse",
+      pass: "netapp123",
       auth: {
-          authdb: 'admin'
+          authdb: 'mean-dev'
       }      
     }
   },
@@ -51,10 +51,10 @@ module.exports = {
     authorization:"Basic YWRtaW46TmV0YXBwMDEh",
     sql: {
       connectionLimit : 5,
-      host: "10.128.113.180",
-      user: 'root',
-      password: 'MH3SG5MYDD' ,
-      database: 'cm_storage' 
+      host: '10.216.51.70',
+      user: 'ntapnse',
+      password: 'netapp123' ,
+      database: 'netapp_model_view' 
     },
     refreshRate: '30000',
     getUUIDtrails: 10,

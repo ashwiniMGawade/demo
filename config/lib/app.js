@@ -51,10 +51,10 @@ module.exports.start = function start(callback) {
       console.log('--');
 
       //startring the rabitmq connection
-      // rabitmqService.start();
+      rabitmqService.start();
 
-      // setInterval(function() {
-      //   rabitmqService.publish("", "jobs", new Buffer("work work work"));
+      // setTimeout(function() {
+      //   rabitmqService.publisher("work work work");
       // }, 1000);
 
       if (callback) callback(app, db, config);

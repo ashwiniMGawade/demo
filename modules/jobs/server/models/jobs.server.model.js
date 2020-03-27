@@ -30,10 +30,13 @@ var JobSchema = new Schema({
     },
     required: 'Operation required'
   },
-  module: {
+  objectType: {
     type: String,
     trim: true,
     required: 'Module required'
+  },
+  objectId: {
+    type: Schema.ObjectId
   },
   payload: {
     type: Object
@@ -71,7 +74,7 @@ var JobSchema = new Schema({
 JobSchema.statics.create = function (req, module, callback) {
   var _this = new this();
   _this.user = {'userId' : req.user._id, 'username' : req.user.username};
-  _this.module = module;
+  _this.objectType = module;
   _this.operation = getOperation(req.method);
   _this.payload = sanitizeMessage.sanitizeObjectForLoggerMessage(req.body);
   if(req.user.tenant && _this.module !== 'notification'){

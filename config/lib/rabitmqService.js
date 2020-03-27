@@ -9,19 +9,27 @@ var amqp = require('amqplib/callback_api'),
   config = require('../config'),
   path = require('path');
 
-var q = 'tasks';
+let channel = null;
+
+var q = 'new_provision';
 
 var bail = function(err) {
     console.error(err);
     process.exit(1);
-  }
+}
 
-var publisher = function() {
+var publisheToQueue = function(message) {
     amqpConn.createChannel(on_open);
     function on_open(err, ch) {
+      channel = ch;
       if (err != null) closeOnErr(err);
-      ch.assertQueue(q);
-      ch.sendToQueue(q, Buffer.from('something to do'));
+      channel.assertQueue(q);
+      var options = {
+          headers: {
+              "content-type":"application/json"
+          }
+      }
+      channel.sendToQueue(q, Buffer.from(JSON.stringify(message)));
     }
 }
 
@@ -66,11 +74,11 @@ var start = function() {
 }
 
 var whenConnected = function() {
-    publisher();
-    // consumer(conn);
+   console.log("after connection is made")
 }
 
 exports.start = start;
-exports.publisher = publisher;
+exports.publisheToQueue = publisheToQueue;
+exports.connection = amqpConn
 
 

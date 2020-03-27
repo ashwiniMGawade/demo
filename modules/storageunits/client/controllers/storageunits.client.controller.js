@@ -21,11 +21,17 @@ angular.module('storageunits')
      .then(function(response) {
          $scope.validOSToAssign = response.data;
       });
+    $http.get('api/lookups/applications')
+      .then(function(response) {
+          $scope.applications = response.data;
+       });
 
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
     $scope.isL1ops = Authentication.user.roles.indexOf('l1ops') !== -1;
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
     $scope.isUser = Authentication.user.roles.indexOf('user') !== -1;
+
+    $scope.applications = ["Ipru","Omnidocs","Email Archival","Icore","Multiple Apps", "Sysadmin Root Backup", "ISG","Lombard"];
 
 
     var flashTimeout = 3000;
@@ -81,8 +87,6 @@ angular.module('storageunits')
     $scope.removeTag = function(index) {
       $scope.tags.splice(index, 1);
     }
-
-    
 
     var prepareTagsObjectFromScope = function(scopeTags) {
       var tags = [];
@@ -144,17 +148,33 @@ angular.module('storageunits')
 
       var tags = prepareTagsObjectFromScope(this.tags);
 
+    
       // Create new storage unit object
       var storageunit = new Storageunits({
         name: $sanitize(this.name),
         code: $sanitize(this.code),
-        storagegroupId: $sanitize(this.storagegroupId),
-        sizegb: $sanitize(this.sizegb),
-        acl: $sanitize(this.acl),
+        // storagegroupId: $sanitize(this.storagegroupId),
+        sizegb: this.sizegb,
+        // acl: $sanitize(this.acl),
         protocol: $sanitize(this.protocol),
-        lunOs: $sanitize(this.lunOs),
-        lunId: $sanitize(this.lunId)
+        // lunOs: $sanitize(this.lunOs),
+        // lunId: $sanitize(this.lunId)
+        application:$sanitize(this.application)
       });
+
+      if(storageunit.protocol == "nfs") {
+        storageunit.readWriteClients = $sanitize(this.aclReadWrite)
+        storageunit.readOnlyClients = $sanitize(this.aclReadOnly)
+      }
+
+      
+      if(storageunit.protocol == "iscsi" || storageunit.protocol == "fc") {
+        storageunit.mapping = this.mapping
+        storageunit.acl = $sanitize(this.acl)
+        storageunit.igroup = $sanitize(this.igroup)
+        storageunit.lunOs =$sanitize(this.lunOs),
+        storageunit.lunId = $sanitize(this.lunId)
+      }
 
       //Redirect to list page after save
       storageunit.$create(function (response) {
@@ -164,12 +184,16 @@ angular.module('storageunits')
         // Clear form fields
         $scope.name = '';
         $scope.code = '';
-        $scope.storagegroupId = '';
         $scope.sizegb = '';
         $scope.acl = '';
         $scope.protocol = '';
+        storageunit.igroup = "";
         $scope.lunOs = '';
         $scope.lunId = '';
+        storageunit.mapping = "";
+        storageunit.readWriteClients = "";
+        storageunit.readOnlyClients = "";
+
 
          if (tags.length > 0) {
           var tag = new Tags({'Tags': tags, objectId: response.storageunitId });

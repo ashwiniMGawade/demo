@@ -9,6 +9,7 @@ var _ = require('lodash'),
   ip = require('ip'),
   util = require('util'),
   mongoose = require('mongoose'),
+  rabbitMqService = require(path.resolve('./config/lib/rabitmqService')),
   featuresSettings = require(path.resolve('./config/features')),
   Storageunit = mongoose.model('Storageunit'),
   Subscription = mongoose.model('Subscription'),
@@ -56,30 +57,31 @@ exports.create = function (req, res) {
   storageunit.code = req.body.code || '';
   storageunit.sizegb = req.body.sizegb;
   storageunit.protocol = req.body.protocol || '';
+  storageunit.application = req.body.application || '';
 
-  if (storageunit.protocol === 'iscsi' && req.body.lunOs) {
-    storageunit.lunOs = req.body.lunOs;
-  }
-
-  if (storageunit.protocol === 'iscsi' && req.body.lunId) {
-    storageunit.lunId = req.body.lunId;
-  }
-
-  if(storageunit.protocol === 'iscsi' && !storageunit.lunOs){
-    return respondError(res, 400, 'LUN OS is required.');
-  }
-
-  if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'nfs') {
+  if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
+    storageunit.lunOs = req.body.lunOs  || '';
+    storageunit.lunId = req.body.lunId || '';
     storageunit.acl = req.body.acl || '';
+    storageunit.igroup = req.body.igroup || '';
+    storageunit.mapping = req.body.mapping || '';
   }
 
-  if (req.body.storagegroupId) {
-    if (mongoose.Types.ObjectId.isValid(req.body.storagegroupId)) {
-      storageunit.storagegroup = mongoose.Types.ObjectId(req.body.storagegroupId);
-    } else {
-      storageunit.storagegroup = mongoose.Types.ObjectId();
-    }
+  
+
+ 
+  if (storageunit.protocol === 'nfs') {
+    storageunit.readWriteClients = req.body.readWriteClients || '';
+    storageunit.readOnlyClients = req.body.readOnlyClients || '';
   }
+
+  // if (req.body.storagegroupId) {
+  //   if (mongoose.Types.ObjectId.isValid(req.body.storagegroupId)) {
+  //     storageunit.storagegroup = mongoose.Types.ObjectId(req.body.storagegroupId);
+  //   } else {
+  //     storageunit.storagegroup = mongoose.Types.ObjectId();
+  //   }
+  // }
 
   storageunit.validate(function(err) {
     if (err) {
@@ -90,7 +92,7 @@ exports.create = function (req, res) {
       });
       return respondError(res, 400, errMsg);
     } else {
-      Job.create(req, 'storageunit', function(err, createJobRes) {
+      Job.create(req, 'storageunits', function(err, createJobRes) {
         suCreateJob = createJobRes;
         storageunit.save(function (err) {
           if (err) {
@@ -109,13 +111,8 @@ exports.create = function (req, res) {
                 return respondError(res, 400, errorHandler.getErrorMessage(err));
               } else {
                 storageunit = storageunitPopulated;
-                res.json(storageunit);
-
-                if (featuresSettings.paymentMethod.prePaid) {
-                  updateSubscription();
-                } else {
-                  createSu();
-                }
+                res.json(storageunit);                
+                createSu();
               }
             });
           }
@@ -124,69 +121,48 @@ exports.create = function (req, res) {
     }
   });
 
-  function updateSubscription() {
-    Subscription.findById(storageunit.subscription, function (err, subscription) {
-      if (err) {
-        return respondError(res, 400, errorHandler.getErrorMessage(err));
-      } else if (!subscription) {
-        return respondError(res, 400, 'No Subscription associated with that Storage Group\'s Server has been found');
-      } else {
-        storageunit.populate('storagegroup', 'name code tier', function (err, storageunitPopulated) {
-          if (err) {
-            suCreateJob.update('Failed', err, storageunit);
-            return respondError(res, 400, errorHandler.getErrorMessage(err));
-          } else {
-            _.forEach(subscription.storagePack, function (value, key) {
-              if (value.class === 'ontap-' + storageunitPopulated.storagegroup.tier) {
-                var classElements = _.filter(subscription.storagePack, {'class': value.class});
-                if (classElements && classElements.length > 1) {
-                  suCreateJob.update('Failed', 'duplicate subscription storage classes', storageunitPopulated);
-                  return respondError(res, 400, errorHandler.getErrorMessage(err));
-                } else {
-                  subscription.storagePack[key].sizegb.available = subscription.storagePack[key].sizegb.available - storageunitPopulated.sizegb;
-                  subscription.save(function (err) {
-                    if (err) {
-                      suCreateJob.update('Failed', err, storageunit);
-                      return respondError(res, 400, errorHandler.getErrorMessage(err));
-                    } else {
-                      createSu();
-                    }
-                  });
-                }
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-
   function createSu() {
     var jobId;
     var args = {
-      code: storageunit.code,
+      name: storageunit.code,
       protocol: storageunit.protocol,
-      server: storageunit.server.code || '',
-      storagegroup: storageunit.storagegroup.code,
-      size_mb: 1024 * storageunit.sizegb,
-      acl: storageunit.acl,
-      lun_os: storageunit.lunOs || '',
-      lun_id: storageunit.lunId || ''
+      size_gb: storageunit.sizegb,
+      application: storageunit.application,
+      svmName: "", // need to work on it
+      objectType: "storageunits",
+      action: "create",
+      objectId: storageunit._id,
+      jobId:suCreateJob._id
     };
+
+    if (storageunit.protocol === "nfs") {
+      args.acl = {
+        readWrite: storageunit.readWriteClients,
+        readOnly: storageunit.readOnlyClients
+      }
+    }
+
+    if (storageunit.protocol === "iscsi" || storageunit.protocol === "fc") {
+      args.existingServer = storageunit.mapping == "existing" ? true : false;
+      args.igroupName = storageunit.igroup;
+      args.acl = storageunit.mapping == "new" ? storageunit.acl : "";
+    }
 
     logger.info('Storage unit create Args:' + util.inspect(args, {showHidden: false, depth: null}));
 
-    clientWfa.suCreateExec(args, function(err, resWfa) {
-      if (err) {
-        suCreateJob.update('Failed', 'Storage unit create: Failed to create WFA, Error:' + err, storageunit);
-        logger.info('Storage unit create: Failed to create, Error:' + err);
-        handleErrorFromWFA(storageunit);
-      } else {
-        jobId = resWfa.jobId;
-        logger.info('Storage Unit: Response from WFA: ' + util.inspect(resWfa, {showHidden: false, depth: null}));
-        untilCreated(jobId);
-      }
-    });
+    rabbitMqService.publisheToQueue(args);
+
+    // clientWfa.suCreateExec(args, function(err, resWfa) {
+    //   if (err) {
+    //     suCreateJob.update('Failed', 'Storage unit create: Failed to create WFA, Error:' + err, storageunit);
+    //     logger.info('Storage unit create: Failed to create, Error:' + err);
+    //     handleErrorFromWFA(storageunit);
+    //   } else {
+    //     jobId = resWfa.jobId;
+    //     logger.info('Storage Unit: Response from WFA: ' + util.inspect(resWfa, {showHidden: false, depth: null}));
+    //     untilCreated(jobId);
+    //   }
+    // });
   }
 
   function untilCreated(jobId) {
