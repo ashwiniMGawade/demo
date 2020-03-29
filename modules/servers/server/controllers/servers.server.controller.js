@@ -12,7 +12,7 @@ var _ = require('lodash'),
   Server = mongoose.model('Server'),
   Icr = mongoose.model('Icr'),
   Pod = mongoose.model('Pod'),
-  Site = mongoose.model('Site'),
+  Cluster = mongoose.model('ontap_clusters'),
   Subscription = mongoose.model('Subscription'),
   Job = mongoose.model('Job'),
   config = require(path.resolve('./config/config')),
@@ -70,215 +70,58 @@ exports.create = function (req, res) {
 
   server.user = req.user;
   server.name = req.body.name;
-  server.vlan = req.body.vlan;
-  server.subnet = req.body.subnet;
+  server.protocols = req.body.protocols;
 
-  if (featuresSettings.server.gateway.enabled) {
-    server.gateway = req.body.gateway;
-  }  
-
-  if(req.body.siteId){
-    if(mongoose.Types.ObjectId.isValid(req.body.siteId)){
-      server.site =  mongoose.Types.ObjectId(req.body.siteId);
+  if(req.body.clusterId){
+    if(mongoose.Types.ObjectId.isValid(req.body.clusterId)){
+      server.cluster =  mongoose.Types.ObjectId(req.body.clusterId);
     }else{
-      server.site = mongoose.Types.ObjectId();
+      server.cluster = mongoose.Types.ObjectId();
     }
   }
-  if(req.body.subtenantId){
-    if(mongoose.Types.ObjectId.isValid(req.body.subtenantId)){
-      server.subtenant =  mongoose.Types.ObjectId(req.body.subtenantId);
-    }else{
-      server.subtenant = mongoose.Types.ObjectId();
-    }
-  }
-
-  if(req.body.subscriptionId){
-    if(mongoose.Types.ObjectId.isValid(req.body.subscriptionId)){
-      server.subscription =  mongoose.Types.ObjectId(req.body.subscriptionId);
-    }else{
-      server.subscription = mongoose.Types.ObjectId();
-    }
-  }
-
-  var cidrSubnet;
-  var site;
-  var pod;
+ 
 
   // The callback hell below is terrible and should be refactored at some
   // stage :( JL - 16 Mar 2018
 
   // Get site
   logger.info('SVM Create: server.site: ' + util.inspect(server.site, {showHidden: false, depth: null}));
-  Site.findById(server.site).populate('site','name code').exec(function (err, site) {
+  Cluster.findById(server.cluster).populate('cluster','name code').exec(function (err, cluster) {
     if(err) {
-      return res.status(404).send({ message: 'Failed to retrive site' });
-    } else if (!site) {
-      return res.status(404).send({ message: 'No site with that identifier has been found' });
+      return res.status(404).send({ message: 'Failed to retrive cluster' });
+    } else if (!cluster) {
+      return res.status(404).send({ message: 'No cluster with that identifier has been found' });
     }
-    logger.info('SVM Create: Site.findById(): site: ' + util.inspect(site, {showHidden: false, depth: null}));
-
-    // Get subscription
-    logger.info('SVM Create: server.subscription: ' + util.inspect(server.subscription, {showHidden: false, depth: null}));
-    Subscription.findById(server.subscription).populate('subscription','name code').exec(function (err, subscription) {
-      if(err) {
-        return res.status(404).send({ message: 'Failed to retrive subscription' });
-      } else if (!subscription) {
-        return res.status(404).send({ message: 'No subscription with that identifier has been found' });
-      }
-      logger.info('SVM Create: Subscription.findById(): subscription: ' + util.inspect(subscription, {showHidden: false, depth: null}));
-
-      // Get Pod Code and Cluster
-      //dbWfa.getAdminVserver(site.code, subscription.code, function (err, adminVserver) {
-      fetchInfo.getAdminVserver(site.id, site.code, subscription.code, function (err, adminVserver) {
-        if(err) {
-          logger.error('SVM Create: Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err); 
-          return respondError(res, 400, 'Failed to retrieve Pod Code and Cluster Name from WFA. Error: ' + err);
-        } else {
-          logger.info("after fetch info adminvserver details");
-          logger.info(adminVserver);
-          // Get Pod
-          Pod.findByCode(adminVserver.podCode, function (err, podResults) {
-            if (podResults.length === 0) {
-              logger.error('SVM Create: Failed to retrieve Pod from Mongo - Pod Code: \"' + adminVserver.podCode + '\".');
-              return respondError(res, 400, 'Failed to retrieve Pod from Mongo - Pod Code: \"' + adminVserver.podCode + '\".');
-            } else {
-              // FIXME Pod is always (incorrectly) assumed to be the first and only pod within a site.
-              // Multiple pods can exist for a site, but this code only considers the first one
-              // returned. JL - 9 Mar 2018
-              pod = podResults[0];
-              
+    logger.info('SVM Create: Cluster.findById(): cluster: ' + util.inspect(cluster, {showHidden: false, depth: null}));
     
-              //Perform all model level validation and return error
-              server.validate(function(err){
-                if(err){
-                  var errMsg = {};
-                  _.forOwn(err.errors, function(error, field) {
-                    logger.info(field, error.message);
-                    errMsg[field] = error.message;
-                  });
-                  return respondError(res, 400, errMsg);
+    //Perform all model level validation and return error
+    server.validate(function(err){
+      if(err){
+        var errMsg = {};
+        _.forOwn(err.errors, function(error, field) {
+          logger.info(field, error.message);
+          errMsg[field] = error.message;
+        });
+        return respondError(res, 400, errMsg);
+      } else {
+          server.save(function (err) {
+            if (err) {
+              return respondError(res, 400, errorHandler.getErrorMessage(err));
+            } else {
+              server.populate('cluster', 'name uuid', function (err, serverPopulated) {
+                if (err){
+                  logger.info('SVM Create: Populate Error: ' + err);
+                  return respondError(res, 400, errorHandler.getErrorMessage(err));
                 } else {
-            
-                  // Validate VLAN.
-                  if(server.vlan) {
-            
-                    // VLAN was specified by user.
-                    if(!server.vlan.match(/^(?:[1-9]\d{0,2}|[1-3]\d{3}|40(?:[0-8]\d|9[0-3]))$/)) {
-                      return respondError(res, 400, 'Invalid VLAN \"' + server.vlan + '\" specified. A VLAN is an integer value in the range 1-4093.');
-                    }
-            
-                    // Verify that the user supplied VLAN is within the 
-                    // vlansAvailable range for the appropriate pod. If the supplied VLAN is
-                    // outside available range, a respondError() should be called. JL - 9 Mar 2018
-                    logger.info('SVM Create: server.vlan specified by user. VLAN: ' + server.vlan);
-            
-                    // Check to see if supplied VLAN is within vlansAvailable range.
-                    logger.info('SVM Create: pod.vlansAvailable: ' + util.inspect(pod.vlansAvailable, {showHidden: false, depth: null}));
-                    logger.info('SVM Create: _.toInteger(server.vlan): ' + util.inspect(_.toInteger(server.vlan), {showHidden: false, depth: null}));
-            
-                    if(_.indexOf(pod.vlansAvailable, _.toInteger(server.vlan)) === -1) {
-                      logger.error('SVM Create: VLAN \"' + server.vlan + '\" specified by user is not within vlansAvailable defined in pod \"' + adminVserver.podCode + '\".');
-                      return respondError(res, 400, 'VLAN \"' + server.vlan + '\" specified is not in the available VLAN list defined in pod \"' + adminVserver.podCode + '\".');
-                    } 
-                  } else {
-                    // Ensure that there are VLANs available in the pod to pop one off the list.
-                    logger.info('SVM Create: pod.vlansAvailable.length: ' + pod.vlansAvailable.length);
-                    if(pod.vlansAvailable.length === 0) {
-                      logger.error('SVM Create: Zero VLANs available in pod \"' + adminVserver.podCode + '\". Admin will need to add more VLANs to this Pod (if there are any available).');
-                      return respondError(res, 400, 'Zero VLANs available in pod \"' + adminVserver.podCode + '\".');
-                    }
-                  }
-            
-                  // Validate subnet.
-                  cidrSubnet = ip.cidrSubnet(server.subnet);
-                  //Masking and suggesting the subnet IP for user
-                  if(server.subnet.split('/')[0]!==cidrSubnet.networkAddress){
-                    return respondError(res, 400, "Valid IP for subnet after masking is "+cidrSubnet.networkAddress);
-                  }
-                  //Validating the gateway is in subnet
-                  if(server.gateway){
-                    if(!cidrSubnet.contains(server.gateway)){
-                      return respondError(res, 400, "Gateway IP is not in the Subnet");
-                    }else if(((ip.toLong(cidrSubnet.firstAddress) + 2) < ip.toLong(server.gateway)) &&
-                             ((ip.toLong(cidrSubnet.firstAddress) + 31) > ip.toLong(server.gateway))){
-                      return respondError(res, 400, "Gateway IP is already reserved for the Server");
-                    }else if(cidrSubnet.broadcastAddress === server.gateway){
-                      return respondError(res, 400, "Gateway IP cannot be the same as the Subnet Broadcast IP");
-                    }else if(cidrSubnet.networkAddress === server.gateway){
-                      return respondError(res, 400, "Gateway IP cannot be the same as the Subnet IP");
-                    }
-                  }else{
-                    server.gateway = cidrSubnet.firstAddress;
-                  }
-                             
-                  console.log(adminVserver, "before calling createsvm");
-                  server.cluster_id = mongoose.Types.ObjectId(adminVserver.clusterId);
-                  console.log("server with cluster", server); 
-
-                  Job.create(req, 'server', function(err, createJobRes) {
-                    serverCreateJob = createJobRes;
-                    server.save(function (err) {
-                      if (err) {
-                        serverCreateJob.update('Failed', "Err on Save : " + err, server);
-                        return respondError(res, 400, errorHandler.getErrorMessage(err));
-                      } else {
-                        server.populate('tenant','name code')
-                              .populate('partner','name code')
-                              .populate('subtenant','name code')
-                              .populate('subscription','name code')
-                              .populate('user', 'username displayName')
-                              .populate('cluster_id', 'name uuid')
-                              .populate('site','name code', function (err, serverPopulated) {
-                          if (err){
-                            logger.info('SVM Create: Populate Error: ' + err);
-                            serverCreateJob.update('Failed', "Err on Populate : " + err, server);
-                            return respondError(res, 400, errorHandler.getErrorMessage(err));
-                          } else {
-                            server = serverPopulated;                
-                            logger.info('SVM Create: Server Populated: ' + util.inspect(server, {showHidden: false, depth: null}));
-                            logger.info("called sendServerResponse");
-                            sendServerResponse(res, server);
-            
-                            // Process VLAN, whether it was supplied by user or popped from the list
-                            // of available VLANs within that pod.
-                            if(!server.vlan) {
-                              // VLAN wasn't specified by user. Use the next VLAN from the vlansAvailable array.
-                              server.vlan = pod.vlansAvailable.$shift();
-                              logger.info('SVM Create: server.vlan NOT specified by user. Using VLAN: ' + server.vlan);
-                            } else {
-                              // Remove user specifed VLAN from vlansAvailable array.
-                              pod.vlansAvailable.pull(_.toInteger(server.vlan));
-                              logger.info('SVM Create: pod.vlansAvailable after removing server.vlan: ' + util.inspect(pod.vlansAvailable, {showHidden: false, depth: null}));
-                            }
-            
-                            // Add VLAN to vlansUsed array.
-                            pod.vlansUsed.push(server.vlan);
-                            logger.info('SVM Create: pod.vlansUsed after pushing server.vlan: ' + util.inspect(pod.vlansUsed, {showHidden: false, depth: null}));
-                            pod.vlansUsed.sort(function(a,b) { return a-b });
-                            logger.info('SVM Create: pod.vlansUsed after sorting: ' + util.inspect(pod.vlansUsed, {showHidden: false, depth: null}));
-                
-                            logger.info('SVM Create: pod before saving: ' + util.inspect(pod, {showHidden: false, depth: null}));
-                            pod.save(function (err) {
-                              if (err) {
-                                logger.info('SVM Create: pod.save() failed: ' + err);
-                              } else {
-                                logger.info('SVM Create: pod.save() succeeded.');
-                                server.pod = pod;
-                                createSvm(adminVserver.clusterName);
-                              }
-                            });
-                            
-                          }
-                        });
-                      }
-                    });
-                  });
+                  server = serverPopulated;                
+                  logger.info('SVM Create: Server Populated: ' + util.inspect(server, {showHidden: false, depth: null}));
+                  logger.info("called sendServerResponse");
+                  sendServerResponse(res, server);
                 }
               });
             }
           });
-        }
-      });
+      }
     });
   });
 
@@ -937,19 +780,14 @@ exports.list = function (req, res) {
   } else {
     query = Server.find({}, { 'gateway': 0 });
   }
-  query
-    .populate('tenant','name code')
-    .populate('partner','name code')
-    .populate('subtenant','name code')
-    .populate('site','name code')
-    .populate('subscription','name code');
+  query.populate('cluster','name uuid');
 
-  if (_.includes(req.user.roles, 'root') || _.includes(req.user.roles, 'l1ops')) {
-  } else if (_.includes(req.user.roles, 'partner')) {
-    query.where({ $or:[ {'tenant':req.user.tenant }, {'partner':req.user.tenant } ] });
-  } else {
-    query.where({ 'tenant': req.user.tenant });
-  }
+  // if (_.includes(req.user.roles, 'root') || _.includes(req.user.roles, 'l1ops')) {
+  // } else if (_.includes(req.user.roles, 'partner')) {
+  //   query.where({ $or:[ {'tenant':req.user.tenant }, {'partner':req.user.tenant } ] });
+  // } else {
+  //   query.where({ 'tenant': req.user.tenant });
+  // }
 
   query.exec(function (err, servers) {
     respondList(err, servers);

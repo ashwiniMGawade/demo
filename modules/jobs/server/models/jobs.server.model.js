@@ -55,6 +55,9 @@ var JobSchema = new Schema({
   result: {
     type: Object
   },
+  last_error: {
+    type: String,
+  },
   comments: {
     type : String
   }, 

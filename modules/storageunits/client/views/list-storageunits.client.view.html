@@ -29,8 +29,9 @@
         <td ng-bind="storageunit.code" title="'Code'" sortable="'code'" class="breakword"></td>
         <td ng-bind="storageunit.application" title="'Application'" sortable="'application'" class="breakword"></td>
         <td ng-bind="storageunit.protocol" title="'Protocol'" sortable="'protocol'" class="breakword" style="text-transform: uppercase;"></td>
+        <td ng-bind="storageunit.cluster.name" title="'Cluster'" sortable="'cluster.name'" class="breakword"></td>  
         <td ng-bind="storageunit.server.name" ng-attr-title="{{labels.server.serverName}}" title="labels.server.serverName" sortable="'server.name'" class="breakword"></td>
-        <td ng-bind="storageunit.storagegroup.name" title="'Volume'" sortable="'storagegroup.name'" class="breakword"></td>        
+              
         <td ng-bind="storageunit.status" title="'Status'" sortable="'status'"></td>
         <td ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="storageunit.status!=='Operational'" ui-sref="storageunits.edit({storageunitId: storageunit.storageunitId})">Edit</button></td>
 

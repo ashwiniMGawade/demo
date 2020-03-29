@@ -1,19 +1,15 @@
 'use strict';
 
 // Servers controller
-angular.module('servers').controller('ServersController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Servers', 'Tags', 'Subtenants', 'Sites', 'Pods', 'Subscriptions', 'modalService', 'Flash', 'Tenants', '$sanitize', 
-  function ($scope, $stateParams, $location, $http, Authentication, Servers, Tags, Subtenants, Sites, Pods, Subscriptions, modalService, Flash, Tenants, $sanitize) {
+angular.module('servers').controller('ServersController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Servers',  'Clusters', 'modalService', 'Flash', '$sanitize', 
+  function ($scope, $stateParams, $location, $http, Authentication, Servers, Clusters, modalService, Flash, $sanitize) {
     $scope.authentication = Authentication;
-    $scope.sites = Sites;
-    $scope.subtenants = Subtenants;
+    $scope.clusters = Clusters.query();
     $scope.serverSettings = featuresSettings.server;
-    $scope.subscriptions = Subscriptions.query();
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
     $scope.isL1ops = Authentication.user.roles.indexOf('l1ops') !== -1;
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
     $scope.labels = featuresSettings.labels;
-    $scope.tags = [{      
-    }];
     $scope.serverAccessRoles = featuresSettings.roles.server;
     $scope.popoverMsg = "Please enter a passphrase or password with greater than 8 characters and maximum of 16 characters, no special characters, at least a digit and a letter."
     
@@ -30,59 +26,55 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
       }
     }
 
-    if($scope.isRoot) {
-      $scope.tenants = Tenants.query();
-      $scope.pods = Pods.query();
-      $scope.$watch("tenants", function(newVal, oldVal) {
-        if(newVal && newVal.length === 1){
-          $scope.tenantId = newVal[0].tenantId;
-        }
-      });
-    } else {
-      $scope.tenantId = $scope.authentication.user.tenant;
-    }
+    // if($scope.isRoot) {
+    //   $scope.tenants = Tenants.query();
+    //   $scope.pods = Pods.query();
+    //   $scope.$watch("tenants", function(newVal, oldVal) {
+    //     if(newVal && newVal.length === 1){
+    //       $scope.tenantId = newVal[0].tenantId;
+    //     }
+    //   });
+    // } else {
+    //   $scope.tenantId = $scope.authentication.user.tenant;
+    // }
 
-    $scope.$watch("tenantId", function(newVal, oldVal) {
-      if (newVal) {
-        $scope.populateSubtenant(newVal, function() {
-          if($scope.subtenants.length === 1){
-            $scope.subtenantId = $scope.subtenants[0].subtenantId;
-          }
-        });
-        $scope.populateSubscriptions($scope.siteId, newVal, function() {
-          if($scope.subscriptions.length === 1){
-            $scope.subscriptionId = $scope.subscriptions[0].subscriptionId;
-          }
-        });
-      }
-    });
+    // $scope.$watch("tenantId", function(newVal, oldVal) {
+    //   if (newVal) {
+    //     $scope.populateSubtenant(newVal, function() {
+    //       if($scope.subtenants.length === 1){
+    //         $scope.subtenantId = $scope.subtenants[0].subtenantId;
+    //       }
+    //     });
+    //     $scope.populateSubscriptions($scope.siteId, newVal, function() {
+    //       if($scope.subscriptions.length === 1){
+    //         $scope.subscriptionId = $scope.subscriptions[0].subscriptionId;
+    //       }
+    //     });
+    //   }
+    // });
 
-    $scope.addTag = function() {
-      $scope.tags.push({});
-    }
+    // $scope.addTag = function() {
+    //   $scope.tags.push({});
+    // }
 
-    $scope.removeTag = function(index) {
-      $scope.tags.splice(index, 1);
-    }
+    // $scope.removeTag = function(index) {
+    //   $scope.tags.splice(index, 1);
+    // }
 
-    var prepareTagsObjectFromScope = function(scopeTags) {
-      var tags = [];
-      angular.forEach(scopeTags, function(tag) {
-        var obj = {};
-        obj[tag.attr] = tag.val
-        tags.push(obj)
-      });
+    // var prepareTagsObjectFromScope = function(scopeTags) {
+    //   var tags = [];
+    //   angular.forEach(scopeTags, function(tag) {
+    //     var obj = {};
+    //     obj[tag.attr] = tag.val
+    //     tags.push(obj)
+    //   });
 
-      return tags;
-    }
+    //   return tags;
+    // }
    
     // Create new Server
     $scope.create = function (isValid) {
       
-      var tags = prepareTagsObjectFromScope(this.tags);
-
-      console.log(tags);
-
       $scope.error = null;
 
       if (!isValid) {
@@ -93,12 +85,8 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
       // Create new Server object
       var server = new Servers({
         name: $sanitize(this.name),
-        subtenantId: $sanitize(this.subtenantId),
-        siteId: $sanitize(this.siteId),
-        vlan: $sanitize(this.vlan),
-        subnet: $sanitize(this.subnet),
-        gateway: $sanitize(this.gateway),
-        subscriptionId: $sanitize(this.subscriptionId)
+        clusterId: $sanitize(this.clusterId),
+        protocols: $sanitize(this.protocols)
       });
 
       
@@ -198,8 +186,6 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
     // Find a list of Servers
     $scope.find = function () {
       $scope.servers = Servers.query();
-      $scope.subtenants = Subtenants.query();
-      $scope.sites = Sites.query();      
     };
 
     // Find existing Server
@@ -219,26 +205,26 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
         });
 
         //Get tags information
-        Tags.get({
-          objectId: $stateParams.serverId
-        }, function(data) {
-          data = data[0];
-          if (data.tags.length > 0) {
-            $scope.tags = [];
-            angular.forEach(data.tags, function(tagVal, tagKey) {
-              var obj = {};
+        // Tags.get({
+        //   objectId: $stateParams.serverId
+        // }, function(data) {
+        //   data = data[0];
+        //   if (data.tags.length > 0) {
+        //     $scope.tags = [];
+        //     angular.forEach(data.tags, function(tagVal, tagKey) {
+        //       var obj = {};
 
-              obj.attr = Object.keys(tagVal)[0];
-              obj.val = tagVal[obj.attr];
-              $scope.tags.push(obj);
-            });          
-          }
-        }, function(error) {
-            if(error.data.http_status_code == 404) {
-              $scope.freshTag = true;
-            }
-            //throwFlashErrorMessage(error.data.message);
-        });
+        //       obj.attr = Object.keys(tagVal)[0];
+        //       obj.val = tagVal[obj.attr];
+        //       $scope.tags.push(obj);
+        //     });          
+        //   }
+        // }, function(error) {
+        //     if(error.data.http_status_code == 404) {
+        //       $scope.freshTag = true;
+        //     }
+        //     //throwFlashErrorMessage(error.data.message);
+        // });
       }, function(error){
         $location.path('servers');
         throwFlashErrorMessage(error.data.message);
@@ -269,45 +255,5 @@ angular.module('servers').controller('ServersController', ['$scope', '$statePara
       });
     };
 
-    $scope.populateSubtenant = function(tenant, callback) {
-      var subtenants = Subtenants.query();
-      if (!tenant) {
-        $scope.subtenants = subtenants;
-      } else {
-        $scope.subtenants = [];
-        $scope.subtenantId = '';
-        subtenants.$promise.then(function(results) {
-          angular.forEach(subtenants, function(subtenant) {
-            if (subtenant.tenant && subtenant.tenant._id === tenant) {
-              $scope.subtenants.push(subtenant);
-            }
-          });
-          callback();
-        });
-      }
-    };
-
-    $scope.populateSubscriptions = function(site, tenant, callback) {
-      var subscriptions = Subscriptions.query();
-      tenant = tenant || $scope.authentication.user.tenant;
-      $scope.subscriptions = [];
-      if (tenant) {
-        $scope.subscriptionId = '';
-        subscriptions.$promise.then(function(results) {
-          angular.forEach(subscriptions, function(subscription) {
-            if (subscription.tenant && subscription.tenant._id === tenant) {
-              if (subscription.site) {
-                if (subscription.site._id === site) {
-                  $scope.subscriptions.push(subscription);
-                }
-              } else {
-                $scope.subscriptions.push(subscription);
-              }
-            }
-          });
-          callback();
-        });
-      }
-    };
   }
 ]);

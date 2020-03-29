@@ -58,6 +58,7 @@ exports.create = function (req, res) {
   storageunit.sizegb = req.body.sizegb;
   storageunit.protocol = req.body.protocol || '';
   storageunit.application = req.body.application || '';
+  storageunit.aggr = req.body.aggr || '';
 
   if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
     storageunit.lunOs = req.body.lunOs  || '';
@@ -66,22 +67,27 @@ exports.create = function (req, res) {
     storageunit.igroup = req.body.igroup || '';
     storageunit.mapping = req.body.mapping || '';
   }
-
-  
-
  
   if (storageunit.protocol === 'nfs') {
     storageunit.readWriteClients = req.body.readWriteClients || '';
     storageunit.readOnlyClients = req.body.readOnlyClients || '';
   }
 
-  // if (req.body.storagegroupId) {
-  //   if (mongoose.Types.ObjectId.isValid(req.body.storagegroupId)) {
-  //     storageunit.storagegroup = mongoose.Types.ObjectId(req.body.storagegroupId);
-  //   } else {
-  //     storageunit.storagegroup = mongoose.Types.ObjectId();
-  //   }
-  // }
+  if (req.body.clusterId) {
+    if (mongoose.Types.ObjectId.isValid(req.body.clusterId)) {
+      storageunit.cluster = mongoose.Types.ObjectId(req.body.clusterId);
+    } else {
+      storageunit.cluster = mongoose.Types.ObjectId();
+    }
+  }
+
+  if (req.body.serverId) {
+    if (mongoose.Types.ObjectId.isValid(req.body.serverId)) {
+      storageunit.server = mongoose.Types.ObjectId(req.body.serverId);
+    } else {
+      storageunit.server = mongoose.Types.ObjectId();
+    }
+  }
 
   storageunit.validate(function(err) {
     if (err) {
@@ -100,12 +106,7 @@ exports.create = function (req, res) {
             return respondError(res, 400, errorHandler.getErrorMessage(err));
           } else {
             storageunit.populate('server', 'name code')
-                       .populate('tenant', 'name code')
-                       .populate('partner', 'name code')
-                       .populate('subtenant', 'name code')
-                       .populate('user', 'username')
-                       .populate('subscription', 'name code')
-                       .populate('storagegroup', 'name code', function (err, storageunitPopulated) {
+              .populate('cluster', 'name uuid managementIp', function (err, storageunitPopulated) {
               if (err) {
                 suCreateJob.update('Failed', err, storageunit);
                 return respondError(res, 400, errorHandler.getErrorMessage(err));
@@ -126,26 +127,35 @@ exports.create = function (req, res) {
     var args = {
       name: storageunit.code,
       protocol: storageunit.protocol,
-      size_gb: storageunit.sizegb,
+      size: storageunit.sizegb,
       application: storageunit.application,
-      svmName: "", // need to work on it
+      vserverName : storageunit.server.name, 
+      aggrName : storageunit.aggr, 
+      clusterName: storageunit.cluster.name, 
       objectType: "storageunits",
       action: "create",
       objectId: storageunit._id,
       jobId:suCreateJob._id
     };
 
+    if (storageunit.protocol === "cifs") {
+      args.user_or_group = "";
+      args.permission = "";
+    }
+
     if (storageunit.protocol === "nfs") {
       args.acl = {
-        readWrite: storageunit.readWriteClients,
-        readOnly: storageunit.readOnlyClients
+        roRule : storageunit.readOnlyClients,
+        rwRule : storageunit.readWriteClients
       }
     }
 
     if (storageunit.protocol === "iscsi" || storageunit.protocol === "fc") {
       args.existingServer = storageunit.mapping == "existing" ? true : false;
       args.igroupName = storageunit.igroup;
-      args.acl = storageunit.mapping == "new" ? storageunit.acl : "";
+      args.initiators = storageunit.mapping == "new" ? storageunit.acl : "";
+      args.osType  = storageunit.lunOs || '';
+      args.lunId = storageunit.lunId || '';
     }
 
     logger.info('Storage unit create Args:' + util.inspect(args, {showHidden: false, depth: null}));
@@ -602,11 +612,7 @@ exports.list = function (req, res) {
 
   var query = Storageunit.find({})
     .populate('server', 'name code')
-    .populate('tenant', 'name code')
-    .populate('partner', 'name code')
-    .populate('subtenant', 'name code')
-    .populate('subscription', 'name code')
-    .populate('storagegroup', 'name code');
+    .populate('cluster', 'name managementIp')
 
   if (req.query.server) {
     if (mongoose.Types.ObjectId.isValid(req.query.server)) {
@@ -616,11 +622,11 @@ exports.list = function (req, res) {
     }
   }
 
-  if (req.query.storagegroup) {
-    if (mongoose.Types.ObjectId.isValid(req.query.storagegroup)) {
-      query.where({'storagegroup' : req.query.storagegroup});
+  if (req.query.cluster) {
+    if (mongoose.Types.ObjectId.isValid(req.query.cluster)) {
+      query.where({'cluster' : req.query.cluster});
     } else {
-      return respondError(res, 400, 'Invalid storagegroup Id');
+      return respondError(res, 400, 'Invalid cluster Id');
     }
   }
 

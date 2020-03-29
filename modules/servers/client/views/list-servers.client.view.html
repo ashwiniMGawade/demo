@@ -17,13 +17,9 @@
   <div class="table-responsive" ng-show="tableParams.total(value)">
     <table ng-table="tableParams" class="table table-bordered table-striped">
       <tr ng-repeat="server in $data">
-        <td ng-bind="server.name" title="'Name'" sortable="'name'" class="capitalize breakword"></td>
-        <td ng-bind="server.code" title="'Code'" sortable="'code'" class="breakword"></td>
-        <td ng-if="isRoot || isL1ops" ng-bind="server.tenant.name" title="'Tenant'" sortable="'tenant.name'" class="breakword"></td>
-        <td ng-bind="server.subtenant.name" title="'Subtenant'" sortable="'subtenant.name'" class="breakword"></td>
-        <td ng-bind="server.site.name" title="'Site'" sortable="'site.name'" class="breakword"></td>
-                
-        <td ng-bind="server.status" title="'Status'" sortable="'status'"></td>
+        <td ng-bind="server.name" title="'Name'" sortable="'name'" class="breakword"></td>
+        <td ng-bind="server.cluster.name" title="'Cluster'" sortable="'cluster.name'" class="breakword"></td>
+        <td ng-bind="server.protocols" title="'Available Protocols'" sortable="'server.protocols'" class="breakword"></td>
         <td ng-if="(serverAccessRoles.update | intersect : authentication.user.roles)> 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="server.status!=='Operational'" ui-sref="servers.edit({serverId: server.serverId})">Edit</button></td>
         <td ng-if="isRoot"><button type="button" class="btn btn-xs btn-primary" ui-sref="servers.fix({serverId: server.serverId})">Fix</button></td>
         <td><button type="button" class="btn btn-xs btn-primary" ui-sref="servers.view({serverId: server.serverId})">Details</button></td>

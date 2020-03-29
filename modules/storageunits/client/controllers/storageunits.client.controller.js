@@ -3,11 +3,12 @@
 // Storage units controller
 
 angular.module('storageunits')
-	.controller('StorageunitsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Storageunits', 'Servers', 'Storagegroups', 'Flash', 'modalService', 'Tenants', '$sanitize', 'Tags',
-  function ($scope, $stateParams, $location, $http, Authentication, Storageunits, Servers, Storagegroups, Flash, modalService, Tenants, $sanitize, Tags) {
+	.controller('StorageunitsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Storageunits', 'Servers', 'Clusters', 'Flash', 'modalService', '$sanitize', 'Tags',
+  function ($scope, $stateParams, $location, $http, Authentication, Storageunits, Servers, Clusters, Flash, modalService, $sanitize, Tags) {
   	$scope.authentication = Authentication;    
-    $scope.storagegroups = [];
+    $scope.clusters = Clusters.query({});
     $scope.servers = [];
+    $scope.aggregates = [];
     $scope.labels = featuresSettings.labels;
     $scope.SUAccessRoles = featuresSettings.roles.storageunit;
     $scope.tags = [{      
@@ -31,8 +32,6 @@ angular.module('storageunits')
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
     $scope.isUser = Authentication.user.roles.indexOf('user') !== -1;
 
-    $scope.applications = ["Ipru","Omnidocs","Email Archival","Icore","Multiple Apps", "Sysadmin Root Backup", "ISG","Lombard"];
-
 
     var flashTimeout = 3000;
 
@@ -49,29 +48,27 @@ angular.module('storageunits')
       }
     }
 
-    $scope.populateSG = function(server, callback) {
-      $scope.storagegroups = [];
-      $scope.storagegroupId = '';
-      var storagegroups = Storagegroups.query({'file-server' : server});
-      storagegroups.$promise.then(function(results) {
-        angular.forEach(storagegroups, function(storagegroup) {
-          if (storagegroup.server && storagegroup.server.id === server && storagegroup.status === 'Operational' && storagegroup.volume_type == 'primary') {
-            $scope.storagegroups.push(storagegroup);
-          }
-        });
-        callback();
+    $scope.populateAggrs = function(cluster, callback) {
+      $scope.aggregates = [];
+      $scope.aggr =  '';
+
+      angular.forEach($scope.clusters, function(clusterInfo) {
+        if (clusterInfo.clusterId && clusterInfo.clusterId === cluster) {
+          $scope.aggregates = clusterInfo.aggregates;
+        }
       });
+      
     };
 
-    $scope.populatevfas = function(tenant, callback) {
+    $scope.populatevfas = function(cluster, callback) {
       $scope.servers = [];
       var servers = Servers.query();
       servers.$promise.then(function(results) {
-        if (!tenant) {
+        if (!cluster) {
           $scope.servers = servers;
         } else {
           angular.forEach(servers, function(server) {
-            if (server.tenant && server.tenant._id === tenant) {
+            if (server.cluster && server.cluster._id === cluster) {
                $scope.servers.push(server);
             }
           });
@@ -100,36 +97,27 @@ angular.module('storageunits')
     }
 
     // watchers to check the update of value and preselect the dropdown if only one value is present
-    if($scope.isRoot) {
-      $scope.tenants = Tenants.query();
-      $scope.$watch("tenants", function(newVal, oldVal) {
-        if(newVal && newVal.length === 1){
-          $scope.tenantId = newVal[0].tenantId;
-        }
-      });     
-    } else {
-      $scope.tenantId = $scope.authentication.user.tenant;
-    }
-
-    $scope.$watch("tenantId", function(newVal, oldVal) {
+  
+    $scope.$watch("clusterId", function(newVal, oldVal) {
       if (newVal) {
         $scope.populatevfas(newVal, function() {
           if($scope.servers.length === 1){
             $scope.serverId = $scope.servers[0].serverId;
           }
-        });        
+        });  
+        $scope.populateAggrs(newVal);     
       }        
     });
 
-    $scope.$watch("serverId", function(newVal, oldVal) {
-      if (newVal) {
-        $scope.populateSG(newVal, function() {
-          if($scope.storagegroups.length === 1){
-            $scope.storagegroupId = $scope.storagegroups[0].storagegroupId;
-          }
-        });        
-      }        
-    });
+    // $scope.$watch("serverId", function(newVal, oldVal) {
+    //   if (newVal) {
+    //     $scope.populateSG(newVal, function() {
+    //       if($scope.storagegroups.length === 1){
+    //         $scope.storagegroupId = $scope.storagegroups[0].storagegroupId;
+    //       }
+    //     });        
+    //   }        
+    // });
 
     $scope.initUpdate = function(acl) {
       Storageunits.get({
@@ -153,12 +141,11 @@ angular.module('storageunits')
       var storageunit = new Storageunits({
         name: $sanitize(this.name),
         code: $sanitize(this.code),
-        // storagegroupId: $sanitize(this.storagegroupId),
+        clusterId: $sanitize(this.clusterId),
+        serverId: $sanitize(this.serverId),
+        aggr: $sanitize(this.aggr),
         sizegb: this.sizegb,
-        // acl: $sanitize(this.acl),
         protocol: $sanitize(this.protocol),
-        // lunOs: $sanitize(this.lunOs),
-        // lunId: $sanitize(this.lunId)
         application:$sanitize(this.application)
       });
 

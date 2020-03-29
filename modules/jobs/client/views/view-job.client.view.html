@@ -1,10 +1,10 @@
 <section ng-controller="JobsController" ng-init="findOne()" ng-show="job.jobId">
   <div class="page-header">
-    <h1>Job: <span class="capitalize">{{::job.module}}</span> - <span class="capitalize">{{::job.operation}}</span></h1>
+    <h1>Job: <span class="capitalize">{{::job.objectType}}</span> - <span class="capitalize">{{::job.operation}}</span></h1>
   </div>
   <div class="col-md-8">
     <table class="table table-striped">
-      <tr><th>Module</th><td ng-bind="job.module" class="word-break-all capitalize"></td></tr>
+      <tr><th>Module</th><td ng-bind="job.objectType" class="word-break-all capitalize"></td></tr>
       <tr><th>Operation</th><td ng-bind="job.operation " class="word-break-all capitalize"></td></tr>
       <tr><th>Object Code</th><td ng-bind="job.object.code" class="word-break-all"></td></tr>
       <tr><th>Created At (UTC)</th><td ng-bind="job.created |  date:'medium' : 'UTC'" ></td></tr>
@@ -13,12 +13,12 @@
       <tr><th>Payload</th><td><pre>{{job.payload | json}}</pre></td></tr>
       <tr><th>Result</th><td><pre>{{getResult(job.result) | json}}</pre></td></tr>     
       <tr><th>Status</th><td ng-bind="job.status" ></td></tr>
-      <tr ng-if="isRoot"><th>Tenant</th>
+      <!-- <tr ng-if="isRoot"><th>Tenant</th>
         <td><pre>{{job.tenant | json}}</pre></td>
       </tr>  
       <tr><th>Partner</th>
         <td><pre>{{job.partner | json}}</pre></td>
-      </tr>    
+      </tr>     -->
     </table>
   </div>
   <div ng-show="error" class="text-danger">

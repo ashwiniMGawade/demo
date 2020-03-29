@@ -9,6 +9,21 @@ var mongoose = require('mongoose'),
 /**
  * Cluster Schema
  */
+
+var aggregateSchema = new Schema ({
+  name: {
+    type: String
+  },
+  available_size: {
+    type: Number
+  },
+  used_percentage: {
+    type: Number
+  },
+  total_commited: {
+    type: Number
+  }
+})
 var ClusterSchema = new Schema({
   name: {
     type: String,
@@ -24,6 +39,7 @@ var ClusterSchema = new Schema({
     type: String,
     trim: true
   },
+  aggregates: [aggregateSchema],
   uuid: {
     type: String,
     trim:true,

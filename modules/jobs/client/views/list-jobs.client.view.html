@@ -48,12 +48,12 @@
   <div class="table-responsive" ng-show="tableParams.total(value)">
     <table ng-table="tableParams" class="table table-bordered table-striped">
       <tr ng-repeat="job in $data">
-        <td ng-bind="job.module" title="'Module'" sortable="'module'" class="capitalize"></td>
+        <td ng-bind="job.objectType" title="'Module'" sortable="'objectType'" class="capitalize"></td>
         <td ng-bind="job.operation" title="'Operation'" sortable="'operation'" class="capitalize"></td>
         <td ng-bind="job.object.code" title="'Object Code'" sortable="'object.code'"></td>
         <td ng-bind="job.user.username" title="'User'" sortable="'user.username'"></td>
         <td ng-bind="job.status" title="'Status'" sortable="'status'" class="capitalize"></td>
-        <td ng-if="isRoot" ng-bind="job.tenant.code" title="'Tenant'" sortable="'tenant.code'"></td>
+        <!-- <td ng-if="isRoot" ng-bind="job.tenant.code" title="'Tenant'" sortable="'tenant.code'"></td> -->
         <td ng-bind="job.created | date:'medium' : 'UTC'" title="'Created At (UTC)'" sortable="'created'"></td>
         <td ng-bind="job.updated | date:'medium' : 'UTC'" title="'Updated At (UTC)'" sortable="'updated'"></td>
         <td><button type="button" class="btn btn-xs btn-primary" ui-sref="jobs.view({jobId: job.jobId})">Details</button></td>

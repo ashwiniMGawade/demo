@@ -41,7 +41,7 @@ exports.listLunOs = function (req, res) {
 };
 
 exports.listApplications = function (req, res) {
-  res.json(Storageunit.schema.path('applications').enumValues);
+  res.json(Storageunit.schema.path('application').enumValues);
 };
 
 exports.listICMStatus = function (req, res) {

@@ -31,31 +31,21 @@ var StorageunitSchema = new Schema({
     minlength: [3, 'Storage unit code, Minimum 3 char required'],
     match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit code can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
   },
-  // storagegroup: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Storagegroup',
-  //   required: 'Storage group required'
-  // },
-  // tenant: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Tenant'
-  // },
-  // partner: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Tenant'
-  // },
-  // subscription: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Subscription'
-  // },
-  // subtenant: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Subtenant'
-  // },
-  // server: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Server'
-  // },
+  cluster: {
+    type: Schema.ObjectId,
+    ref: 'ontap_clusters',
+    required: 'Storage group required'
+  },
+  server: {
+    type: Schema.ObjectId,
+    ref: 'Server',
+    required: 'Storage group required'
+  },
+  aggr: {
+    type: String,
+    trim: true,
+    required: "Aggregate name is required"
+  },
   sizegb: {
     type: Number,
     min: [100, 'Storage Unit Size should be greater than or equal to 100'],
@@ -150,13 +140,13 @@ StorageunitSchema.pre('save', function (next, done) {
     next();
   } else {
     var self = this;
-    // mongoose.model('Storagegroup').findById(self.storagegroup).exec(function (err, storagegroup) {
+    // mongoose.model('ontap_clusters').findById(self.cluster).exec(function (err, cluster) {
     //   if (err) {
     //     logger.info('Storageunit Model: ' + err);
     //   } else if (!storagegroup) {
-    //     logger.info('Storageunit Model: Invalid Storagegroup ID');
+    //     logger.info('Storageunit Model: Invalid Cluster ID');
     //   } else {
-    //     self.tenant = storagegroup.tenant_id;
+    //     self.cluster = storagegroup.tenant_id;
     //     self.subtenant = storagegroup.subtenant_id;
     //     self.server = storagegroup.server;
     //     self.partner = storagegroup.partner;
@@ -178,47 +168,61 @@ StorageunitSchema.pre('validate', function (next, done) {
   // validStoragegroup();
 
   // Only checked with a new object (can not change storage group)
-  function validStoragegroup() {
-    mongoose.model('Storagegroup').findById(self.storagegroup).exec(function (err, storagegroup) {
+  function validCluster() {
+    mongoose.model('ontap_clusters').findById(self.cluster).exec(function (err, cluster) {
       if (err) {
         logger.info('Storageunit Model: ' + err);
-        self.invalidate('storagegroup', 'Invalid Storagegroup ID');
+        self.invalidate('storagegroup', 'Invalid cluster ID');
         next();
-      } else if (!storagegroup) {
-        logger.info('Storageunit Model: Invalid Storagegroup ID');
-        self.invalidate('storagegroup', 'Invalid Storagegroup ID');
+      } else if (!cluster) {
+        logger.info('Storageunit Model: Invalid cluster ID');
+        self.invalidate('cluster', 'Invalid cluster ID');
         next();
-      } else if (self.isNew && self.user && self.user.tenant && !(_.isEqual(storagegroup.tenant, self.user.tenant) || _.isEqual(storagegroup.tenant, self.user.tenant._id))) {
-        logger.info('Storageunit Model: Storagegroup belongs to different Tenant');
-        self.invalidate('storagegroup', 'Invalid Storagegroup ID');
-        next();
-      } else if (self.isNew && storagegroup.status !== 'Operational') {
-        logger.info('Storageunit Model: Storagegroup not Operational');
-        self.invalidate('storagegroup', 'Storage Group needs to be Operational');
-        next();
+      } else if(cluster.aggregates.length > 0) {
+        var validAggr = false
+        cluster.aggregates.forEach(function(aggr) {
+          if (aggr.name == self.aggr) {
+            validAggr = true;
+            break;
+          }
+        })
+        if(!validAggr) {
+          logger.info('Storageunit Model: Invalid aggregate name');
+          self.invalidate('aggr', 'Invalid aggregate name');
+          next();
+        } else {
+          validServer(cluster);
+        }
       } else {
-        validServer(storagegroup);
+        logger.info('Storageunit Model: Invalid cluster ID');
+        self.invalidate('cluster', 'Invalid cluster ID, Cluster does not have any aggregates');
+        next();
       }
     });
   }
 
   // Only checked with a new object (can not change protocol)
-  function validServer(storagegroup) {
-    mongoose.model('Server').findById(storagegroup.server).exec(function (err, server) {
+  function validServer(cluster) {
+    mongoose.model('Server').findById(self.server).exec(function (err, server) {
       if (err) {
         logger.info('Storageunit Model: ' + err);
-        self.invalidate('storagegroup', 'Error with Server associated with Storagegroup');
+        self.invalidate('server', 'Error with Server associated with Storagegroup');
         next();
       } else if (!server) {
         logger.info('Storageunit Model: Invalid Server ID - Should never happen');
-        self.invalidate('storagegroup', 'Invalid Server ID associated with Storagegroup');
+        self.invalidate('server', 'Invalid Server ID associated with storageunit');
         next();
-      } else if (self.isNew && self.protocol && !server[self.protocol]) {
+      } else if (self.isNew && self.protocol && !server.protocols.indexOf[self.protocol] === -1) {
         logger.info('Storageunit Model: Protocol not enabled on Server');
-        self.invalidate('storagegroup', 'Storagegroup\'s Server is not enabled for specified Protocol');
+        self.invalidate('server', 'Storageunit\'s Server is not enabled for specified Protocol');
+        next();
+      } else if(server.cluster !== cluster.clusterId) {
+        //check if the server belongs to the cluster chosen
+        logger.info('Storageunit Model: Server does not belongs to specified cluster');
+        self.invalidate('server', "Server does not belongs to specified cluster");
         next();
       } else {
-        availableSizeSubscription(storagegroup);
+        validACL()
       }
     });
   }
@@ -293,6 +297,13 @@ StorageunitSchema.pre('validate', function (next, done) {
       } else {
         uniqueCode();
       }
+    } else if(self.protocol === 'fc' && self.acl) {
+      if (!(/^(((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+((,((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+))*)$/).test(self.acl)) {
+        self.invalidate('acl', 'Invalid ACL');
+        next();
+      } else {
+        uniqueCode();
+      }
     } else {
       uniqueCode();
     }
@@ -300,15 +311,15 @@ StorageunitSchema.pre('validate', function (next, done) {
 
   // Only checked with a new object (can not change code)
   function uniqueCode() {
-    mongoose.model('Storageunit').find({code: new RegExp('^'+ self.code + '$', "i"), storagegroup: self.storagegroup}).exec(function (err, storageunit) {
+    mongoose.model('Storageunit').find({code: new RegExp('^'+ self.code + '$', "i"), cluster: self.cluster, server: self.server}).exec(function (err, storageunit) {
       if (err) {
         logger.info('Storageunit Model: ' + err);
-        self.invalidate('code', 'Code has to be unique per Storagegroup');
+        self.invalidate('code', 'Code has to be unique per Cluster, Server combination');
         next();
       } else if (storageunit.length) {
         if (storageunit.length > 1 || (storageunit.length === 1 && storageunit[0]._id.toString() !== self._id.toString())) {
-          logger.info('Storageunit Model: Code not unique per Storagegroup');
-          self.invalidate('code', 'Code has to be unique per Storagegroup');
+          logger.info('Storageunit Model: Code not unique per Cluster, Server combination');
+          self.invalidate('code', 'Code has to be unique per Cluster, Server combination');
           next();
         } else {
           uniqueName();
@@ -320,15 +331,15 @@ StorageunitSchema.pre('validate', function (next, done) {
   }
 
   function uniqueName() {
-    mongoose.model('Storageunit').find({name: new RegExp('^' + self.name + '$', "i"), storagegroup: self.storagegroup}).exec(function (err, storageunit) {
+    mongoose.model('Storageunit').find({name: new RegExp('^' + self.name + '$', "i"), cluster: self.cluster, server:self.server}).exec(function (err, storageunit) {
       if (err) {
         logger.info('Storageunit Model: ' + err);
-        self.invalidate('name', 'Name has to be unique per Storagegroup');
+        self.invalidate('name', 'Name has to be unique per Cluster, Server combination');
         next();
       } else if (storageunit.length) {
         if (storageunit.length > 1 || (storageunit.length === 1 && storageunit[0]._id.toString() !== self._id.toString())) {
-          logger.info('Storageunit Model: Name not unique per Storagegroup');
-          self.invalidate('name', 'Name has to be unique per Storagegroup');
+          logger.info('Storageunit Model: Name not unique per Cluster, Server combination');
+          self.invalidate('name', 'Name has to be unique per Cluster, Server combination');
           next();
         } else{
           next();
@@ -340,8 +351,8 @@ StorageunitSchema.pre('validate', function (next, done) {
   }
 });
 
-StorageunitSchema.index({ name: 1, storagegroup: 1 }, { unique: true });
-StorageunitSchema.index({ code: 1, storagegroup: 1 }, { unique: true });
+StorageunitSchema.index({ name: 1, cluster: 1, server: 1 }, { unique: true });
+StorageunitSchema.index({ code: 1, cluster: 1, server: 1 }, { unique: true });
 
 StorageunitSchema.methods.toJSON = function() {
   var obj = this.toObject();
