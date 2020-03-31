@@ -45,6 +45,13 @@ exports.invokeRolesPolicies = function () {
       resources: '/api/storageunits/:storageunitId',
       permissions: ['delete']
     }]
+  },
+  {
+    roles:  featuresSettings.roles.storageunit.create,
+    allows: [{
+      resources: '/api/storageunits/getListOfIgroups',
+      permissions: ['get']
+    }]
   }]);
 };
 

@@ -22,7 +22,7 @@ exports.read = function (req, res) {
     delete job.__v;
     res.json(job);
   } else {
-    Job.findById(req.job._id, 'user operation objectType payload result status object created updated').exec(function (err, job) {
+    Job.findById(req.job._id, 'user operation objectType payload result status object created updated last_error comments').exec(function (err, job) {
       res.json(job);
     });
   }
@@ -39,7 +39,7 @@ exports.list = function (req, res) {
   var endDate = req.query.end ? new Date(moment(req.query.end)) : '';
   var search = req.query.search ? req.query.search : '';
 
-  var query =  Job.find({},  'user partner module operation created updated status object objectType').sort('-created');
+  var query =  Job.find({},  'user operation objectType payload result status object created updated last_error comments').sort('-created');
   if (startDate && endDate) {
     query.where({'created': {$gte: startDate, $lte: endDate}});
   }
@@ -88,7 +88,7 @@ exports.jobByID = function (req, res, next, id) {
     });
   }
 
-  Job.findById(id, 'user operation objectType payload result status object created updated')
+  Job.findById(id, 'user operation objectType payload result status object created updated last_error comments')
   .exec(function (err, job) {
     if (err) {
       return next(err);

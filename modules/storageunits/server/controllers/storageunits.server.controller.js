@@ -106,7 +106,7 @@ exports.create = function (req, res) {
             return respondError(res, 400, errorHandler.getErrorMessage(err));
           } else {
             storageunit.populate('server', 'name code')
-              .populate('cluster', 'name uuid managementIp', function (err, storageunitPopulated) {
+              .populate('cluster', 'name uuid management_ip', function (err, storageunitPopulated) {
               if (err) {
                 suCreateJob.update('Failed', err, storageunit);
                 return respondError(res, 400, errorHandler.getErrorMessage(err));
@@ -131,7 +131,7 @@ exports.create = function (req, res) {
       application: storageunit.application,
       vserverName : storageunit.server.name, 
       aggrName : storageunit.aggr, 
-      clusterName: storageunit.cluster.name, 
+      clusterName: storageunit.cluster.management_ip, 
       objectType: "storageunits",
       action: "create",
       objectId: storageunit._id,
@@ -214,34 +214,35 @@ exports.create = function (req, res) {
 exports.read = function (req, res) {
   var storageunit = req.storageunit.toObject();
   storageunit.storageunitId = storageunit._id;
-  var dbWfa = require('./storageunits.server.wfa.db.read');
-  mongoose.model('Storagegroup').findById(storageunit.storagegroup).exec(function (err, storagegroup) {
-    mongoose.model('Server').findById(storagegroup.server).exec(function (err, server) {
-      if(storageunit.protocol === 'cifs'){
-        storageunit.mount = '\\\\'+server.cifsServername+'.'+server.cifsDnsDomain+'\\'+storageunit.code+'$';
-        storageunit.mount1 = '\\\\'+server.ipMgmt+'\\'+storageunit.code+'$';
-        res.json(storageunit);
-      }else if(storageunit.protocol === 'nfs'){
-        storageunit.mount = server.ipMgmt+':/'+storagegroup.code+'/'+storageunit.code;
-        res.json(storageunit);
-      }else if(storageunit.protocol === 'iscsi'){
-        var args = {
-          code: storageunit.code,
-          server: server.code || '',
-          storagegroup: storagegroup.code
-        };
-        dbWfa.sgRead(args, function (err, out) {
-          if (err) {
-            logger.info('SG Create: Failed to Read LUN ID for ISCSI from  WFA, Error: ' + err);
-            res.json(storageunit);
-          } else {
-            storageunit.mount = server.ipsSan+':'+out.lunid;
-            res.json(storageunit);
-          }
-        });
-      }
-    });
-  });
+  res.json(storageunit);
+  // var dbWfa = require('./storageunits.server.wfa.db.read');
+  // mongoose.model('Storagegroup').findById(storageunit.storagegroup).exec(function (err, storagegroup) {
+  //   mongoose.model('Server').findById(storagegroup.server).exec(function (err, server) {
+  //     if(storageunit.protocol === 'cifs'){
+  //       storageunit.mount = '\\\\'+server.cifsServername+'.'+server.cifsDnsDomain+'\\'+storageunit.code+'$';
+  //       storageunit.mount1 = '\\\\'+server.ipMgmt+'\\'+storageunit.code+'$';
+  //       res.json(storageunit);
+  //     }else if(storageunit.protocol === 'nfs'){
+  //       storageunit.mount = server.ipMgmt+':/'+storagegroup.code+'/'+storageunit.code;
+  //       res.json(storageunit);
+  //     }else if(storageunit.protocol === 'iscsi'){
+  //       var args = {
+  //         code: storageunit.code,
+  //         server: server.code || '',
+  //         storagegroup: storagegroup.code
+  //       };
+  //       dbWfa.sgRead(args, function (err, out) {
+  //         if (err) {
+  //           logger.info('SG Create: Failed to Read LUN ID for ISCSI from  WFA, Error: ' + err);
+  //           res.json(storageunit);
+  //         } else {
+  //           storageunit.mount = server.ipsSan+':'+out.lunid;
+  //           res.json(storageunit);
+  //         }
+  //       });
+  //     }
+  //   });
+  // });
 };
 
 /**
@@ -612,7 +613,7 @@ exports.list = function (req, res) {
 
   var query = Storageunit.find({})
     .populate('server', 'name code')
-    .populate('cluster', 'name managementIp')
+    .populate('cluster', 'name management_ip')
 
   if (req.query.server) {
     if (mongoose.Types.ObjectId.isValid(req.query.server)) {
@@ -661,10 +662,7 @@ exports.storageunitByID = function (req, res, next, id) {
   }
 
   Storageunit.findById(id).populate('storagegroup','name code')
-  .populate('tenant','name code')
-  .populate('partner', 'name code')
-  .populate('subtenant','name code')
-  .populate('subscription', 'name code')
+  .populate('cluster','name management_ip')
   .populate('server','name code')
   .exec(function (err, storageunit) {
     if (err) {
@@ -675,4 +673,11 @@ exports.storageunitByID = function (req, res, next, id) {
     req.storageunit = storageunit;
     next();
   });
+};
+
+/**
+ * Get list of available igroups under given server and cluster
+ */
+exports.getListOfIgroups = function(req, res) {
+  console.log("called");
 };

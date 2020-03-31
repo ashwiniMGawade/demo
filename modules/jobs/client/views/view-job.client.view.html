@@ -13,6 +13,8 @@
       <tr><th>Payload</th><td><pre>{{job.payload | json}}</pre></td></tr>
       <tr><th>Result</th><td><pre>{{getResult(job.result) | json}}</pre></td></tr>     
       <tr><th>Status</th><td ng-bind="job.status" ></td></tr>
+      <tr><th>Error</th><td ng-bind="job.last_error" ></td></tr>
+      <tr><th>Comments</th><td ng-bind="job.comments" ></td></tr>
       <!-- <tr ng-if="isRoot"><th>Tenant</th>
         <td><pre>{{job.tenant | json}}</pre></td>
       </tr>  

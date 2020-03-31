@@ -13,12 +13,17 @@ module.exports = function (app) {
   app.route('/api/storageunits').all([auth.loginODIN, storageunitsPolicy.isAllowed])
     .get(storageunits.list)
     .post(storageunits.create);
+  
+  app.route('/api/storageunits/getListOfIgroups').all([auth.loginODIN, storageunitsPolicy.isAllowed])
+    .get(storageunits.getListOfIgroups)
 
   // Single server routes
   app.route('/api/storageunits/:storageunitId').all([auth.loginODIN, storageunitsPolicy.isAllowed])
     .get(storageunits.read)
     .put(storageunits.update)
     .delete(storageunits.delete);
+  
+  
 
   // Finish by binding the server middleware
   app.param('storageunitId', storageunits.storageunitByID);
