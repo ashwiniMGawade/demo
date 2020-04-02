@@ -8,16 +8,20 @@ angular.module('storageunits')
   	$scope.authentication = Authentication;    
     $scope.clusters = Clusters.query({});
     $scope.servers = [];
+    $scope.igroups = [];
     $scope.aggregates = [];
     $scope.labels = featuresSettings.labels;
     $scope.SUAccessRoles = featuresSettings.roles.storageunit;
     $scope.tags = [{      
     }];
 
-    $http.get('api/lookups/protocol')
-     .then(function(response) {
-         $scope.validProtocolsToAssign = response.data;
-     });
+    $scope.serverName = "";
+    $scope.clusterName = "";
+
+    // $http.get('api/lookups/protocol')
+    //  .then(function(response) {
+    //      $scope.validProtocolsToAssign = response.data;
+    //  });
     $http.get('api/lookups/lunos')
      .then(function(response) {
          $scope.validOSToAssign = response.data;
@@ -70,12 +74,22 @@ angular.module('storageunits')
           angular.forEach(servers, function(server) {
             if (server.cluster && server.cluster._id === cluster) {
                $scope.servers.push(server);
+               $scope.clusterName = server.cluster.name;
             }
           });
         }        
         callback();
       });
     };
+
+    $scope.populateIgroups = function(server) {
+      $scope.igroups = [];
+      var igroups = Storageunits.getIgroups({"vserverName": $scope.serverName, "clusterName": $scope.clusterName});
+      igroups.$promise.then(function(results) {
+        $scope.igroups = results;
+      });
+    };
+
 
     $scope.addTag = function() {
       $scope.tags.push({});
@@ -109,15 +123,23 @@ angular.module('storageunits')
       }        
     });
 
-    // $scope.$watch("serverId", function(newVal, oldVal) {
-    //   if (newVal) {
-    //     $scope.populateSG(newVal, function() {
-    //       if($scope.storagegroups.length === 1){
-    //         $scope.storagegroupId = $scope.storagegroups[0].storagegroupId;
-    //       }
-    //     });        
-    //   }        
-    // });
+    $scope.$watch("serverId", function(newVal, oldVal) {
+      if (newVal) {
+        angular.forEach($scope.servers, function(serverDetail) {
+          if (serverDetail.serverId && serverDetail.serverId === newVal) {
+             $scope.serverName = serverDetail.name;
+             serverDetail.protocols = serverDetail.protocols.replace('fcp', 'fc');
+             $scope.validProtocolsToAssign = serverDetail.protocols.split(',');
+             if ($scope.validProtocolsToAssign.indexOf("ndmp") >=0 ) {
+              $scope.validProtocolsToAssign.splice($scope.validProtocolsToAssign.indexOf("ndmp"), 1);
+             }
+          }
+        });
+       
+        $scope.populateIgroups(newVal, function() {
+        });        
+      }        
+    });
 
     $scope.initUpdate = function(acl) {
       Storageunits.get({

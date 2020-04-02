@@ -185,7 +185,7 @@ exports.getHealthData =function(req, res) {
   var callback = function(err, results) {
     if (err) {
       logger.info(err);
-      respondError(res, 400, err);
+      return respondError(res, 400, err);
     } else {
       var resultJson = JSON.stringify(results);
       resultJson = JSON.parse(resultJson);

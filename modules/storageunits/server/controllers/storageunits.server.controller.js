@@ -679,5 +679,22 @@ exports.storageunitByID = function (req, res, next, id) {
  * Get list of available igroups under given server and cluster
  */
 exports.getListOfIgroups = function(req, res) {
-  console.log("called");
+  console.log(req.query);
+  if (req.query['vserverName'] == "" || req.query['clusterName'] == "" ) {
+    res.json([])
+  }
+  var args = {
+    "vserverName": req.query['vserverName'],
+    "clusterName": req.query['clusterName']
+  }
+  var dbWfa = require('./storageunits.server.wfa.db.read');
+  dbWfa.getIgroups(args, function (err, out) {
+    if (err) {
+      logger.info('SG Create: Failed to Read LUN ID for ISCSI from  WFA, Error: ' + err);
+      res.json([])
+    } else {
+      res.json(out);
+    }
+  });
+  
 };

@@ -13,6 +13,11 @@ angular.module('storageunits').factory('Storageunits', ['$resource',
       create: {
         method: 'POST'
       },
+      getIgroups: {
+        method: 'GET',
+        url: 'api/storageunits/getListOfIgroups',
+        isArray: true
+      },
       'query': {
         method: 'GET',
         isArray: true

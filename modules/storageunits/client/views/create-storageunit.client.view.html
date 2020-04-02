@@ -83,7 +83,7 @@
 
         <div class="form-group required" show-errors>
           <label for="serverId">{{labels.server.serverName}}</label>
-          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required ng-disabled="isRoot && !clusterId">
+          <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required ng-disabled="isRoot && (!clusterId || !servers.length)"> 
             <option value="">Please select a {{labels.server.serverName}}</option>
           </select>
           <div ng-messages="storageunitForm.serverId.$error" role="alert">
@@ -106,7 +106,7 @@
 
         <div class="form-group required" show-errors>
           <label for="protocol">Provision Type</label>
-          <select class="form-control" name="protocol" id="protocol" ng-model="protocol" required placeholder="">
+          <select class="form-control" name="protocol" id="protocol" ng-model="protocol" required placeholder="" ng-disabled="!validProtocolsToAssign.length">
               <option value="">Please select Provision Type</option>
               <option ng-repeat="protocol in validProtocolsToAssign | orderBy" value="{{protocol}}">{{protocol | uppercase}}</option>
           </select>
@@ -177,7 +177,7 @@
 
         <div class="form-group" show-errors ng-if="(protocol === 'iscsi' || protocol=== 'fc') && mapping =='existing'">
           <label for="existingIgroup">Igroup</label>
-          <select name="igroup" ng-model="$parent.igroup" id="igroup" class="form-control" ng-options="storagegroup.id as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required ng-disabled="!serverId || storagegroups.length == 0">
+          <select name="igroup" ng-model="$parent.igroup" id="igroup" class="form-control" ng-options="igroup for igroup in igroups" required ng-disabled="!serverId || igroups.length == 0">
             <option value="">Please select a Igroup</option>
           </select>
           <div ng-messages="storageunitForm.igroup.$error" role="alert">

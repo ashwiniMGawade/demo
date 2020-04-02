@@ -175,6 +175,11 @@ flash-message .alert .close{
   font-weight: 900 !important;
 }
 
+.text-danger {
+  color: #a94442 !important;
+  font-weight: 900 !important;
+}
+
 .alert-success hr {
   border-top-color: #c9e2b3;
 }

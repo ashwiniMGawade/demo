@@ -19,10 +19,10 @@
                         <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')">Cluster Name</span>
                     </th>
                         <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('system_health')" scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label"  ng-click="orderByFn('system_health')"> System Health</span>
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('system_health')">System Health</span>
                     </th>
                         <th class="luci-table__header-cell-sort--sorting" ="getSortingClass('communication')" scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label" ng-click="orderByFn('communication')"> Communication</span>
+                        <span class="luci-table__sort-label" ng-click="orderByFn('communication')">Communication</span>
                     </th>
                         <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('os_version')" scope="col" aria-sort="true" tabindex="0">
                         <span class="luci-table__sort-label" ng-click="orderByFn('os_version')"> OS version</span>
@@ -157,7 +157,7 @@
                 </tr>
             </thead>
             <tbody>                              
-                <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--warning" style="text-align:center;font-weight: bold;" colspan="10">No Records Found!</td></tr>
+                <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--success" style="text-align:center;font-weight: bold;" colspan="10">System health is optimal.</td></tr>
                 <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='clusters'" class="capitalize">
                     <td ng-bind="row.cluster_name"></td>
                     <td ng-bind="row.system_health"></td>

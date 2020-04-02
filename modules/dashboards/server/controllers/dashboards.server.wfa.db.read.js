@@ -160,25 +160,25 @@ exports.clusterRead = function (callback) {
         if(err){
           logger.error('Cluster health MySQL Read: Connection Error: ' + err);
           //On error send empty output
-          callback(err, [])
+          return callback(err, [])
         }else{
           connection.query(args, function (err, result) {
+            connection.release();
             logger.info('Cluster health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
             if (err) {
               logger.info('Cluster health MySQL Read: Error: ' + err);
             } else if (result.length > 0) {
               myCache.set( "clusters", result, 100 );  
-              callback(null, result);
+              return callback(null, result);
             }
-            callback(null, []);
-            connection.release();
+            return callback(null, []);           
           });
         }
       });
     } else {
       logger.info("Loading from cache clusters");
       //  logger.info(util.inspect(value, {showHidden: false, depth: null}));
-      callback(null, value);
+      return callback(null, value);
     }
 };
 
@@ -259,25 +259,30 @@ FROM netapp_model.node LEFT JOIN netapp_model.cluster ON netapp_model.node.clust
       if(err){
         logger.error('Node health MySQL Read: Connection Error: ' + err);
         //On error send empty output
-        callback(err, [])
+        connection.release();
+        return callback(err, [])
       }else{
         connection.query(args, function (err, result) {
           logger.info('Node health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
           if (err) {
             logger.info('Node health MySQL Read: Error: ' + err);
+            connection.release();
+            return callback(err, [])
           } else if (result.length > 0) {
             myCache.set( "nodes", result, 100 );  
-            callback(null, result);
-          }
-          callback(null, []);
+            connection.release();
+            return callback(null, result);
+          } 
           connection.release();
+          return callback(null, []);
+         
         });
       }
     });
   } else {
     logger.info("Loading aggregates from cache");
     //  logger.info(util.inspect(value, {showHidden: false, depth: null}));
-    callback(null, value);
+    return callback(null, value);
   }
 };
 
@@ -339,18 +344,21 @@ WHERE netapp_model.aggregate.isRootAggregate=0;
       if(err){
         logger.error('aggreagate health MySQL Read: Connection Error: ' + err);
         //On error send empty output
-        callback(err, [])
+        return callback(err, [])
       }else{
         connection.query(args, function (err, result) {
+          connection.release();
           logger.info('aggreagate health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
           if (err) {
             logger.info('aggreagate health MySQL Read: Error: ' + err);
+            return callback(err, [])
           } else if (result.length > 0) {
             myCache.set( "aggregates", result, 100 );  
-            callback(null, result);
+            return callback(null, result);
+          } else {
+            return callback(null, []);
           }
-          callback(null, []);
-          connection.release();
+         
         });
       }
     });
@@ -382,18 +390,18 @@ exports.SVMRead = function (callback) {
       if(err){
         logger.error('SVM health MySQL Read: Connection Error: ' + err);
         //On error send empty output
-        callback(err, [])
+        return callback(err, [])
       }else{
         connection.query(args, function (err, result) {
+          connection.release();
           logger.info('SVM health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
           if (err) {
             logger.info('SVM health MySQL Read: Error: ' + err);
           } else if (result.length > 0) {
             myCache.set( "svms", result, 100 );  
-            callback(null, result);
+            return callback(null, result);
           }
-          callback(null, []);
-          connection.release();
+          return callback(null, []);
         });
       }
     });
@@ -416,7 +424,7 @@ WHERE (volume.sizeUsedPercent >= 90 OR volume.stateRaw = 'offline' OR volume.sis
 AND (volume.volTypeRaw = 'rw' AND volume.isVserverRoot = 0);
 
   */
- var value = myCache.get("volumes")
+var value = myCache.get("volumes")
   if(value == undefined){
     var args = "SELECT volume.name AS 'volume_name', aggregate.name AS 'aggregate_name', " +
     "vserver.name AS 'vserver_name', cluster.name AS 'cluster_name', " +
@@ -429,10 +437,11 @@ AND (volume.volTypeRaw = 'rw' AND volume.isVserverRoot = 0);
 
     logger.info('Volume health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
     connectionPool.getConnection(function(err, connection) {
+      connection.release();
       if(err){
         logger.error('Volume health MySQL Read: Connection Error: ' + err);
         //On error send empty output
-        callback(err, [])
+        return callback(err, [])
       }else{
         connection.query(args, function (err, result) {
           logger.info('Volume health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
@@ -440,10 +449,10 @@ AND (volume.volTypeRaw = 'rw' AND volume.isVserverRoot = 0);
             logger.info('Volume health MySQL Read: Error: ' + err);
           } else if (result.length > 0) {
             myCache.set( "volumes", result, 100 );  
-            callback(null, result);
+            return callback(null, result);
           }
-          callback(null, []);
-          connection.release();
+          return callback(null, []);
+          
         });
       }
     });
@@ -481,18 +490,19 @@ WHERE netapp_model.lun.isOnline = 0;
       if(err){
         logger.error('lun health MySQL Read: Connection Error: ' + err);
         //On error send empty output
-        callback(err, [])
+        return callback(err, [])
       }else{
         connection.query(args, function (err, result) {
+          connection.release();
           logger.info('lun health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
           if (err) {
             logger.info('lun health MySQL Read: Error: ' + err);
           } else if (result.length > 0) {
             myCache.set( "luns", result, 100 );  
-            callback(null, result);
+            return callback(null, result);
           }
-          callback(null, []);
-          connection.release();
+          return callback(null, []);
+          
         });
       }
     });
