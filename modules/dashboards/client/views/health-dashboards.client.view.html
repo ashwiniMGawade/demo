@@ -140,7 +140,7 @@
                 </tr>
                 <tr ng-if="type=='luns'">
                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('path')"  scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label" ng-click="orderByFn('path')">LUN Name</span>
+                        <span class="luci-table__sort-label" ng-click="orderByFn('lun_name')">LUN Name</span>
                     </th>
                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('volume_name')"  scope="col" aria-sort="true" tabindex="0">
                         <span class="luci-table__sort-label" ng-click="orderByFn('volume_name')"> Volume Name</span>
@@ -210,12 +210,13 @@
                     <td class="text-danger" ng-bind="row.error_status"></td>
                 </tr>
                 <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='luns'" class="capitalize">
-                    <td class="text-danger" ng-bind="row.error_status"></td>
+                    <td ng-bind="row.lun_name"></td>   
                     <td ng-bind="row.volume_name"></td>
                     <td ng-bind="row.aggregate_name"></td>
                     <td ng-bind="row.vserver_name"></td>
                     <td ng-bind="row.cluster_name"></td>  
-                    <td ng-bind="row.path"></td>                                
+                    <td class="text-danger" ng-bind="row.error_status"></td>
+                                               
                 </tr>
             </tbody>
         </table>

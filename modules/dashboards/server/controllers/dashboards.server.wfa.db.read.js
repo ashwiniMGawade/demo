@@ -483,10 +483,23 @@ LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.
 LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId
 LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId WHERE lun.isOnline = 0;
 
+
+[2:50 PM] S, Durai
+    SELECT substring_index(lun.path,'/',-1) AS 'lun_name', volume.name AS 'volume_name', aggregate.name 'aggregate_name', vserver.name AS 'vserver_name', cluster.name AS 'cluster_name',
+   CASE
+      WHEN lun.isOnline=0 THEN 'LUN is Offline'
+      WHEN lun.isMapped=0 THEN 'LUN is Unmapped'
+    END AS 'error_status'
+FROM netapp_model.lun LEFT JOIN netapp_model.volume ON netapp_model.volume.objid = netapp_model.lun.volumeId
+LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.volume.aggregateId
+LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId
+LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId WHERE lun.isOnline = 0 or lun.isMapped = 0;
+
+
   */
   var value = myCache.get("luns")
   if(value == undefined){
-    var args = "SELECT lun.path AS 'path', volume.name AS 'volume_name', aggregate.name 'aggregate_name', vserver.name AS 'vserver_name', cluster.name AS 'cluster_name', " +
+    var args = "SELECT  substring_index(lun.path,'/',-1) AS 'lun_name', volume.name AS 'volume_name', aggregate.name 'aggregate_name', vserver.name AS 'vserver_name', cluster.name AS 'cluster_name', " +
     "  CASE " +
     "WHEN lun.isOnline=0 THEN 'LUN is Offline' " +
     "WHEN lun.isMapped=0 THEN 'LUN is Unmapped' " +
@@ -496,7 +509,7 @@ LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.
     "LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.volume.aggregateId " +
     "LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId " +
     "LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId " +
-    "WHERE netapp_model.lun.isOnline = 0;";
+    "WHERE netapp_model.lun.isOnline = 0 or lun.isMapped = 0;";
 
     logger.info('lun health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
     connectionPool.getConnection(function(err, connection) {
