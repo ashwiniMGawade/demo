@@ -7,6 +7,17 @@
       <div class="col-md-4 search-top-bar">
         <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()"  ng-bind-html/>
       </div>
+      <div class="col-md-2 search-top-bar  right-loader">
+        <button class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.create">
+          <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#add">
+                  </use>
+              </svg>
+          </span>
+        </button>
+      </div> 
+  
     </div>
   </div>
   <div class="table-responsive" ng-show="tableParams.total(value)">

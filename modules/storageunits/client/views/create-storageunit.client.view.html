@@ -74,10 +74,10 @@
             <option value="">Please select a cluster</option>
           </select>
           <div class="loader" ng-show="!clusters.length"></div>       
-          <div ng-messages="serverForm.clusterId.$error" role="alert">
+          <div ng-messages="storageunitForm.clusterId.$error" role="alert">
             <p class="help-block error-text" ng-message="required">cluster name is required.</p>
           </div>
-          <p class="help-block">The cluster the {{labels.server.serverName}} is to be created in.</p>
+          <p class="help-block">The cluster the storageunit is to be created in.</p>
         </div>
 
 
@@ -171,6 +171,7 @@
           </div>
         </div> -->
         <div class="form-group"  ng-show="protocol === 'iscsi' || protocol === 'fc'">
+          <label for="existingIgroup">Mapping</label>
           <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing">Existing Server</label>
           <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" checked>New Server</label>
         </div>
