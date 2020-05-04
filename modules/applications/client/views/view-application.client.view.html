@@ -1,0 +1,47 @@
+<section ng-controller="ApplicationsController" ng-init="findOne()" ng-show="application.applicationId">
+  <div class="page-header">
+    <h1>Application: <span ng-bind="application.name" class="capitalize"></span></h1>
+  </div>
+  <div class="col-md-6">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="application.name" class="capitalize"></td></tr>
+      <tr><th>Code</th><td ng-bind="application.code"></td></tr>
+      <tr ng-if="annotationSetting.enabled"><th>Annotation</th><td ng-bind="application.annotation"></td></tr>
+      
+      <tr ng-if="(applicationAccessRoles.update | intersect : authentication.user.roles) > 0 || (applicationAccessRoles.delete | intersect : authentication.user.roles) > 0 ">
+        <th>Actions</th>
+        <td>
+          <!--button type="button" class="btn btn-xs btn-primary" ng-click="exportcsv(application);">Export</button-->
+          <button  ng-if="(applicationAccessRoles.update | intersect : authentication.user.roles) > 0 " type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="applications.edit({applicationId: application.applicationId})" title="Edit">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#edit">
+                  </use>
+              </svg>
+          </span>
+          </button>
+
+          <button ng-if="(applicationAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="luci-button luci-button--icon-only luci-button--primary" ng-click="remove(application);" title="Delete">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#delete">
+                  </use>
+              </svg>
+          </span>
+          </button>
+          <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="applications.list" title="Back">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#navigate-back">
+                  </use>
+              </svg>
+          </span>
+          </button>
+        </td>
+      </tr>
+    </table>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+  </div>
+</section>

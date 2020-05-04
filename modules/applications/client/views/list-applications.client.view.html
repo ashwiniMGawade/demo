@@ -2,13 +2,13 @@
   <div class="page-header">
     <div class="row">
       <div class="col-md-4">
-        <h1>Clusters</h1>
+        <h1>Applications</h1>
       </div>
       <div class="col-md-4 search-top-bar">
-        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()"  ng-bind-html/>
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
       </div>
       <div class="col-md-2 search-top-bar  right-loader">
-        <button class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.create">
+        <button class="luci-button luci-button--icon-only luci-button--primary" ui-sref="applications.create">
           <span class="luci-button__inner">
               <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
                   <use xlink:href="/assets/css/icons/luci.svg#add">
@@ -17,19 +17,15 @@
           </span>
         </button>
       </div> 
-  
     </div>
   </div>
   <div class="table-responsive" ng-show="tableParams.total(value)">
     <table ng-table="tableParams" class="table table-bordered table-striped">
-      <tr ng-repeat="cluster in $data">
-        <td ng-bind="cluster.name" class="breakword" title="'Name'" sortable="'name'"></td>
-        <td ng-bind="cluster.uuid" title="'UUID'" sortable="'uuid'" class="breakword"></td>
-        <td ng-bind="cluster.management_ip" title="'Management IP'" sortable="'management_ip'" class="breakword"></td>
-        <td ng-bind="cluster.provisioning_state" title="'Provisioning State'" sortable="'provisioning_state'" class="breakword capitalize"></td>
-        <!-- <td ng-bind="cluster.rest_uri" title="'REST URI'" sortable="'rest_uri'" class="breakword"></td> -->
-        <td ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0" title="'Actions'">          
-          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.edit({clusterId: cluster.clusterId})" title="Edit">
+      <tr ng-repeat="application in $data">
+        <td ng-bind="application.name" title="'Name'" sortable="'name'" class="breakword capitalize"></td>
+        <td ng-bind="application.code" title="'Code'" sortable="'code'" class="breakword"></td>
+        <td ng-if="(applicationAccessRoles.update | intersect : authentication.user.roles) > 0 " title="'Actions'">
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="applications.edit({applicationId: application.applicationId})" title="Edit">
             <span class="luci-button__inner">
               <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
                   <use xlink:href="/assets/css/icons/luci.svg#edit">
@@ -37,16 +33,16 @@
               </svg>
             </span>
           </button>
-          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.view({clusterId: cluster.clusterId})" title="Details">
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="applications.view({applicationId: application.applicationId})" title="Details">
             <span class="luci-button__inner">
               <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
                   <use xlink:href="/assets/css/icons/luci.svg#monitor">
                   </use>
               </svg>
             </span>
-          </button>        
+          </button>
         </td>
-        
+       
       </tr>
     </table>
   </div>

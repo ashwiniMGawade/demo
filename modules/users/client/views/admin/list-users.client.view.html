@@ -21,7 +21,15 @@
         
         <td ng-if="(userAccessRoles.update | intersect : authentication.user.roles) > 0 " ><button type="button" class="btn btn-xs btn-primary" ui-sref="admin.user-edit({userId: user.userId})">Edit</button></td>
 
-        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="admin.user({userId: user.userId})">Details</button></td>
+        <td>
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="admin.user({userId: user.userId})" title="Details">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#monitor">
+                  </use>
+              </svg>
+            </span>
+          </td>
       </tr>
     </table>
   </div>

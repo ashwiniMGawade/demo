@@ -3,15 +3,15 @@
 // Storage units controller
 
 angular.module('storageunits')
-	.controller('StorageunitsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Storageunits', 'Servers', 'Clusters', 'Flash', 'modalService', '$sanitize', 'Tags',
-  function ($scope, $stateParams, $location, $http, Authentication, Storageunits, Servers, Clusters, Flash, modalService, $sanitize, Tags) {
-  	$scope.authentication = Authentication;    
-    $scope.clusters = Clusters.query({});
+	.controller('StorageunitsController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Storageunits', 'Servers', 'Clusters', 'Flash', 'modalService', '$sanitize', 'Tags', 'Applications',
+  function ($scope, $stateParams, $location, $http, Authentication, Storageunits, Servers, Clusters, Flash, modalService, $sanitize, Tags, Applications) {
+  	$scope.authentication = Authentication;   
     $scope.servers = [];
     $scope.igroups = [];
     $scope.aggregates = [];
     $scope.labels = featuresSettings.labels;
     $scope.SUAccessRoles = featuresSettings.roles.storageunit;
+    $scope.applications = Applications.query();
     $scope.tags = [{      
     }];
 
@@ -26,11 +26,7 @@ angular.module('storageunits')
      .then(function(response) {
          $scope.validOSToAssign = response.data;
       });
-    $http.get('api/lookups/applications')
-      .then(function(response) {
-          $scope.applications = response.data;
-       });
-
+    
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
     $scope.isL1ops = Authentication.user.roles.indexOf('l1ops') !== -1;
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
@@ -90,6 +86,23 @@ angular.module('storageunits')
       });
     };
 
+    $scope.populateClusters = function(application) {
+      $scope.clusters = [];
+      var clusters = Clusters.query();
+      clusters.$promise.then(function(results) {
+        if (!application) {
+          $scope.clusters = clusters;
+        } else {
+          angular.forEach(clusters, function(cluster) {
+            if (cluster.applications.length > 0  && cluster.applications.includes(application)) {
+               $scope.clusters.push(cluster);
+            }
+          });
+        }        
+        callback();
+      });
+    }
+
 
     $scope.addTag = function() {
       $scope.tags.push({});
@@ -111,7 +124,18 @@ angular.module('storageunits')
     }
 
     // watchers to check the update of value and preselect the dropdown if only one value is present
-  
+    
+    $scope.$watch("applicationId", function(newVal, oldVal) {
+      if (newVal) {
+        $scope.populateClusters(newVal, function() {
+          if($scope.clusters.length === 1){
+            $scope.clusterId = $scope.clusters[0].clusterId;
+          }
+        });  
+        $scope.populateAggrs(newVal);     
+      }        
+    });
+
     $scope.$watch("clusterId", function(newVal, oldVal) {
       if (newVal) {
         $scope.populatevfas(newVal, function() {
@@ -168,7 +192,7 @@ angular.module('storageunits')
         aggr: $sanitize(this.aggr),
         sizegb: this.sizegb,
         protocol: $sanitize(this.protocol),
-        application:$sanitize(this.application)
+        applicationId:$sanitize(this.applicationId)
       });
 
       if(storageunit.protocol == "nfs") {

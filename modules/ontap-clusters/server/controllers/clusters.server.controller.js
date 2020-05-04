@@ -23,7 +23,7 @@ exports.create = function (req, res) {
   cluster.uuid = req.body.uuid;
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
-  cluster.rest_uri = req.body.rest_uri || '';
+  cluster.applications = req.body.applications || '';
 
 
   cluster.save(function (err) {
@@ -59,7 +59,7 @@ exports.update = function (req, res) {
   cluster.uuid = req.body.uuid;
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
-  cluster.rest_uri = req.body.rest_uri;
+  cluster.applications = req.body.applications;
 
    cluster.save(function (err) {
       logger.info('Cluster cluster.save(): Entered');
@@ -143,7 +143,7 @@ exports.clusterByID = function (req, res, next, id) {
     });
   }
 
-  Cluster.findById(id).exec(function (err, cluster) {
+  Cluster.findById(id).populate('applications').exec(function (err, cluster) {
     if (err) {
       return next(err);
     } else if (!cluster) {

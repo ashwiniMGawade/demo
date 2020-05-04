@@ -2,19 +2,61 @@
   <div class="page-header">
     <h1>Cluster: <span ng-bind="cluster.name" class=""></span></h1>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-8">
     <table class="table table-striped">
       <tr><th>Name</th><td ng-bind="cluster.name" class=""></td></tr>
       <tr><th>UUID</th><td ng-bind="cluster.uuid"></td></tr>
       <tr><th>API-S Key</th><td ng-bind="cluster.apis_cluster_key"></td></tr>
       <tr><th>Management IP</th><td ng-bind="cluster.management_ip"></td></tr>
       <tr><th>Provisioning State</th><td ng-bind="cluster.provisioning_state" class="word-break-all"></td></tr>
-      <!-- <tr><th>REST URI</th><td ng-bind="cluster.rest_uri" class="word-break-all"></td></tr> -->
+      <tr><th>Aggregates</th>
+        <td class="word-break-all">
+          <ul ng-repeat="agg in cluster.aggregates">
+            <li>
+              <span>Name: {{agg.name}} | </span>
+              <span>Avaialable Size: {{agg.available_size}}  | </span>
+              <span>Used(%): {{agg.used_percentage}}  | </span>
+              <span>Total: {{agg.total_commited}} </span>
+            </li>
+          </ul>
+        </td>
+      </tr>
+      <tr><th>Applications</th>
+        <td class="word-break-all">
+          <ul ng-repeat="app in cluster.applications">
+            <li ng-bind="app.name"></li>
+          </ul>
+        </td>
+      </tr>
       <tr ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0 || (clusterAccessRoles.delete | intersect : authentication.user.roles) > 0">
         <th>Actions</th>
         <td>
-          <button ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ui-sref="clusters.edit({clusterId: cluster.clusterId})">Edit</button>
-          <button ng-if="(clusterAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xs1 btn-primary" ng-click="remove(cluster);">Delete</button>
+          <button  ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.edit({clusterId: cluster.clusterId})" title="Edit">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#edit">
+                  </use>
+              </svg>
+          </span>
+          </button>
+
+          <button ng-if="(clusterAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="luci-button luci-button--icon-only luci-button--primary" ng-click="remove(cluster);" title="Delete">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#delete">
+                  </use>
+              </svg>
+            </span>
+          </button>
+          <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.list" title="Back">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#navigate-back">
+                  </use>
+              </svg>
+          </span>
+          </button>
+         
         </td>
       </tr>
     </table>

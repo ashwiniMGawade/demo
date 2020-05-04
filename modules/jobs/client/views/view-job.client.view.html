@@ -21,6 +21,16 @@
       <tr><th>Partner</th>
         <td><pre>{{job.partner | json}}</pre></td>
       </tr>     -->
+      <tr><th>Actions</th><td>
+        <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="jobs.list" title="Details">
+          <span class="luci-button__inner">
+            <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                <use xlink:href="/assets/css/icons/luci.svg#monitor">
+                </use>
+            </svg>
+          </span>
+        </button>   
+      </td></tr>
     </table>
   </div>
   <div ng-show="error" class="text-danger">

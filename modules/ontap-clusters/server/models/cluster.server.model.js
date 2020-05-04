@@ -64,10 +64,10 @@ var ClusterSchema = new Schema({
             message: '`{VALUE}` not a valid value for Provisioning State'
           }
   }, 
-  rest_uri: {
-    type: String,
-    default: ''
-  }, 
+  applications:[{
+    type: Schema.ObjectId,
+    ref: 'Application'
+  }], 
   user: {
     type: Schema.ObjectId,
     ref: 'User'

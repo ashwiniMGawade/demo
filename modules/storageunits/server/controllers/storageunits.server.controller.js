@@ -57,7 +57,6 @@ exports.create = function (req, res) {
   storageunit.code = req.body.code || '';
   storageunit.sizegb = req.body.sizegb;
   storageunit.protocol = req.body.protocol || '';
-  storageunit.application = req.body.application || '';
   storageunit.aggr = req.body.aggr || '';
 
   if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
@@ -71,6 +70,14 @@ exports.create = function (req, res) {
   if (storageunit.protocol === 'nfs') {
     storageunit.readWriteClients = req.body.readWriteClients || '';
     storageunit.readOnlyClients = req.body.readOnlyClients || '';
+  }
+
+  if (req.body.applicationId) {
+    if (mongoose.Types.ObjectId.isValid(req.body.applicationId)) {
+      storageunit.application = mongoose.Types.ObjectId(req.body.applicationId);
+    } else {
+      storageunit.application = mongoose.Types.ObjectId();
+    }
   }
 
   if (req.body.clusterId) {
@@ -88,6 +95,8 @@ exports.create = function (req, res) {
       storageunit.server = mongoose.Types.ObjectId();
     }
   }
+
+  console.log("storageunit is:", storageunit)
 
   storageunit.validate(function(err) {
     if (err) {
@@ -614,6 +623,7 @@ exports.list = function (req, res) {
   var query = Storageunit.find({})
     .populate('server', 'name code')
     .populate('cluster', 'name management_ip')
+    .populate('application', 'name code')
 
   if (req.query.server) {
     if (mongoose.Types.ObjectId.isValid(req.query.server)) {
@@ -664,6 +674,7 @@ exports.storageunitByID = function (req, res, next, id) {
   Storageunit.findById(id).populate('storagegroup','name code')
   .populate('cluster','name management_ip')
   .populate('server','name code')
+  .populate('application', 'name code')
   .exec(function (err, storageunit) {
     if (err) {
       return next(err);

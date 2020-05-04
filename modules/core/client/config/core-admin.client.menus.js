@@ -74,6 +74,7 @@ angular.module('core.admin').run(['Menus',
       roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
       position: 7,
     });
+
    
   }
 ]);

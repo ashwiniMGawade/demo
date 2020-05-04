@@ -60,10 +60,10 @@
 
         <div class="form-group required" show-errors ng-if="isRoot">
           <label for="application">Application</label>
-          <select name="application" ng-model="$parent.application" id="application" class="form-control" ng-options="app as app for app in applications" required>
+          <select name="applicationId" ng-model="$parent.applicationId" id="applicationId" class="form-control" ng-options="app.applicationId as app.name for app in applications" required>
             <option value="">Please select a Application</option>
           </select>
-          <div ng-messages="storageunitForm.application.$error" role="alert">
+          <div ng-messages="storageunitForm.applicationId.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Application name is required.</p>
           </div>
         </div>
@@ -73,7 +73,7 @@
           <select name="clusterId" ng-model="clusterId" id="clusterId" class="form-control" ng-options="cluster.clusterId as cluster.name for cluster in clusters | orderBy: 'name'" required  ng-disabled="!clusters.length">
             <option value="">Please select a cluster</option>
           </select>
-          <div class="loader" ng-show="!clusters.length"></div>       
+          <!-- <div class="loader" ng-show="!clusters.length"></div>        -->
           <div ng-messages="storageunitForm.clusterId.$error" role="alert">
             <p class="help-block error-text" ng-message="required">cluster name is required.</p>
           </div>

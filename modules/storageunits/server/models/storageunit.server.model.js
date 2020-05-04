@@ -31,6 +31,11 @@ var StorageunitSchema = new Schema({
     minlength: [3, 'Storage unit code, Minimum 3 char required'],
     match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit code can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
   },
+  application: {
+    type: Schema.ObjectId,
+    ref: 'Application',
+    required: 'Application required'
+  },
   cluster: {
     type: Schema.ObjectId,
     ref: 'ontap_clusters',
@@ -79,14 +84,6 @@ var StorageunitSchema = new Schema({
     maxlength: [32, 'Storage unit igroup, Maximum 32 char allowed'],
     minlength: [3, 'Storage unit igroup, Minimum 3 char required'],
     match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit igroup can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
-  },
-  application: {
-    type: String,
-    enum: {
-      values: ["Ipru","Omnidocs","Email Archival","Icore","Multiple Apps", "Sysadmin Root Backup", "ISG","Lombard"],
-      message: '`{VALUE}` not a valid value for application'
-    },
-    required: 'Storage Unit application is required'
   },
   mapping: {
     type: String,

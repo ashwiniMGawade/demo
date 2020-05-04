@@ -1,10 +1,11 @@
 'use strict';
 
 // Pods controller
-angular.module('clusters').controller('ClustersController', ['$scope', '$stateParams', '$location', 'Authentication', 'Clusters', 'Sites', 'modalService', 'Flash', '$sanitize',
-  function ($scope, $stateParams, $location, Authentication, Clusters, Sites, modalService, Flash, $sanitize) {
+angular.module('clusters').controller('ClustersController', ['$scope', '$stateParams', '$location', 'Authentication', 'Clusters', 'Applications', 'modalService', 'Flash', '$sanitize',
+  function ($scope, $stateParams, $location, Authentication, Clusters, Applications, modalService, Flash, $sanitize) {
     $scope.authentication = Authentication;
     $scope.clusterAccessRoles = featuresSettings.roles.cluster;
+    $scope.applicationsList = Applications.query()
     
     var flashTimeout = 3000;
     
@@ -35,7 +36,7 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
         uuid: $sanitize(this.uuid),
         management_ip: $sanitize(this.management_ip),
         provisioning_state: $sanitize(this.provisioning_state),
-        rest_uri: $sanitize(this.rest_uri)
+        applications: this.applications
       });
 
       // Redirect after save
@@ -91,6 +92,7 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
       }
 
       var cluster = $scope.cluster;
+      cluster.applications = this.applications
 
       cluster.$update(function () {
         $location.path('clusters');
@@ -111,6 +113,11 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
         clusterId: $stateParams.clusterId
       }, function(data) {
         $scope.cluster = data;
+        var applicationList = [];
+        data.applications.forEach(function(app) {
+          applicationList.push(app._id)
+        });
+        $scope.applications = applicationList;
       }, function(error){
         $location.path('clusters');
         throwFlashErrorMessage('No cluster with that identifier has been found');

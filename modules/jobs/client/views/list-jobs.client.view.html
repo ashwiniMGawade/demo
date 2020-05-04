@@ -41,7 +41,7 @@
                 </div>
               </div>
         </div>
-        <button type="submit" class="btn btn-primary" ng-disabled="errMessage">Search</button>
+        <button type="submit" class="btn luci-button--primary" ng-disabled="errMessage">Search</button>
       </div>
     </form>
   </div>
@@ -56,7 +56,15 @@
         <!-- <td ng-if="isRoot" ng-bind="job.tenant.code" title="'Tenant'" sortable="'tenant.code'"></td> -->
         <td ng-bind="job.created | date:'medium' : 'UTC'" title="'Created At (UTC)'" sortable="'created'"></td>
         <td ng-bind="job.updated | date:'medium' : 'UTC'" title="'Updated At (UTC)'" sortable="'updated'"></td>
-        <td><button type="button" class="btn btn-xs btn-primary" ui-sref="jobs.view({jobId: job.jobId})">Details</button></td>
+        <td title="'actions'">
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="jobs.view({jobId: job.jobId})" title="Details">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#monitor">
+                  </use>
+              </svg>
+            </span>
+          </button>   
       </tr>
     </table>
   </div>

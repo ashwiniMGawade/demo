@@ -1,0 +1,55 @@
+<section ng-controller="ApplicationsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Application</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="applicationForm" class="form-horizontal" ng-submit="create(applicationForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="name" id="name" class="form-control" placeholder="Name"
+                  ng-pattern="/^[a-zA-Z0-9\ -]*$/"
+                  ng-minlength="3"
+                  ng-maxlength="64"
+                 required>
+          <div ng-messages="applicationForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Application name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Application name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Application name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">
+              Application name should contain only alphanumeric characters including space and dash.
+            </p>
+          </div>
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="code">Code</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+                 ng-minlength="3"
+                 ng-maxlength="16"
+                 ng-pattern="/^[a-z0-9]*$/"
+                 required>
+          <div ng-messages="applicationForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Application code is required.</p>
+            <p class="help-block error-text" ng-message="minlength">Application code must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="maxlength">Application code should be maximum 8 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters are allowed</p>
+          </div>
+        </div>       
+        <div class="form-group">
+          <button  type="button" class="luci-button luci-button--primary" ng-click="create(applicationForm.$valid)">Create</button>
+          <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="applications.list" title="Back">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#navigate-back">
+                  </use>
+              </svg>
+          </span>
+          </button>
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

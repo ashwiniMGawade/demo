@@ -7,30 +7,46 @@
       <tr><th>Name</th><td ng-bind="storageunit.name" class="capitalize"></td></tr>
       <tr><th>Code</th><td ng-bind="storageunit.code"></td></tr>
       <tr><th>Status</th><td ng-bind="storageunit.status"></td></tr>
-      <tr ng-show="isRoot || isL1ops"><th>Tenant</th><td ng-bind="storageunit.tenant.name"></td></tr>
-      <tr><th>Partner</th><td ng-bind="storageunit.partner.name"></td></tr>
-      <tr><th>Subtenant</th><td ng-bind="storageunit.subtenant.name"></td></tr>
+      <tr><th>Application</th><td ng-bind="storageunit.application.name"></td></tr>
+      <tr><th>Cluster</th><td ng-bind="storageunit.cluster.name"></td></tr>
       <tr><th>{{labels.server.serverName}}</th><td ng-bind="storageunit.server.name"></td></tr>
-      <tr><th>Subscription</th><td ng-bind="storageunit.subscription.name"></td></tr>
-      <tr><th>Volume</th><td ng-bind="storageunit.storagegroup.name"></td></tr>
+      <tr><th>Aggregate</th><td ng-bind="storageunit.aggr"></td></tr>
       <tr><th>Protocol</th><td ng-bind="storageunit.protocol | uppercase"></td></tr>
       <tr><th>Size (GB)</th><td ng-bind="storageunit.sizegb"></td></tr>
-      <tr><th>Mount</th><td>{{storageunit.mount}}<div ng-if="storageunit.mount1">   Or   {{storageunit.mount1}}</div></td></tr>
-      <tr ng-if="storageunit.protocol === 'nfs' || storageunit.protocol === 'iscsi'"><th>ACL</th><td ng-bind="storageunit.acl"></td></tr>
-      <tr><th>Tags</th>
+      <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>Mapping</th><td ng-bind="storageunit.mapping"></td></tr>
+      <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>Igroup</th><td ng-bind="storageunit.igroup"></td></tr>
+      <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>LUN Id</th><td ng-bind="storageunit.lunId"></td></tr>
+      <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>LUN OS</th><td ng-bind="storageunit.lunOs"></td></tr>
+      <tr ng-if="storageunit.protocol === 'nfs'">
+        <th>Read-write-clients</th><td ng-bind="storageunit.readWriteClients"></td>
+      </tr>
+      <tr ng-if="storageunit.protocol === 'nfs'">
+        <th>Read-only-clients</th><td ng-bind="storageunit.readOnlyClients"></td>
+      </tr>
+
+      <tr ng-if="storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc'"><th>ACL</th><td ng-bind="storageunit.acl"></td></tr>
+      <!-- <tr><th>Tags</th>
         <td> 
           <li ng-if="tags[0].attr" ng-repeat="tag in tags">{{tag.attr}}: {{ tag.val}} </li>
         </td>
-      </tr>
+      </tr> -->
       <tr ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0 ||  (SUAccessRoles.update | intersect : authentication.user.roles) > 0">
 
         <th>Actions</th>
         <td>
-          <button ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary"
+          <!-- <button ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl luci-button--primary"
           ng-disabled="storageunit.status!=='Operational'"
-          ui-sref="storageunits.edit({storageunitId: storageunit.storageunitId})">Edit</button>
+          ui-sref="storageunits.edit({storageunitId: storageunit.storageunitId})">Edit</button> -->
 
-          <button ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl btn-primary" ng-disabled="storageunit.status!=='Operational'" ng-click="remove(storageunit);">Delete</button>
+          <button ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0" type="button" class="btn btn-xl luci-button--primary" ng-disabled="storageunit.status!=='Operational'" ng-click="remove(storageunit);">Delete</button>
+          <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="storageunits.list" title="Back">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#navigate-back">
+                  </use>
+              </svg>
+          </span>
+        </button>
         </td>
       </tr>
     </table>
