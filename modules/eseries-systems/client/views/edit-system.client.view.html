@@ -1,0 +1,89 @@
+<section ng-controller="SystemsController" ng-init="findOne()" ng-show="system.systemId">
+  <div class="page-header">
+    <h1>Eseries System: <span>{{ ::system.name }}</span></h1>
+  </div>
+  <div class="row show-grid">
+    <div class="col-md-6">
+      <form name="systemForm" class="form-horizontal" ng-submit="update(systemForm.$valid)" novalidate>
+        <fieldset>
+          <div class="form-group required" show-errors>
+            <label for="name">Name</label>
+            <input name="name" type="text" ng-model="system.name" id="name" class="form-control" placeholder="Name" 
+            ng-minlength="3"
+            ng-maxlength="64"
+            ng-pattern="/^[a-zA-Z0-9\-]*$/"
+            ng-bind-html
+            required>
+            <div ng-messages="systemForm.name.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Eseries System name is required.</p>
+              <p class="help-block error-text" ng-message="minlength">Eseries System name should have Minimum 3 characters</p>
+            <p class="help-block error-text" ng-message="maxlength">Eseries System name should have Maximum 64 characters.</p>
+            <p class="help-block error-text" ng-message="pattern">Eseries System name can only include alphanumeric characters including dash.</p>
+            </div>
+            <p class="help-block">Name of the Eseries System</p>
+          </div>
+
+          <div class="form-group required" show-errors>
+            <label for="wwn">WWN</label>
+            <input name="wwn" type="text" ng-model="system.wwn" id="wwn" class="form-control" placeholder="eg. 90ba5cfe-a3aa-11e6-b4c4-005056a8f8ff"
+            ng-pattern="/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/" required>
+            <div ng-messages="systemForm.wwn.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">System WWN is required.</p>            
+              <p class="help-block error-text" ng-message="pattern">WWN is invalid</p>
+            </div>
+        </div>
+
+          <div class="form-group required" show-errors >
+            <label for="rest_url">REST URL</label>
+            <input name="rest_url" type="text" ng-model="system.rest_url" id="rest_url" class="form-control" placeholder="e.g. 10.20.30.65"
+                 ng-pattern="/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i" required="">
+            <div ng-messages="systemForm.rest_url.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">REST URL is required.</p>
+              <p class="help-block error-text" ng-message="pattern">A valid REST URL address is required</p>
+            </div>          
+          </div>
+        <div class="form-group required" show-errors>
+          <label for="provisioning_state">Provisioning State</label>   
+          <select name="provisioning_state" ng-model="system.provisioning_state" id="provisioning_state" class="form-control"  required >
+            <option value="">Please select a Provisioning State</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+          </select>
+           
+          <div ng-messages="systemForm.provisioning_state.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Provisioning State is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="provisioning_state">Applications</label>   
+          <select name="applications" ng-model="applications" id="applications" class="form-control"  required ng-options="app.applicationId as app.name for app in applicationsList | orderBy: 'name'" multiple ng-disabled="applicationsList.length==0">
+          </select>
+          <!-- <p class="help-block" ng-message="required">Please select one more applications which can be provisioned under the system</p> -->
+          <div ng-messages="systemForm.applications.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Please select one more applications which can be provisioned under the system</p>
+          </div>
+        </div>
+        <!-- <div class="form-group" show-errors>
+          <label for="rest_uri">REST URI</label>   
+          <input name="rest_uri" type="text" ng-model="system.rest_uri" id="rest_uri" class="form-control" placeholder="http://sample.com">  
+        </div>    -->       
+          <div class="form-group">
+            <button  type="button" class="luci-button luci-button--primary" ng-click="update(systemForm.$valid)">Update</button>
+            <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="systems.list" title="Back">
+              <span class="luci-button__inner">
+                <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                    <use xlink:href="/assets/css/icons/luci.svg#navigate-back">
+                    </use>
+                </svg>
+            </span>
+          </button>
+          </div>
+          <div ng-show="error" class="text-danger">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>

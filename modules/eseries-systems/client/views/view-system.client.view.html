@@ -1,0 +1,80 @@
+<section ng-controller="SystemsController" ng-init="findOne()" ng-show="system.systemId">
+  <div class="page-header">
+    <h1>Eseries System: <span ng-bind="system.name" class=""></span></h1>
+  </div>
+  <div class="col-md-8">
+    <table class="table table-striped">
+      <tr><th>Name</th><td ng-bind="system.name" class=""></td></tr>
+      <tr><th>WWN</th><td ng-bind="system.wwn"></td></tr>
+      <tr><th>API-S Key</th><td ng-bind="system.apis_system_key"></td></tr>
+      <tr><th>Management IP</th><td ng-bind="system.management_ip"></td></tr>
+      <tr><th>Provisioning State</th><td ng-bind="system.provisioning_state" class="word-break-all"></td></tr>
+      <tr><th>Storage Pool</th>
+        <td class="word-break-all">
+          <ul ng-repeat="sp in system.storage_pool">
+            <li>
+              <span>Name: {{sp.name}} | </span>
+              <span>Avaialable Size: {{sp.available_size}}  | </span>
+              <span>Used(%): {{sp.used_percentage}}  | </span>
+              <span>Raid Status: {{sp.raid_status}} </span>
+              <span>Raid Level: {{sp.raid_level}} </span>
+              <span>Offline: {{sp.offline}} </span>
+            </li>
+          </ul>
+        </td>
+      </tr>
+      <tr><th>Host Types</th>
+        <td class="word-break-all">
+          <ul ng-repeat="ht in system.host_type">
+            <li>
+              <span>Name: {{ht.name}} | </span>
+              <span>Code: {{sp.code}}  | </span>
+              <span>Index: {{sp.index}}  | </span>
+            </li>
+          </ul>
+        </td>
+      </tr>
+      <tr><th>Applications</th>
+        <td class="word-break-all">
+          <ul ng-repeat="app in system.applications">
+            <li ng-bind="app.name"></li>
+          </ul>
+        </td>
+      </tr>
+      <tr ng-if="(systemAccessRoles.update | intersect : authentication.user.roles) > 0 || (systemAccessRoles.delete | intersect : authentication.user.roles) > 0">
+        <th>Actions</th>
+        <td>
+          <button  ng-if="(systemAccessRoles.update | intersect : authentication.user.roles) > 0" type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="systems.edit({systemId: system.systemId})" title="Edit">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#edit">
+                  </use>
+              </svg>
+          </span>
+          </button>
+
+          <button ng-if="(systemAccessRoles.delete | intersect : authentication.user.roles) > 0 " type="button" class="luci-button luci-button--icon-only luci-button--primary" ng-click="remove(system);" title="Delete">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#delete">
+                  </use>
+              </svg>
+            </span>
+          </button>
+          <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="systems.list" title="Back">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#navigate-back">
+                  </use>
+              </svg>
+          </span>
+          </button>
+         
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-show="error" class="text-danger">
+    <strong ng-bind="error"></strong>
+  </div>
+</section>

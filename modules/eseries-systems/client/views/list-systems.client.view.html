@@ -1,0 +1,56 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-4">
+        <h1>Eseries Systems</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()"  ng-bind-html/>
+      </div>
+      <div class="col-md-2 search-top-bar  right-loader">
+        <button class="luci-button luci-button--icon-only luci-button--primary" ui-sref="systems.create">
+          <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#add">
+                  </use>
+              </svg>
+          </span>
+        </button>
+      </div> 
+  
+    </div>
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="system in $data">
+        <td ng-bind="system.name" class="breakword" title="'Name'" sortable="'name'"></td>
+        <td ng-bind="system.wwn" title="'WWN'" sortable="'wwn'" class="breakword"></td>
+        <td ng-bind="system.rest_url" title="'Management IP'" sortable="'rest_url'" class="breakword"></td>
+        <td ng-bind="system.provisioning_state" title="'Provisioning State'" sortable="'provisioning_state'" class="breakword capitalize"></td>
+        <!-- <td ng-bind="system.rest_uri" title="'REST URI'" sortable="'rest_uri'" class="breakword"></td> -->
+        <td ng-if="(systemAccessRoles.update | intersect : authentication.user.roles) > 0" title="'Actions'">          
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="systems.edit({systemId: system.systemId})" title="Edit">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#edit">
+                  </use>
+              </svg>
+            </span>
+          </button>
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="systems.view({systemId: system.systemId})" title="Details">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#monitor">
+                  </use>
+              </svg>
+            </span>
+          </button>        
+        </td>
+        
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>
