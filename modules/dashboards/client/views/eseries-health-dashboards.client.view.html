@@ -225,7 +225,7 @@
                     <td ng-bind="row.status" ng-class="row.state=='online'? 'text-success': 'text-danger'"></td>
                     <td ng-bind="row.type"></td>
                     <td ng-bind="row.serial_number"></td>
-                    <td ng-bind="row.removed" ng-class="row.removed==true? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.removed" ng-class="row.removed==false? 'text-success': 'text-danger'"></td>
                     <td ng-bind="row.cause"></td>
                 </tr>
                 <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='interfaces'" class="capitalize">
