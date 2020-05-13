@@ -26,8 +26,9 @@ var DashboardEseriesDriveSchema = new Schema({
     trim: true,
   },
   serial_number: {
-    type: Boolean,
-    default: false
+    type: String,
+    default: '',
+    trim: true
   },
   removed:  {
     type: Boolean,
