@@ -19,12 +19,21 @@ angular.module('dashboards').config(['$stateProvider',
         }
       })
       .state('dashboards.details', {
-        url: '/health/:type',
-        templateUrl: 'modules/dashboards/client/views/health-dashboards.client.view.html',
-        controller: 'DashboardsHealthController',
+        url: '/ontap-health/:type',
+        templateUrl: 'modules/dashboards/client/views/ontap-health-dashboards.client.view.html',
+        controller: 'DashboardsOntapHealthController',
         data: {
           roles: ['read', 'user', 'admin', 'partner', 'root', 'l1ops'],
-          parent: 'health'
+          parent: 'ontapHealth'
+        }
+      })
+      .state('dashboards.eseriesDetails', {
+        url: '/eseries-health/:type',
+        templateUrl: 'modules/dashboards/client/views/eseries-health-dashboards.client.view.html',
+        controller: 'DashboardsEseriesHealthController',
+        data: {
+          roles: ['read', 'user', 'admin', 'partner', 'root', 'l1ops'],
+          parent: 'eseriesHealth'
         }
       })
       // .state('dashboards.nodes', {

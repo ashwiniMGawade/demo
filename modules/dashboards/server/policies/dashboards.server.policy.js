@@ -23,7 +23,11 @@ exports.invokeRolesPolicies = function () {
       permissions: '*'
     },
     {
-      resources: '/api/health/:type',
+      resources: '/api/ontapHealth/:type',
+      permissions: '*'
+    },
+    {
+      resources: '/api/eseriesHealth/:type',
       permissions: '*'
     }
   ]

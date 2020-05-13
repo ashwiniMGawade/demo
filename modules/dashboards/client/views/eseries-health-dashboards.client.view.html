@@ -1,0 +1,248 @@
+<section>
+    <div class="page-header">
+        <div class="row">
+          <div class="col-md-8">
+            <h2 class="capitalize">{{type}}</h2>
+          </div>
+        </div>
+      </div>
+    
+    <div class="luci-grid" style="margin:0;">
+        <span class="luci-grid__col luci-grid__col-8"></span>
+        <span  class="luci-grid__col luci-grid__col-4"><input class="luci-form__input " type="text" ng-model="search" placeholder="Search">  </span>
+    </div>
+    <div class="luci-table">
+        <table class="luci-table__table">
+            <thead>
+                <tr ng-if="type=='asups'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')">Storage System</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('asup_capable')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('asup_capable')">Asup Capable</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ="getSortingClass('asup_enabled')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('asup_enabled')">Asup Enabled</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ondemand_capable')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('ondemand_capable')">Ondemand Capable</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ondemand_enabled')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('ondemand_enabled')">Ondemand Enabled</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('destination_address')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('destination_address')"> Destination Address</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='controllers'">
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')"> Storage System</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('controller')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('controller')"> Controller</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ip_addresses')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('ip_addresses')"> IP Addresses</span>
+                    </th>                        
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('quiesced')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('quiesced')"> Quiesced</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('active')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('active')"> Active</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')" scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label"  ng-click="orderByFn('status')">Status</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='drives'">
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')"> Storage System</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('id')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('id')"> Id</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('type')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('type')"> Type</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('serial_number')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('serial_number')"> Serial Number</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('removed')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('removed')"> Removed</span>
+                    </th>
+                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cause')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('cause')">Cause</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='interfaces'">                   
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')"> Storage System</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('controller')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('controller')"> Controller</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('interface')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('interface')"> Interface</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('type')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('type')"> Type</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('max_frame_size')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('max_frame_size')"> Max Frame Size</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('current_speed')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('current_speed')"> Current Speed</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('max_speed')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('max_speed')"> Max Speed</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('degraded')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('degraded')"> Degraded</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>                   
+                </tr>
+                <tr ng-if="type=='volumes'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')"> Storage System</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('name')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('name')">Name</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('id')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('id')"> Id</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('thin_provisioned')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('thin_provisioned')"> Thin Provisioned</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('capacity')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('capacity')"> Capacity</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('mapped')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('mapped')"> Mapped</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('offline')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('offline')"> Offline</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('volume_full')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('volume_full')"> Volume Full</span>
+                    </th>                   
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='pools'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')"> Storage System</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('name')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('name')">Name</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('id')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('id')"> Id</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('offline')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('offline')"> Offline</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('state')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('state')"> State</span>
+                    </th>                   
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('raid_level')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('raid_level')">Raid Level</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('raid_status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('raid_status')">Raid Status</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('total_size')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('total_size')">Total Size</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('free_space')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('free_space')">Free Space</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='systems'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('storage_system')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('storage_system')"> Storage System</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('wwn')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('wwn')">WWN</span>
+                    </th>                    
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>  
+                </tr>
+            </thead>
+            <tbody>                              
+                <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--success" style="text-align:center;font-weight: bold;" colspan="10">System health is optimal.</td></tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='asups'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td>
+                    <td ng-bind="row.asup_capable"></td>
+                    <td ng-bind="row.asup_enabled" ng-class="row.asup_enabled==true ? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.ondemand_capable"></td>
+                    <td ng-bind="row.ondemand_enabled"></td>
+                    <td ng-bind="row.destination_address"></td>
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='controllers'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td>
+                    <td ng-bind="row.controller"></td>
+                    <td ng-bind="row.ip_addresses"></td>
+                    <td ng-bind="row.quiesced" ng-class="row.quiesced==true? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.active" ng-class="row.active==true? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.status" ng-class="row.status=='optimal'? 'text-success': 'text-danger'"></td>                    
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='drives'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td>
+                    <td ng-bind="row.id"></td>
+                    <td ng-bind="row.status" ng-class="row.state=='online'? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.type"></td>
+                    <td ng-bind="row.serial_number"></td>
+                    <td ng-bind="row.removed"></td>
+                    <td ng-bind="row.cause"></td>
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='interfaces'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td>                    
+                    <td ng-bind="row.controller"></td>
+                    <td ng-bind="row.interface"></td>
+                    <td ng-bind="row.type"></td>
+                    <td ng-bind="row.max_frame_size"></td>
+                    <td ng-bind="row.current_speed"></td>
+                    <td ng-bind="row.max_speed"></td>
+                    <td ng-bind="row.degraded"></td>
+                    <td ng-bind="row.status" ng-class="row.status=='up'? 'text-success': 'text-danger'"></td>
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='volumes'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td>
+                    <td ng-bind="row.name"></td>
+                    <td ng-bind="row.id"></td>
+                    <td ng-bind="row.thin_provisioned"></td>
+                    <td ng-bind="row.capacity"></td>  
+                    <td ng-bind="row.mapped" ng-class="row.mapped==true? 'text-success': 'text-danger'"></td> 
+                    <td ng-bind="row.offline" ng-class="row.offline==true? 'text-success': 'text-danger'"></td> 
+                    <td ng-bind="row.volume_full" ng-class="row.volume_full==true? 'text-success': 'text-danger'"></td> 
+                    <td ng-bind="row.status" ng-class="row.status=='degraded'? 'text-danger': 'text-success'"></td> 
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='pools'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td> 
+                    <td ng-bind="row.name"></td>   
+                    <td ng-bind="row.id"></td>
+                    <td ng-bind="row.offline" ng-class="row.offline==false? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.state"></td>
+                    <td ng-bind="row.raid_level"></td>
+                    <td ng-bind="row.raid_status" ng-class="row.raid_status=='degraded'? 'text-danger': 'text-success'"></td>
+                    <td ng-bind="row.total_size"></td>
+                    <td ng-bind="row.free_space"></td>                                               
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='systems'" class="capitalize">
+                    <td ng-bind="row.storage_system"></td> 
+                    <td ng-bind="row.wwn"></td>   
+                    <td ng-bind="row.status"></td>                                             
+                </tr>
+            </tbody>
+        </table>
+        <div style="text-align:center; padding:10px;" ng-show="isLoading"><img src='/modules/core/client/img/loaders/loader.gif'></div>
+        </div> 
+</section> 

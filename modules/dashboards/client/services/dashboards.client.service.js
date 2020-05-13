@@ -16,15 +16,26 @@ angular.module('dashboards').factory('Dashboards', ['$resource',
   }
 ]);
 
-
-angular.module('dashboards').factory('Health', ['$resource', '$window',
+angular.module('dashboards').factory('OntapHealth', ['$resource', '$window',
   function ($resource, $window) {
-    return $resource('api/health/:type', {
+    return $resource('api/ontapHealth/:type', {
       type: '@type'
     }, {
       'get': {
         method: 'GET'
       }
     });
-  }
+  } 
+]);
+
+angular.module('dashboards').factory('EseriesHealth', ['$resource', '$window',
+  function ($resource, $window) {
+    return $resource('api/eseriesHealth/:type', {
+      type: '@type'
+    }, {
+      'get': {
+        method: 'GET'
+      }
+    });
+  } 
 ]);

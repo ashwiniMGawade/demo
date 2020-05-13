@@ -11,7 +11,7 @@ var amqp = require('amqplib/callback_api'),
 
 let channel = null;
 
-var q = 'new_provision';
+var q = 'ontap_provision';
 
 var bail = function(err) {
     console.error(err);

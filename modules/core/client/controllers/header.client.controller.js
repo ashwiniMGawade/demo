@@ -60,7 +60,7 @@ angular.module('core')
     // });
 
     $scope.getState = function(state, name) {
-      if (state =='dashboards.details') {
+      if (state =='dashboards.details' || state =='dashboards.eseriesDetails') {
         $state.go(state, {type: angular.lowercase(name)});
       } else {
         $state.go(state)
@@ -68,7 +68,6 @@ angular.module('core')
     }
 
     $scope.getChildClass = function(item) { 
-       
       if ($stateParams.type === angular.lowercase(item.title)) {
         return 'luci-navigation__link--is-active'
       } else {

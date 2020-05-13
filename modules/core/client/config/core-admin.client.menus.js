@@ -42,8 +42,16 @@ angular.module('core.admin').run(['Menus',
     });
 
     Menus.addMenuItem('topbar', {
-      title: 'Health',
-      state: 'health',
+      title: 'Ontap Health',
+      state: 'ontapHealth',
+      type: 'dropdown',
+      roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+      position:0
+    });
+
+    Menus.addMenuItem('topbar', {
+      title: 'Eseries Health',
+      state: 'eseriesHealth',
       type: 'dropdown',
       roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
       position:0

@@ -5,7 +5,7 @@ angular.module('clusters').run(['Menus',
   function (Menus) {
     // Add the pods dropdown item
     var t= Menus.addSubMenuItem('topbar', 'administration', {
-      title: 'Clusters',
+      title: 'Ontap Clusters',
       state: 'clusters.list',
       type: 'dropdown',
       roles: featuresSettings.roles.cluster.list,

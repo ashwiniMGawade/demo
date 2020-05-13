@@ -10,6 +10,13 @@ var path = require('path'),
   Tenant = mongoose.model('Tenant'),
   Server = mongoose.model('Server'),
   Storagegroup = mongoose.model('Storagegroup'),
+  EseriesAsup = mongoose.model('eseries_asup_health'),
+  EseriesContoller = mongoose.model('eseries_controller_health'),
+  EseriesDrive = mongoose.model('eseries_drive_health'),
+  EseriesInterface = mongoose.model('eseries_interface_health'),
+  EseriesPool = mongoose.model('eseries_pool_health'),
+  EseriesSystem = mongoose.model('eseries_system_health'),
+  EseriesVolume = mongoose.model('eseries_volume_health'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   request = require('then-request'),
   config = require(path.resolve('./config/config')),
@@ -178,7 +185,7 @@ exports.getTestGraph = function(req, res) {
     ]);
 }
 
-exports.getHealthData =function(req, res) {
+exports.getOntapHealthData =function(req, res) {
   var type = req.params.type
   var dbWfa = require('./dashboards.server.wfa.db.read');    
 
@@ -219,4 +226,52 @@ exports.getHealthData =function(req, res) {
 
  
 }
+
+exports.getEseriesHealthData =function(req, res) {
+  var type = req.params.type
+
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header('Expires', '-1');
+  res.header('Pragma', 'no-cache');
+
+  var callback = function(err, results) {
+    console.log(err, results)
+    if (err) {
+      logger.info(err);
+      return respondError(res, 400, err);
+    } else {
+      res.json(results)
+    }      
+  }; 
+
+  if (type == "asups") {      
+    EseriesAsup.find({}).exec(callback);
+  } 
+
+  if (type == "controllers") {
+    EseriesContoller.find().exec(callback);    
+  } 
+
+  if (type == "drives") {   
+    EseriesDrive.find().exec(callback);
+  } 
+
+  if (type == "interfaces") {
+    EseriesInterface.find().exec(callback);    
+  } 
+
+  if (type == "pools") {   
+    EseriesPool.find().exec(callback);
+  } 
+
+  if (type == "systems") {
+    EseriesSystem.find().exec(callback);    
+  } 
+
+  if (type == "volumes") {
+    EseriesVolume.find().exec(callback);    
+  } 
+ 
+}
+
 

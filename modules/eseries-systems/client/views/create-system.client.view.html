@@ -22,7 +22,7 @@
         <div class="form-group required" show-errors>
           <label for="wwn">wwn</label>
           <input name="wwn" type="text" ng-model="wwn" id="wwn" class="form-control" placeholder="eg. 600A098000A4AE91000000005EA11AAD"
-          ng-pattern="/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/" required>
+          ng-pattern="/^[A-Z0-9]{33}$/" required>
           <div ng-messages="SystemForm.wwn.$error" role="alert">
             <p class="help-block error-text" ng-message="required">System wwn is required.</p>            
             <p class="help-block error-text" ng-message="pattern">wwn is invalid</p>

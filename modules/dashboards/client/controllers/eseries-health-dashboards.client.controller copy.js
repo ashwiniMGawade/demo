@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('dashboards').controller('DashboardsHealthController', ['$scope', '$stateParams', '$filter', '$http', '$interval', 'Authentication', 'Health', 'Flash',
-  function ($scope, $stateParams, $filter, $http, $interval, Authentication, Health, Flash) {
+angular.module('dashboards').controller('DashboardsEseriesHealthController', ['$scope', '$stateParams', '$filter', '$http', '$interval', 'Authentication', 'EseriesHealth', 'Flash',
+  function ($scope, $stateParams, $filter, $http, $interval, Authentication, EseriesHealth, Flash) {
     $scope.authentication = Authentication;
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
     $scope.isPartner = Authentication.user.roles.indexOf('partner') !== -1;
@@ -15,7 +15,7 @@ angular.module('dashboards').controller('DashboardsHealthController', ['$scope',
     console.log($scope.type);
     $scope.data = []
 
-    var results = Health.query({"type":$scope.type});
+    var results = EseriesHealth.query({"type":$scope.type});
     $scope.isLoading = true;
     results.$promise.then(function(results) {
         $scope.data = results
