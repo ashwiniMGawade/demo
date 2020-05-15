@@ -116,6 +116,35 @@
           <p class="help-block">The Provision Type with which the Storage Unit is to be accessed with.</p>
         </div>
 
+        <div class="form-group" show-errors ng-if="showDrEnabledCheckBox"> 
+          <input type="checkbox" ng-model="$parent.dr_enabled"  ng-change="checkboxChanged()" name="dr_enabled" value="true">
+          <label for="dr_enabled">DR Enabled</label>  
+       </div>
+
+       <div class="form-group required" show-errors ng-if="dr_enabled">
+        <label for="clusterId">Destination Cluster</label>   
+        <select name="clusterId" ng-model="clusterId" id="clusterId" class="form-control" ng-options="cluster.clusterId as cluster.name for cluster in clusters | orderBy: 'name'" required  ng-disabled="!clusters.length">
+          <option value="">Please select a cluster</option>
+        </select>
+        <!-- <div class="loader" ng-show="!clusters.length"></div>        -->
+        <div ng-messages="storageunitForm.clusterId.$error" role="alert">
+          <p class="help-block error-text" ng-message="required">cluster name is required.</p>
+        </div>
+        <p class="help-block">The cluster the storageunit is to be created in.</p>
+      </div>
+
+
+      <div class="form-group required" show-errors ng-if="dr_enabled">
+        <label for="serverId">Destination {{labels.server.serverName}}</label>
+        <select name="serverId" ng-model="serverId" id="serverId" class="form-control" ng-options="server.serverId as server.name for server in servers | orderBy: 'name'" required ng-disabled="isRoot && (!clusterId || !servers.length)"> 
+          <option value="">Please select a {{labels.server.serverName}}</option>
+        </select>
+        <div ng-messages="storageunitForm.serverId.$error" role="alert">
+          <p class="help-block error-text" ng-message="required">{{labels.server.serverName}} is required.</p>
+        </div>
+        <p class="help-block">The {{labels.server.serverName}} in which the Storage Unit is to reside in.</p>
+      </div>
+
 
         <!-- <div class="form-group required" show-errors>
           <label for="storagegroupId">Volume</label>

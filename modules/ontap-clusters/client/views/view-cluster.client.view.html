@@ -28,6 +28,7 @@
           </ul>
         </td>
       </tr>
+      <tr><th>DR Enabled</th><td ng-bind="cluster.dr_enabled" class="word-break-all"></td></tr>      
       <tr ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0 || (clusterAccessRoles.delete | intersect : authentication.user.roles) > 0">
         <th>Actions</th>
         <td>

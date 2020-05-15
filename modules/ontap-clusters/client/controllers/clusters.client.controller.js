@@ -36,7 +36,8 @@ angular.module('clusters').controller('ClustersController', ['$scope', '$statePa
         uuid: $sanitize(this.uuid),
         management_ip: $sanitize(this.management_ip),
         provisioning_state: $sanitize(this.provisioning_state),
-        applications: this.applications
+        applications: this.applications,
+        dr_enabled:this.dr_enabled
       });
 
       // Redirect after save

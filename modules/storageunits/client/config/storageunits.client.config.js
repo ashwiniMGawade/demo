@@ -6,7 +6,7 @@ angular.module('storageunits').run(['Menus',
 
     // Add the Storage Units dropdown item
     Menus.addSubMenuItem('topbar', 'storagemanagement', {
-      title: 'Storage Units',
+      title: 'Ontap Storage Units',
       state: 'storageunits.list',
       type: 'dropdown',
       roles: featuresSettings.roles.storageunit.list,

@@ -32,6 +32,8 @@ angular.module('storageunits')
     $scope.isAdmin = Authentication.user.roles.indexOf('admin') !== -1;
     $scope.isUser = Authentication.user.roles.indexOf('user') !== -1;
 
+    $scope.showDrEnabledCheckBox = false;
+
 
     var flashTimeout = 3000;
 
@@ -138,6 +140,11 @@ angular.module('storageunits')
 
     $scope.$watch("clusterId", function(newVal, oldVal) {
       if (newVal) {
+        angular.forEach($scope.clusters, function(clusterDetail) {
+          if (clusterDetail.clusterId && clusterDetail.clusterId === newVal) {
+             $scope.showDrEnabledCheckBox = clusterDetail.dr_enabled;
+          }
+        });
         $scope.populatevfas(newVal, function() {
           if($scope.servers.length === 1){
             $scope.serverId = $scope.servers[0].serverId;

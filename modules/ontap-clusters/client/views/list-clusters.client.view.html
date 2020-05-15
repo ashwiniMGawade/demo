@@ -27,7 +27,7 @@
         <td ng-bind="cluster.uuid" title="'UUID'" sortable="'uuid'" class="breakword"></td>
         <td ng-bind="cluster.management_ip" title="'Management IP'" sortable="'management_ip'" class="breakword"></td>
         <td ng-bind="cluster.provisioning_state" title="'Provisioning State'" sortable="'provisioning_state'" class="breakword capitalize"></td>
-        <!-- <td ng-bind="cluster.rest_uri" title="'REST URI'" sortable="'rest_uri'" class="breakword"></td> -->
+        <td ng-bind="cluster.dr_enabled" title="'DR Enabled'" sortable="'dr_enabled'" class="breakword"></td>
         <td ng-if="(clusterAccessRoles.update | intersect : authentication.user.roles) > 0" title="'Actions'">          
           <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.edit({clusterId: cluster.clusterId})" title="Edit">
             <span class="luci-button__inner">

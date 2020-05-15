@@ -129,31 +129,29 @@ exports.acRead = function (tenant, server, sg, callback) {
 
 exports.clusterRead = function (callback) {
   /*
-   SELECT cluster.name AS 'cluster_name', cluster.diagnosisStatus AS 'system_health',
-   if(((unix_timestamp(now()) * 1000)-cluster.lastUpdateTime)<=900000, 'Good','Bad') AS 'communicaion',
-   substring_index(substring(cluster.version,16,10),':',1) As 'os_version',
-   if(cluster.haConfigured,'true','false') AS 'ha_configured',
-   count(netapp_model.node.name) AS 'Node Count'
-    FROM netapp_model.cluster
-    LEFT JOIN netapp_model.node ON netapp_model.node.clusterId = netapp_model.cluster.objid
-    GROUP BY cluster.name;
+   SELECT mcls.name  AS 'Cluster', mcls.diagnosisStatus AS 'System Health',
+if(((unix_timestamp(now()) * 1000)-mcls.lastUpdateTime)<=900000, 'Good','Bad') AS 'Communication',
+substring_index(substring(mcls.version,16,10),':',1) As 'OS Version',
+if(mcls.haConfigured,'true','false') AS 'HA Configured', count(mnod.name)  AS 'Node Count'
+FROM netapp_model.cluster mcls LEFT JOIN netapp_model.node mnod ON mnod.clusterId = mcls.objid GROUP BY mcls.name;
+
   */
     var value = myCache.get("clusters")
     if(value == undefined){
       console.log("inside the cache not found. getting from db")
       var args = 'SELECT ' +
-        'cluster.name AS \'cluster_name\', ' +
-        'cluster.diagnosisStatus AS \'system_health\', ' +
-        'if(((unix_timestamp(now()) * 1000)-cluster.lastUpdateTime)<=900000, \'Good\',\'Bad\') AS \'communicaion\', ' +
-        'substring_index(substring(cluster.version,16,10),\':\',1) As \'os_version\', ' +
-        'if(cluster.haConfigured,\'true\',\'false\') AS \'ha_configured\', ' +
-        ' count(netapp_model.node.name) AS \'node_count\' ' +
+        'mcls.name AS \'cluster_name\', ' +
+        'mcls.diagnosisStatus AS \'system_health\', ' +
+        'if(((unix_timestamp(now()) * 1000)-mcls.lastUpdateTime)<=900000, \'Good\',\'Bad\') AS \'communicaion\', ' +
+        'substring_index(substring(mcls.version,16,10),\':\',1) As \'os_version\', ' +
+        'if(mcls.haConfigured,\'true\',\'false\') AS \'ha_configured\', ' +
+        ' count(mnod.name) AS \'node_count\' ' +
       'FROM ' +
-        'netapp_model.cluster ' +
+        'netapp_model.cluster mcls' +
         'LEFT JOIN ' +
-        'netapp_model.node ' +
-          'ON netapp_model.node.clusterId = netapp_model.cluster.objid ' +
-          'GROUP BY cluster.name';
+        'netapp_model.node mnod' +
+          'ON mnod.clusterId = mcls.objid ' +
+          'GROUP BY mcls.name';
 
       logger.info('Cluster health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
       connectionPool.getConnection(function(err, connection) {
@@ -220,6 +218,15 @@ exports.nodeRead = function (callback) {
        if((node.rawDiskBytesUsed/1024/1024/1024/1024) <= 1024,concat(round(node.rawDiskBytesUsed/1024/1024/1024/1024,2),' TB'),
        concat(round(node.rawDiskBytesUsed/1024/1024/1024/1024/1024,2),' PB')))))) AS 'Used Raw Capacity'
 FROM netapp_model.node LEFT JOIN netapp_model.cluster ON netapp_model.node.clusterId = netapp_model.cluster.objid;
+
+
+SELECT mcls.name AS 'Cluster', mnod.name AS 'Node', mnod.model AS 'Model',
+substring_index(substring(mnod.version,16,10),':',1) As 'OS Version', if(mnod.isNodeHealthy,'Yes','No') AS 'Healthy',
+if(mnod.isInterconnectUp,'Yes','No') AS 'HA Status', if(mnod.isFailoverEnabled,'Yes','No') AS 'Failover Enabled',
+if(mnod.isTakeOverPossible,'Yes','No') AS 'TakeOver Possible', substring(mnod.interconnectLinks,22,2) AS 'RMDA Connection',
+if(mnod.isAllFlashOptimized,'Yes',if(substring(mnod.model,1,3)='FAS','NA','No')) AS 'Flash Optimized'
+FROM netapp_model.node mnod LEFT JOIN netapp_model.cluster mcls ON mnod.clusterId = mcls.objid;
+
   */
     var args = "SELECT cluster.name AS 'cluster_name', node.name AS 'node_name', node.model AS 'node_model'," +
     "substring_index(substring(node.version,16,10),':',1) As 'os_version'," +
@@ -311,33 +318,28 @@ exports.aggregateRead = function (callback) {
 FROM netapp_model.aggregate
 LEFT JOIN netapp_model.node ON netapp_model.aggregate.nodeId = netapp_model.node.objid
 WHERE netapp_model.aggregate.isRootAggregate=0;
+
+SELECT  magr.name AS 'Aggregate', mnod.name AS 'Node', magr.aggregateType AS 'Type', magr.stateRaw AS 'State',
+CASE
+    WHEN (magr.totalCommitted >= magr.sizeTotal) THEN 'Aggregate overcommit threshold breached'
+    WHEN (magr.sizeUsedPercent >= 90) THEN CONCAT('Aggregate is at ',magr.sizeUsedPercent,' % utilization')
+    WHEN magr.stateRaw='offline' THEN 'Aggregate is offline'
+END AS 'Status'
+FROM netapp_model.aggregate magr LEFT JOIN netapp_model.node mnod ON magr.nodeId = mnod.objid
+WHERE magr.isRootAggregate=0 AND (magr.stateRaw='offline' OR magr.totalCommitted >= magr.sizeTotal OR magr.sizeUsedPercent >= 90)
   */
   var value = myCache.get("aggregates")
   if(value == undefined){
     console.log("inside the cache not found. getting from db")
-    var args ="SELECT  aggregate.name AS 'aggregate_name', aggregate.stateRaw AS 'state', node.name AS 'node_name', " +
-      "aggregate.aggregateType AS 'type'," +
-      "if((aggregate.sizeAvail) <= 1024,concat(aggregate.sizeAvail,' B')," +
-      "if((aggregate.sizeAvail/1024) <= 1024,concat(round(aggregate.sizeAvail/1024,2),' KB')," +
-      "if((aggregate.sizeAvail/1024/1024) <= 1024,concat(round(aggregate.sizeAvail/1024/1024,2),' MB')," +
-      "if((aggregate.sizeAvail/1024/1024/1024) <= 1024,concat(round(aggregate.sizeAvail/1024/1024/1024,2),' GB')," +
-      "if((aggregate.sizeAvail/1024/1024/1024/1024) <= 1024,concat(round(aggregate.sizeAvail/1024/1024/1024/1024,2),' TB')," +
-      "concat(round(aggregate.sizeAvail/1024/1024/1024/1024/1024,2),' PB')))))) AS 'available_data_capacity'," +
-      "if((aggregate.sizeTotal) <= 1024,concat(aggregate.sizeTotal,' B')," +
-      "if((aggregate.sizeTotal/1024) <= 1024,concat(round(aggregate.sizeTotal/1024,2),' KB')," +
-      "if((aggregate.sizeTotal/1024/1024) <= 1024,concat(round(aggregate.sizeTotal/1024/1024,2),' MB')," +
-      "if((aggregate.sizeTotal/1024/1024/1024) <= 1024,concat(round(aggregate.sizeTotal/1024/1024/1024,2),' GB')," +
-      "if((aggregate.sizeTotal/1024/1024/1024/1024) <= 1024,concat(round(aggregate.sizeTotal/1024/1024/1024/1024,2),' TB')," +
-      "concat(round(aggregate.sizeTotal/1024/1024/1024/1024/1024,2),' PB')))))) AS 'total_data_capacity'," +
-      "if((aggregate.totalCommitted) <= 1024,concat(aggregate.totalCommitted,' B')," +
-      "if((aggregate.totalCommitted/1024) <= 1024,concat(round(aggregate.totalCommitted/1024,2),' KB')," +
-      "if((aggregate.totalCommitted/1024/1024) <= 1024,concat(round(aggregate.totalCommitted/1024/1024,2),' MB')," +
-      "if((aggregate.totalCommitted/1024/1024/1024) <= 1024,concat(round(aggregate.totalCommitted/1024/1024/1024,2),' GB')," +
-      "if((aggregate.totalCommitted/1024/1024/1024/1024) <= 1024,concat(round(aggregate.totalCommitted/1024/1024/1024/1024,2),' TB')," +
-      "concat(round(aggregate.totalCommitted/1024/1024/1024/1024/1024,2),' PB')))))) AS 'committed_capacity' " +
-      "FROM netapp_model.aggregate " +
-      "LEFT JOIN netapp_model.node ON netapp_model.aggregate.nodeId = netapp_model.node.objid " +
-      "WHERE netapp_model.aggregate.isRootAggregate=0 ";
+    var args ="SELECT  magr.name AS 'aggregate_name', magr.stateRaw AS 'state', mnod.name AS 'node_name', " +
+      "magr.aggregateType AS 'type'," +
+      "CASE " +
+      "WHEN (magr.totalCommitted >= magr.sizeTotal) THEN 'Aggregate overcommit threshold breached' " +
+      "WHEN (magr.sizeUsedPercent >= 90) THEN CONCAT('Aggregate is at ',magr.sizeUsedPercent,' % utilization')" +
+      "WHEN magr.stateRaw='offline' THEN 'Aggregate is offline' " +
+      "END AS 'status' " +
+      "FROM netapp_model.aggregate magr LEFT JOIN netapp_model.node mnod ON magr.nodeId = mnod.objid" + 
+      " WHERE magr.isRootAggregate=0 AND (magr.stateRaw='offline' OR magr.totalCommitted >= magr.sizeTotal OR magr.sizeUsedPercent >= 90)";      
 
     logger.info('aggreagate health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
     connectionPool.getConnection(function(err, connection) {
@@ -376,14 +378,18 @@ exports.SVMRead = function (callback) {
   FROM netapp_model.vserver
   LEFT JOIN netapp_model.cluster ON netapp_model.vserver.clusterId = netapp_model.cluster.objid
   WHERE netapp_model.vserver.typeRaw = 'data' AND netapp_model.vserver.subtypeRaw = 'default';
+
+  SELECT mvs.name AS 'SVM', mcls.name AS 'Cluster', mvs.stateRaw AS 'State', mvs.operationalStateRaw AS 'Ops State', mvs.allowedProtocols AS 'Protocols'
+FROM netapp_model.vserver mvs LEFT JOIN netapp_model.cluster mcls ON mvs.clusterId = mcls.objid
+WHERE mvs.typeRaw = 'data' AND mvs.subtypeRaw = 'default' AND (mvs.stateRaw = 'stopped' OR mvs.operationalStateRaw = 'stopped');
   */
   var value = myCache.get("svms")
   if(value == undefined){
-    var args = "SELECT vserver.name AS 'svm_name', cluster.name AS 'cluster_name', vserver.operationalStateRaw AS 'ops_status'," +
+    var args = "SELECT vserver.name AS 'svm_name', cluster.name AS 'cluster_name',  vserver.stateRaw AS 'state', vserver.operationalStateRaw AS 'ops_status'," +
     "vserver.allowedProtocols AS 'protocols', vserver.language AS 'language' " +
     "FROM netapp_model.vserver " +
     "LEFT JOIN netapp_model.cluster ON netapp_model.vserver.clusterId = netapp_model.cluster.objid " +
-    "WHERE netapp_model.vserver.typeRaw = 'data' AND netapp_model.vserver.subtypeRaw = 'default'";
+    "WHERE netapp_model.vserver.typeRaw = 'data' AND netapp_model.vserver.subtypeRaw = 'default' AND (vserver.stateRaw = 'stopped' OR vserver.operationalStateRaw = 'stopped')";
 
     logger.info('SVM health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
     connectionPool.getConnection(function(err, connection) {
@@ -423,15 +429,31 @@ LEFT JOIN netapp_model_view.aggregate ON netapp_model_view.volume.aggregateId = 
 WHERE (volume.sizeUsedPercent >= 90 OR volume.stateRaw = 'offline' OR volume.sisStateRaw = 'disabled')
 AND (volume.volTypeRaw = 'rw' AND volume.isVserverRoot = 0);
 
+  SELECT mvol.name AS 'Name', magrs.name AS 'Aggregate', mvs.name AS 'Vserver', mcls.name AS 'Cluster',
+CASE
+   WHEN mvol.sizeUsedPercent = 90 THEN'Volume is at 90% utilization'
+   WHEN mvol.sizeUsedPercent > 90 THEN'Volume is above 90% utilization'
+   WHEN mvol.stateRaw = 'offline' THEN 'Volume is Offline'
+   WHEN mvol.sisStateRaw = 'disabled' THEN 'Volume efficiency is disabled'
+END AS 'Status' FROM netapp_model.volume mvol LEFT JOIN netapp_model.cluster mcls ON mvol.clusterId = mcls.objid
+LEFT JOIN netapp_model.vserver mvs ON mvol.vserverId = mvs.objid
+LEFT JOIN netapp_model.aggregate magrs ON mvol.aggregateId = magrs.objid
+WHERE (mvol.sizeUsedPercent >= 90 OR mvol.stateRaw = 'offline' OR mvol.sisStateRaw = 'disabled') AND (mvol.volTypeRaw = 'rw' AND mvol.isVserverRoot = 0); 
+
   */
 var value = myCache.get("volumes")
   if(value == undefined){
     var args = "SELECT volume.name AS 'volume_name', aggregate.name AS 'aggregate_name', " +
     "vserver.name AS 'vserver_name', cluster.name AS 'cluster_name', " +
-    "IF(volume.sizeUsedPercent >= 90,'Volume is at 90% or above',IF(volume.stateRaw = 'offline','Volume is Offline',IF(volume.sisStateRaw = 'disabled','Volume efficiency is disabled','NA'))) AS 'error_status'  " +
-    "FROM netapp_model_view.volume LEFT JOIN netapp_model_view.cluster ON netapp_model_view.volume.clusterId = netapp_model_view.cluster.objid  " +
-    "LEFT JOIN netapp_model_view.vserver ON netapp_model_view.volume.vserverId = netapp_model_view.vserver.objid  " +
-    "LEFT JOIN netapp_model_view.aggregate ON netapp_model_view.volume.aggregateId = netapp_model_view.aggregate.objid  " +
+    "CASE" +
+    "WHEN volume.sizeUsedPercent = 90 THEN'Volume is at 90% utilization' " +
+    "WHEN volume.sizeUsedPercent > 90 THEN'Volume is above 90% utilization' " +
+    "WHEN volume.stateRaw = 'offline' THEN 'Volume is Offline' " +
+    "WHEN volume.sisStateRaw = 'disabled' THEN 'Volume efficiency is disabled' " +
+    "END AS 'error_status' " +    
+    "FROM netapp_model.volume LEFT JOIN netapp_model.cluster ON netapp_model.volume.clusterId = netapp_model.cluster.objid  " +
+    "LEFT JOIN netapp_model.vserver ON netapp_model.volume.vserverId = netapp_model.vserver.objid  " +
+    "LEFT JOIN netapp_model.aggregate ON netapp_model.volume.aggregateId = netapp_model.aggregate.objid  " +
     "WHERE (volume.sizeUsedPercent >= 90 OR volume.stateRaw = 'offline' OR volume.sisStateRaw = 'disabled')  " +
     "AND (volume.volTypeRaw = 'rw' AND volume.isVserverRoot = 0)";
 
@@ -465,36 +487,15 @@ var value = myCache.get("volumes")
 
 exports.lunRead = function (callback) {
   /*
-SELECT lun.path AS 'path', volume.name AS 'volume_name', aggregate.name 'aggregate_name', vserver.name AS 'vserver_name', cluster.name AS 'cluster_name'
-FROM netapp_model.lun
-LEFT JOIN netapp_model.volume ON netapp_model.volume.objid = netapp_model.lun.volumeId
-LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.volume.aggregateId
-LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId
-LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId
-WHERE netapp_model.lun.isOnline = 0;
-
-    SELECT lun.path AS 'path', volume.name AS 'volume_name', aggregate.name 'aggregate_name', vserver.name AS 'vserver_name', cluster.name AS 'cluster_name',
-   CASE
-      WHEN lun.isOnline=0 THEN 'LUN is Offline'
-      WHEN lun.isMapped=0 THEN 'LUN is Unmapped'
-    END AS 'error_status'
-FROM netapp_model.lun LEFT JOIN netapp_model.volume ON netapp_model.volume.objid = netapp_model.lun.volumeId
-LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.volume.aggregateId
-LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId
-LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId WHERE lun.isOnline = 0;
-
-
-[2:50 PM] S, Durai
-    SELECT substring_index(lun.path,'/',-1) AS 'lun_name', volume.name AS 'volume_name', aggregate.name 'aggregate_name', vserver.name AS 'vserver_name', cluster.name AS 'cluster_name',
-   CASE
-      WHEN lun.isOnline=0 THEN 'LUN is Offline'
-      WHEN lun.isMapped=0 THEN 'LUN is Unmapped'
-    END AS 'error_status'
-FROM netapp_model.lun LEFT JOIN netapp_model.volume ON netapp_model.volume.objid = netapp_model.lun.volumeId
-LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.volume.aggregateId
-LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId
-LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId WHERE lun.isOnline = 0 or lun.isMapped = 0;
-
+  SELECT substring_index(mlun.path,'/',-1) AS 'Name', mvol.name AS 'Volume', magr.name 'Aggregate', mvs.name AS 'Vserver', mcls.name AS 'Cluster',
+  CASE
+    WHEN mlun.isOnline=0 THEN 'LUN is Offline'
+    WHEN mlun.isMapped=0 THEN 'LUN is Unmapped'
+  END AS 'Status'
+  FROM netapp_model.lun mlun LEFT JOIN netapp_model.volume mvol ON mvol.objid = mlun.volumeId
+  LEFT JOIN netapp_model.aggregate magr ON magr.objid = mvol.aggregateId
+  LEFT JOIN netapp_model.vserver mvs ON mvs.objid = mlun.vserverId
+  LEFT JOIN netapp_model.cluster mcls ON mcls.objid = mlun.clusterId WHERE (mlun.isOnline = 0 or mlun.isMapped=0) AND mvol.volTypeRaw = 'rw';
 
   */
   var value = myCache.get("luns")
@@ -509,7 +510,7 @@ LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.
     "LEFT JOIN netapp_model.aggregate ON netapp_model.aggregate.objid = netapp_model.volume.aggregateId " +
     "LEFT JOIN netapp_model.vserver ON netapp_model.vserver.objid = netapp_model.lun.vserverId " +
     "LEFT JOIN netapp_model.cluster ON netapp_model.cluster.objid = netapp_model.lun.clusterId " +
-    "WHERE netapp_model.lun.isOnline = 0 or lun.isMapped = 0;";
+    "WHERE (netapp_model.lun.isOnline = 0 or netapp_model.lun.isMapped = 0) AND netapp_model.volume.volTypeRaw='rw';";
 
     logger.info('lun health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
     connectionPool.getConnection(function(err, connection) {

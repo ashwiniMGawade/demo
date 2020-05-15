@@ -24,6 +24,7 @@ exports.create = function (req, res) {
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
   cluster.applications = req.body.applications || '';
+  cluster.dr_enabled = req.body.dr_enabled || false;
 
 
   cluster.save(function (err) {
@@ -60,6 +61,7 @@ exports.update = function (req, res) {
   cluster.management_ip = req.body.management_ip;
   cluster.provisioning_state = req.body.provisioning_state;
   cluster.applications = req.body.applications;
+  cluster.dr_enabled = req.body.dr_enabled;
 
    cluster.save(function (err) {
       logger.info('Cluster cluster.save(): Entered');

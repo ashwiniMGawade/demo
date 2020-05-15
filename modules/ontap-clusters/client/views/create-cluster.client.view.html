@@ -58,13 +58,13 @@
             <p class="help-block error-text" ng-message="required">Please select one more applications which can be provisioned under the cluster</p>
           </div>
         </div>
-        <!-- <div class="form-group" show-errors>
-          <label for="rest_uri">REST URI</label>   
-          <input name="rest_uri" type="text" ng-model="rest_uri" id="rest_uri" class="form-control" placeholder="http://sample.com">  
-        </div> -->
+        <div class="form-group" show-errors> 
+          <input type="checkbox" ng-model="dr_enabled"  ng-change="checkboxChanged()" name="dr_enabled" value="true">
+          <label for="dr_enabled">DR Enabled</label>  
+       </div>
         <div class="form-group">
           <button  type="button" class="luci-button luci-button--primary" ng-click="create(clusterForm.$valid)">Create</button>
-            <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.list" title="Back">
+          <button  type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="clusters.list" title="Back">
               <span class="luci-button__inner">
                 <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
                     <use xlink:href="/assets/css/icons/luci.svg#navigate-back">

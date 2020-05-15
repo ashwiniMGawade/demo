@@ -25,7 +25,7 @@
                         <span class="luci-table__sort-label" ng-click="orderByFn('communication')">Communication</span>
                     </th>
                         <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('os_version')" scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label" ng-click="orderByFn('os_version')"> OS version</span>
+                        <span class="luci-table__sort-`label" ng-click="orderByFn('os_version')"> OS version</span>
                     </th>
                         <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ha_configured')" scope="col" aria-sort="true" tabindex="0">
                         <span class="luci-table__sort-label" ng-click="orderByFn('ha_configured')"> HA Configured</span>
@@ -95,14 +95,8 @@
                         <span class="luci-table__sort-label" ng-click="orderByFn('type')"> Type</span>
                     </th>
                         <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('available_data_capacity')"  scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label" ng-click="orderByFn('available_data_capacity')"> Available Data Capacity</span>
-                    </th>
-                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('total_data_capacity')"  scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label" ng-click="orderByFn('total_data_capacity')"> Total Data Capacity</span>
-                    </th>
-                        <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('committed_capacity')"  scope="col" aria-sort="true" tabindex="0">
-                        <span class="luci-table__sort-label" ng-click="orderByFn('committed_capacity')">Committed Capacity</span>
-                    </th>
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>                        
                 </tr>
                 <tr ng-if="type=='svms'">
                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('svm_name')"  scope="col" aria-sort="true" tabindex="0">
@@ -110,6 +104,9 @@
                     </th>
                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster_name')"  scope="col" aria-sort="true" tabindex="0">
                         <span class="luci-table__sort-label" ng-click="orderByFn('cluster_name')"> Cluster Name</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('state')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('state')"> State</span>
                     </th>
                     <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ops_status')"  scope="col" aria-sort="true" tabindex="0">
                         <span class="luci-table__sort-label" ng-click="orderByFn('ops_status')"> Status</span>
@@ -190,15 +187,14 @@
                     <td ng-bind="row.aggregate_name"></td>
                     <td ng-bind="row.node_name"></td>
                     <td ng-bind="row.state" ng-class="row.state=='online'? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.status"></td>
                     <td ng-bind="row.type"></td>
-                    <td ng-bind="row.available_data_capacity"></td>
-                    <td ng-bind="row.total_data_capacity"></td>
-                    <td ng-bind="row.committed_capacity"></td>
                 </tr>
                 <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='svms'" class="capitalize">
                     <td ng-bind="row.svm_name"></td>
                     <td ng-bind="row.cluster_name"></td>
                     <td ng-bind="row.ops_status" ng-class="row.ops_status=='running'? 'text-success': 'text-danger'"></td>
+                    <td ng-bind="row.state"></td>
                     <td ng-bind="row.protocols"></td>
                     <td ng-bind="row.language"></td>
                 </tr>

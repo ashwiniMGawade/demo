@@ -40,6 +40,10 @@ var ClusterSchema = new Schema({
     trim: true
   },
   aggregates: [aggregateSchema],
+  dr_enabled: {
+    type: Boolean,
+    default: false
+  },
   uuid: {
     type: String,
     trim:true,
