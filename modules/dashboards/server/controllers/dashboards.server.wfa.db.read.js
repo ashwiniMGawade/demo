@@ -149,7 +149,7 @@ FROM netapp_model.cluster mcls LEFT JOIN netapp_model.node mnod ON mnod.clusterI
       'FROM ' +
         'netapp_model.cluster mcls' +
         'LEFT JOIN ' +
-        'netapp_model.node mnod' +
+        'netapp_model.node mnod ' +
           'ON mnod.clusterId = mcls.objid ' +
           'GROUP BY mcls.name';
 

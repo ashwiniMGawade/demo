@@ -182,12 +182,12 @@
             </thead>
             <tbody>   
                 <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--success" style="text-align:center;font-weight: bold;" colspan="10">System health is optimal.</td></tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='systems'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='systems'" >
                     <td ng-bind="row.storage_system"></td> 
                     <td ng-bind="row.wwn"></td>   
                     <td ng-bind="row.status" ng-class="row.status=='optimal'? 'text-success': 'text-danger'"></td>                                             
                 </tr> 
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='controllers'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='controllers'" >
                     <td ng-bind="row.storage_system"></td>
                     <td ng-bind="row.controller"></td>
                     <td ng-bind="row.ip_addresses"></td>
@@ -195,7 +195,7 @@
                     <td ng-bind="row.active" ng-class="row.active==true? 'text-success': 'text-danger'"></td>
                     <td ng-bind="row.status" ng-class="row.status=='optimal'? 'text-success': 'text-danger'"></td>                    
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='pools'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='pools'" >
                     <td ng-bind="row.storage_system"></td> 
                     <td ng-bind="row.name"></td>   
                     <td ng-bind="row.id" style="word-break: break-all;"></td>
@@ -207,7 +207,7 @@
                     <td ng-bind="row.free_space"></td>
                     <td ng-bind="row.used_percentage"></td>                                               
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='volumes'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='volumes'" >
                     <td ng-bind="row.storage_system"></td>
                     <td ng-bind="row.name"></td>
                     <td ng-bind="row.id" style="word-break: break-all;"></td>
@@ -219,7 +219,7 @@
                     <td ng-bind="row.status" ng-class="row.status=='degraded'? 'text-danger': 'text-success'"></td>
                     <td ng-bind="row.used_percentage" ng-class="row.used_percentage > 90 ? 'text-danger': 'text-success'"></td> 
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='drives'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='drives'" >
                     <td ng-bind="row.storage_system"></td>
                     <td ng-bind="row.id" style="word-break: break-all;"></td>
                     <td ng-bind="row.status" ng-class="row.state=='online'? 'text-success': 'text-danger'"></td>
@@ -228,10 +228,10 @@
                     <td ng-bind="row.removed" ng-class="row.removed==false? 'text-success': 'text-danger'"></td>
                     <td ng-bind="row.cause"></td>
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='interfaces'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='interfaces'" >
                     <td ng-bind="row.storage_system"></td>                    
                     <td ng-bind="row.controller" style="word-break: break-all;"></td>
-                    <td ng-bind="row.interface" style="word-    break: break-all;"></td>
+                    <td ng-bind="row.interface" style="word-break: break-all;"></td>
                     <td ng-bind="row.type"></td>
                     <td ng-bind="row.max_frame_size"></td>
                     <td ng-bind="row.current_speed"></td>
@@ -239,7 +239,7 @@
                     <td ng-bind="row.degraded" ng-class="'text-danger':row.degraded==true,  'text-success': row.degraded==false"></td>
                     <td ng-bind="row.status" ng-class="row.status=='up'? 'text-success': 'text-danger'"></td>
                 </tr>   
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='asups'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='asups'" >
                     <td ng-bind="row.storage_system"></td>
                     <td ng-bind="row.asup_capable" ng-class="row.asup_capable==true ? 'text-success': 'text-danger'"></td>
                     <td ng-bind="row.asup_enabled" ng-class="row.asup_enabled==true ? 'text-success': 'text-danger'"></td>

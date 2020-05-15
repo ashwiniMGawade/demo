@@ -158,7 +158,7 @@
             </thead>
             <tbody>                              
                 <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--success" style="text-align:center;font-weight: bold;" colspan="10">System health is optimal.</td></tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='clusters'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='clusters'">
                     <td ng-bind="row.cluster_name"></td>
                     <td ng-bind="row.system_health"></td>
                     <td ng-bind="row.communicaion" ng-class="row.communicaion=='Good'? 'text-success': 'text-danger'"></td>
@@ -166,7 +166,7 @@
                     <td ng-bind="row.ha_configured"></td>
                     <td ng-bind="row.node_count"></td>
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='nodes'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='nodes'" >
                     <td ng-bind="row.cluster_name"></td>
                     <td ng-bind="row.node_name"></td>
                     <td ng-bind="row.node_model"></td>
@@ -183,14 +183,15 @@
                     <td ng-bind="row.total_raw_capacity"></td>
                     <td ng-bind="row.used_raw_capacity"></td> -->
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='aggregates'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='aggregates'" >
                     <td ng-bind="row.aggregate_name"></td>
                     <td ng-bind="row.node_name"></td>
                     <td ng-bind="row.state" ng-class="row.state=='online'? 'text-success': 'text-danger'"></td>
-                    <td ng-bind="row.status"></td>
                     <td ng-bind="row.type"></td>
+                    <td ng-bind="row.status" class="text-danger"></td>
+                    
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='svms'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='svms'" >
                     <td ng-bind="row.svm_name"></td>
                     <td ng-bind="row.cluster_name"></td>
                     <td ng-bind="row.ops_status" ng-class="row.ops_status=='running'? 'text-success': 'text-danger'"></td>
@@ -198,14 +199,14 @@
                     <td ng-bind="row.protocols"></td>
                     <td ng-bind="row.language"></td>
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='volumes'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='volumes'" >
                     <td ng-bind="row.volume_name"></td>
                     <td ng-bind="row.aggregate_name"></td>
                     <td ng-bind="row.vserver_name"></td>
                     <td ng-bind="row.cluster_name"></td>
                     <td class="text-danger" ng-bind="row.error_status"></td>
                 </tr>
-                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='luns'" class="capitalize">
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='luns'" >
                     <td ng-bind="row.lun_name"></td>   
                     <td ng-bind="row.volume_name"></td>
                     <td ng-bind="row.aggregate_name"></td>
