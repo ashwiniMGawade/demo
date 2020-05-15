@@ -32,10 +32,15 @@ margin: 0 auto;
     }
 } */
 
-.luci-table__table th, .luci-table__table td {
+.luci-table__table th{
     padding:10px;
     text-transform: capitalize;
 }
+
+.luci-table__table td {
+    padding:10px;
+}
+
 
 
 

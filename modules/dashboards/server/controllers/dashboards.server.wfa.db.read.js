@@ -148,7 +148,7 @@ FROM netapp_model.cluster mcls LEFT JOIN netapp_model.node mnod ON mnod.clusterI
         ' count(mnod.name) AS \'node_count\' ' +
       'FROM ' +
         'netapp_model.cluster mcls' +
-        'LEFT JOIN ' +
+        ' LEFT JOIN ' +
         'netapp_model.node mnod ' +
           'ON mnod.clusterId = mcls.objid ' +
           'GROUP BY mcls.name';

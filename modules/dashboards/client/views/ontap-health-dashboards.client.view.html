@@ -195,7 +195,7 @@
                     <td ng-bind="row.svm_name"></td>
                     <td ng-bind="row.cluster_name"></td>
                     <td ng-bind="row.ops_status" ng-class="row.ops_status=='running'? 'text-success': 'text-danger'"></td>
-                    <td ng-bind="row.state"></td>
+                    <td ng-bind="row.state"  ng-class="row.ops_status=='running'? 'text-success': 'text-danger'"></td>
                     <td ng-bind="row.protocols"></td>
                     <td ng-bind="row.language"></td>
                 </tr>
