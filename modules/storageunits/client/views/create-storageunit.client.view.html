@@ -116,9 +116,9 @@
           <p class="help-block">The Provision Type with which the Storage Unit is to be accessed with.</p>
         </div>
 
-        <div class="form-group" show-errors ng-if="showDrEnabledCheckBox"> 
+        <div class="form-group" show-errors ng-if="showDrEnabledCheckBox && serverId!='' && clusterId!=''"> 
           <input type="checkbox" ng-model="$parent.dr_enabled"  ng-change="checkboxChanged()" name="dr_enabled" value="true">
-          <label for="dr_enabled">DR Enabled</label>  
+          <label for="dr_enabled">&nbsp;Snapmirror protection required</label>  
        </div>
 
        <div class="form-group required" show-errors ng-if="dr_enabled">

@@ -51,8 +51,8 @@ module.exports = {
     authorization:"Basic YWRtaW46TmV0YXBwMDEh",
     sql: {
       connectionLimit : 5,
-      host: '10.216.51.70',
-      user: 'ntapnse',
+      host: '10.216.51.78',
+      user: 'ntaproot',
       password: 'netapp123' ,
       database: 'netapp_model_view' 
     },
