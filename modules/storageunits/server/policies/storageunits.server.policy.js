@@ -52,7 +52,15 @@ exports.invokeRolesPolicies = function () {
       resources: '/api/storageunits/getListOfIgroups',
       permissions: ['get']
     }]
-  }]);
+  },
+  {
+    roles: featuresSettings.roles.storageunit.create,
+    allows: [{
+      resources: '/api/peers',
+      permissions: ['get']
+    }]
+  }
+]);
 };
 
 /**

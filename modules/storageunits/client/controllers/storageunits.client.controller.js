@@ -82,7 +82,7 @@ angular.module('storageunits')
 
     $scope.populateIgroups = function(server) {
       $scope.igroups = [];
-      var igroups = Storageunits.getIgroups({"vserverName": $scope.serverName, "clusterName": $scope.clusterName});
+      var igroups = Storageunits.getPeers({"vserverName": $scope.serverName, "clusterName": $scope.clusterName});
       igroups.$promise.then(function(results) {
         $scope.igroups = results;
       });
@@ -101,7 +101,7 @@ angular.module('storageunits')
             }
           });
         }        
-        callback();
+        // callback();
       });
     }
 
@@ -123,6 +123,20 @@ angular.module('storageunits')
       });
 
       return tags;
+    }
+
+    $scope.checkboxChanged = function() {
+      if ($scope.dr_enabled && $scope.serverName != "" && $scope.clusterName != "") {
+        //query DB and get the peer relations
+        var peers = Storageunits.getPeers({"server":$scope.serverName, "cluster":$scope.clusterName});
+        peers.$promise.then(function(results) {
+          $scope.peers = results;
+          if(results.length == 1) {
+            $scope.destinationCluster = results[0]['peerCluster'];
+            $scope.destinationVserver = results[0]['peerVserver']
+          }
+        });
+      }
     }
 
     // watchers to check the update of value and preselect the dropdown if only one value is present
@@ -189,7 +203,7 @@ angular.module('storageunits')
 
       var tags = prepareTagsObjectFromScope(this.tags);
 
-    
+      
       // Create new storage unit object
       var storageunit = new Storageunits({
         name: $sanitize(this.name),
@@ -199,8 +213,11 @@ angular.module('storageunits')
         aggr: $sanitize(this.aggr),
         sizegb: this.sizegb,
         protocol: $sanitize(this.protocol),
-        applicationId:$sanitize(this.applicationId)
+        applicationId:$sanitize(this.applicationId),
+        destinationCluster:$sanitize(this.destinationCluster.peerCluster),
+        destinationVserver:$sanitize(this.destinationVserver.peerVserver)
       });
+
 
       if(storageunit.protocol == "nfs") {
         storageunit.readWriteClients = $sanitize(this.aclReadWrite)

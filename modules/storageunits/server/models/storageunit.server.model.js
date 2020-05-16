@@ -51,6 +51,14 @@ var StorageunitSchema = new Schema({
     trim: true,
     required: "Aggregate name is required"
   },
+  destinationCluster: {
+    type: String,
+    trim: true,
+  },
+  destinationVserver: {
+    type: String,
+    trim: true,
+  },
   sizegb: {
     type: Number,
     min: [100, 'Storage Unit Size should be greater than or equal to 100'],

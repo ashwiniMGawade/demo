@@ -13,6 +13,7 @@ var _ = require('lodash'),
   featuresSettings = require(path.resolve('./config/features')),
   Storageunit = mongoose.model('Storageunit'),
   Subscription = mongoose.model('Subscription'),
+  Peer = mongoose.model('ontap_peers'),
   Job = mongoose.model('Job'),
   config = require(path.resolve('./config/config')),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
@@ -58,6 +59,8 @@ exports.create = function (req, res) {
   storageunit.sizegb = req.body.sizegb;
   storageunit.protocol = req.body.protocol || '';
   storageunit.aggr = req.body.aggr || '';
+  storageunit.destinationVserver = req.body.destinationVserver || '';
+  storageunit.destinationCluster = req.body.destinationCluster || '';
 
   if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
     storageunit.lunOs = req.body.lunOs  || '';
@@ -141,6 +144,8 @@ exports.create = function (req, res) {
       vserverName : storageunit.server.name, 
       aggrName : storageunit.aggr, 
       clusterName: storageunit.cluster.management_ip, 
+      destinationCluster:storageunit.destinationCluster,
+      destinationVserver:storageunit.destinationVserver,
       objectType: "storageunits",
       action: "create",
       objectId: storageunit._id,
@@ -709,3 +714,24 @@ exports.getListOfIgroups = function(req, res) {
   });
   
 };
+
+exports.getPeers = function(req, res) {
+  var serverName = req.query.server || '';
+  var clusterName = req.query.cluster || '';
+  if (serverName != "" && clusterName != "") {
+    var query = {"sourceCluster": clusterName, "sourceVserver": serverName};
+    Peer.find(query)
+    .exec(function (err, peers) {
+      if (err) {
+        return respondError(res, 400, 'No peer with that identifier has been found');
+      } else if (peers.length > 0 ) {
+        res.json(peers)        
+      } else {
+        res.json([])
+      }
+    });
+  } else {
+    res.json([])
+  }
+  
+}

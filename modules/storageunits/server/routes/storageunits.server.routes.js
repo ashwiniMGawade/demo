@@ -22,7 +22,9 @@ module.exports = function (app) {
     .get(storageunits.read)
     .put(storageunits.update)
     .delete(storageunits.delete);
-  
+
+  app.route('/api/peers').all([auth.loginODIN, storageunitsPolicy.isAllowed])
+  .get(storageunits.getPeers) 
   
 
   // Finish by binding the server middleware

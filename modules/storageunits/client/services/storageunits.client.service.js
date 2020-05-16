@@ -18,6 +18,11 @@ angular.module('storageunits').factory('Storageunits', ['$resource',
         url: 'api/storageunits/getListOfIgroups',
         isArray: true
       },
+      getPeers: {
+        method: 'GET',
+        url: 'api/peers',
+        isArray: true
+      },
       'query': {
         method: 'GET',
         isArray: true
