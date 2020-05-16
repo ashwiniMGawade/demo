@@ -214,6 +214,7 @@ angular.module('storageunits')
         sizegb: this.sizegb,
         protocol: $sanitize(this.protocol),
         applicationId:$sanitize(this.applicationId),
+        dr_enabled:this.dr_enabled,
         destinationCluster:$sanitize(this.destinationCluster.peerCluster),
         destinationVserver:$sanitize(this.destinationVserver.peerVserver)
       });

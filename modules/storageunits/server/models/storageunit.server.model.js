@@ -59,6 +59,10 @@ var StorageunitSchema = new Schema({
     type: String,
     trim: true,
   },
+  dr_enabled: {
+    type:Boolean,
+    default:false
+  },
   sizegb: {
     type: Number,
     min: [100, 'Storage Unit Size should be greater than or equal to 100'],

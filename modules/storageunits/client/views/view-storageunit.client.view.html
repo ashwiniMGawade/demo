@@ -13,6 +13,7 @@
       <tr><th>Aggregate</th><td ng-bind="storageunit.aggr"></td></tr>
       <tr><th>Protocol</th><td ng-bind="storageunit.protocol | uppercase"></td></tr>
       <tr><th>Size (GB)</th><td ng-bind="storageunit.sizegb"></td></tr>
+      
       <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>Mapping</th><td ng-bind="storageunit.mapping"></td></tr>
       <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>Igroup</th><td ng-bind="storageunit.igroup"></td></tr>
       <tr ng-if="storageunit.protocol === 'fc' || storageunit.protocol === 'iscsi'"><th>LUN Id</th><td ng-bind="storageunit.lunId"></td></tr>
@@ -30,6 +31,10 @@
           <li ng-if="tags[0].attr" ng-repeat="tag in tags">{{tag.attr}}: {{ tag.val}} </li>
         </td>
       </tr> -->
+      <tr><th>Snapmirror protection required </th><td ng-bind="storageunit.dr_enabled"></td></tr>
+      <tr ng-if="storageunit.destinationCluster!=''"><th>Destination Cluster: </th><td ng-bind="storageunit.destinationCluster"></td></tr>
+      <tr ng-if="storageunit.destinationVserver!=''"><th>Destination Vserver: </th><td ng-bind="storageunit.destinationVserver"></td></tr>
+
       <tr ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0 ||  (SUAccessRoles.update | intersect : authentication.user.roles) > 0">
 
         <th>Actions</th>

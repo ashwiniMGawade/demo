@@ -60,7 +60,8 @@ exports.create = function (req, res) {
   storageunit.protocol = req.body.protocol || '';
   storageunit.aggr = req.body.aggr || '';
   storageunit.destinationVserver = req.body.destinationVserver || '';
-  storageunit.destinationCluster = req.body.destinationCluster || '';
+  storageunit.destinationCluster = req.body.destinationCluster || '';  
+  storageunit.dr_enabled =  req.body.dr_enabled || false;
 
   if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
     storageunit.lunOs = req.body.lunOs  || '';
