@@ -61,6 +61,7 @@ exports.create = function (req, res) {
   storageunit.aggr = req.body.aggr || '';
   storageunit.destinationVserver = req.body.destinationVserver || '';
   storageunit.destinationCluster = req.body.destinationCluster || '';  
+  storageunit.destinationAggr = req.body.destinationAggr || '';
   storageunit.dr_enabled =  req.body.dr_enabled || false;
 
   if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
@@ -147,6 +148,7 @@ exports.create = function (req, res) {
       clusterName: storageunit.cluster.management_ip, 
       destinationCluster:storageunit.destinationCluster,
       destinationVserver:storageunit.destinationVserver,
+      destinationAggr:storageunit.destinationAggr,
       objectType: "storageunits",
       action: "create",
       objectId: storageunit._id,
@@ -717,15 +719,17 @@ exports.getListOfIgroups = function(req, res) {
 };
 
 exports.getPeers = function(req, res) {
-  var serverName = req.query.server || '';
-  var clusterName = req.query.cluster || '';
+  var serverName = req.query.vserverName || '';
+  var clusterName = req.query.clusterName || '';
   if (serverName != "" && clusterName != "") {
     var query = {"sourceCluster": clusterName, "sourceVserver": serverName};
+    console.log(query)
     Peer.find(query)
     .exec(function (err, peers) {
       if (err) {
         return respondError(res, 400, 'No peer with that identifier has been found');
       } else if (peers.length > 0 ) {
+        console.log(peers)
         res.json(peers)        
       } else {
         res.json([])

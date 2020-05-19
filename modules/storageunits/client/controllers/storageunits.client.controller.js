@@ -62,6 +62,17 @@ angular.module('storageunits')
       
     };
 
+    $scope.populateDestinationAggrs = function(cluster, callback) {
+      $scope.destinationAggregates = [];
+      $scope.destinationAggr =  '';
+
+      angular.forEach($scope.clusters, function(clusterInfo) {
+        if (clusterInfo.name && clusterInfo.name === cluster) {
+          $scope.destinationAggregates = clusterInfo.aggregates;
+        }
+      });      
+    };
+
     $scope.populatevfas = function(cluster, callback) {
       $scope.servers = [];
       var servers = Servers.query();
@@ -82,7 +93,7 @@ angular.module('storageunits')
 
     $scope.populateIgroups = function(server) {
       $scope.igroups = [];
-      var igroups = Storageunits.getPeers({"vserverName": $scope.serverName, "clusterName": $scope.clusterName});
+      var igroups = Storageunits.getIgroups({"vserverName": $scope.serverName, "clusterName": $scope.clusterName});
       igroups.$promise.then(function(results) {
         $scope.igroups = results;
       });
@@ -128,7 +139,7 @@ angular.module('storageunits')
     $scope.checkboxChanged = function() {
       if ($scope.dr_enabled && $scope.serverName != "" && $scope.clusterName != "") {
         //query DB and get the peer relations
-        var peers = Storageunits.getPeers({"server":$scope.serverName, "cluster":$scope.clusterName});
+        var peers = Storageunits.getPeers({"vserverName":$scope.serverName, "clusterName":$scope.clusterName});
         peers.$promise.then(function(results) {
           $scope.peers = results;
           if(results.length == 1) {
@@ -186,6 +197,12 @@ angular.module('storageunits')
       }        
     });
 
+    $scope.$watch("destinationCluster", function(newVal, oldVal) {
+      if (newVal) {       
+        $scope.populateDestinationAggrs(newVal.sourceCluster);     
+      }        
+    });
+
     $scope.initUpdate = function(acl) {
       Storageunits.get({
         storageunitId: $stateParams.storageunitId
@@ -216,7 +233,8 @@ angular.module('storageunits')
         applicationId:$sanitize(this.applicationId),
         dr_enabled:this.dr_enabled,
         destinationCluster:$sanitize(this.destinationCluster.peerCluster),
-        destinationVserver:$sanitize(this.destinationVserver.peerVserver)
+        destinationVserver:$sanitize(this.destinationVserver.peerVserver),
+        destinationAggr:$sanitize(this.destinationAggr)
       });
 
 

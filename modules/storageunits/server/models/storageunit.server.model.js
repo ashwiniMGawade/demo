@@ -51,6 +51,10 @@ var StorageunitSchema = new Schema({
     trim: true,
     required: "Aggregate name is required"
   },
+  destinationAggr:{
+    type: String,
+    trim: true
+  },
   destinationCluster: {
     type: String,
     trim: true,

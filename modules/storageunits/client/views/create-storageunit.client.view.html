@@ -132,16 +132,26 @@
         <p class="help-block">The Destination cluster the storageunit is to be created in.</p>
       </div>
 
-
       <div class="form-group required" show-errors ng-if="dr_enabled">
         <label for="destinationVserver">Destination {{labels.server.serverName}}</label>
-        <select name="destinationVserver" ng-model="$parent.destinationVserver" id="serverId" class="form-control" ng-options="peer.peerVserver for peer in peers | orderBy: 'peerVserver'" required ng-disabled="!peers.length"> 
+        <select name="destinationVserver" ng-model="$parent.destinationVserver" id="destinationVserver" class="form-control" ng-options="peer.peerVserver for peer in peers | orderBy: 'peerVserver' | filter: {peerCluster:$parent.destinationCluster.peerCluster}" required ng-disabled="!peers.length"> 
           <option value="">Please select a {{labels.server.serverName}}</option>
         </select>
         <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
           <p class="help-block error-text" ng-message="required">Destination {{labels.server.serverName}} is required.</p>
         </div>
         <p class="help-block">The Destination {{labels.server.serverName}} in which the Storage Unit is to reside in.</p>
+      </div>
+
+      <div class="form-group required" show-errors ng-if="dr_enabled">
+        <label for="destinationAggr">Destination Aggregate</label>
+        <select name="destinationAggr" ng-model="$parent.destinationAggr" id="destinationAggr" class="form-control" ng-options="aggregate.name as aggregate.name for aggregate in destinationAggregates | orderBy: 'name'" required ng-disabled="!peers.length"> 
+          <option value="">Please select a Aggregate</option>
+        </select>
+        <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
+          <p class="help-block error-text" ng-message="required">Destination Aggregate is required.</p>
+        </div>
+        <p class="help-block">The Destination Aggregate in which the Storage Unit is to reside in.</p>
       </div>
 
 
