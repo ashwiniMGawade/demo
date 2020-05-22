@@ -154,6 +154,22 @@
         <p class="help-block">The Destination Aggregate in which the Storage Unit is to reside in.</p>
       </div>
 
+      <div class="form-group required" show-errors ng-if="dr_enabled">
+        <label for="schedule">Schedule</label>
+        <select name="schedule" ng-model="$parent.schedule" id="scehdule" class="form-control" required ng-disabled="!peers.length"> 
+          <option value="">Please select a schedule</option>
+          <option value="@00.30">@00.30</option>
+          <option value="@10.40">@10.40</option>
+          <option value="@15min">@15min</option>
+          <option value="@20.50">@20.50</option>
+          <option value="daily@0.10">daily@0.10</option>
+        </select>
+        <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
+          <p class="help-block error-text" ng-message="required">Schedule is required.</p>
+        </div>
+        <p class="help-block">The Schedule in which the Storage Unit is to reside in.</p>
+      </div>
+
 
         <!-- <div class="form-group required" show-errors>
           <label for="storagegroupId">Volume</label>

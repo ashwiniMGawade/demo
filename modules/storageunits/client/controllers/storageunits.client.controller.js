@@ -234,7 +234,8 @@ angular.module('storageunits')
         dr_enabled:this.dr_enabled,
         destinationCluster:$sanitize(this.destinationCluster.peerCluster),
         destinationVserver:$sanitize(this.destinationVserver.peerVserver),
-        destinationAggr:$sanitize(this.destinationAggr)
+        destinationAggr:$sanitize(this.destinationAggr),
+        schedule:$sanitize(this.schedule)
       });
 
 
@@ -251,7 +252,6 @@ angular.module('storageunits')
         storageunit.lunOs =$sanitize(this.lunOs),
         storageunit.lunId = $sanitize(this.lunId)
       }
-
       //Redirect to list page after save
       storageunit.$create(function (response) {
         $location.path('storageunits');

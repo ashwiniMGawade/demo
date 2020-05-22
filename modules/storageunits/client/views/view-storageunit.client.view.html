@@ -34,6 +34,8 @@
       <tr><th>Snapmirror protection required </th><td ng-bind="storageunit.dr_enabled"></td></tr>
       <tr ng-if="storageunit.destinationCluster!=''"><th>Destination Cluster: </th><td ng-bind="storageunit.destinationCluster"></td></tr>
       <tr ng-if="storageunit.destinationVserver!=''"><th>Destination Vserver: </th><td ng-bind="storageunit.destinationVserver"></td></tr>
+      <tr ng-if="storageunit.destinationAggr!=''"><th>Destination Aggregate: </th><td ng-bind="storageunit.destinationAggr"></td></tr>
+      <tr ng-if="storageunit.schedule!=''"><th>Destination Schedule: </th><td ng-bind="storageunit.schedule"></td></tr>
 
       <tr ng-if="(SUAccessRoles.delete | intersect : authentication.user.roles) > 0 ||  (SUAccessRoles.update | intersect : authentication.user.roles) > 0">
 

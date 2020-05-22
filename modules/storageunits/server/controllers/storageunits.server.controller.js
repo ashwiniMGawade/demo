@@ -63,6 +63,7 @@ exports.create = function (req, res) {
   storageunit.destinationCluster = req.body.destinationCluster || '';  
   storageunit.destinationAggr = req.body.destinationAggr || '';
   storageunit.dr_enabled =  req.body.dr_enabled || false;
+  storageunit.schedule = req.body.schedule || '';
 
   if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
     storageunit.lunOs = req.body.lunOs  || '';
@@ -149,6 +150,7 @@ exports.create = function (req, res) {
       destinationCluster:storageunit.destinationCluster,
       destinationVserver:storageunit.destinationVserver,
       destinationAggr:storageunit.destinationAggr,
+      schedule:storageunit.schedule,
       objectType: "storageunits",
       action: "create",
       objectId: storageunit._id,
