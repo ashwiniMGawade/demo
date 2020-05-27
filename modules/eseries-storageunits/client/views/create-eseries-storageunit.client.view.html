@@ -1,0 +1,265 @@
+<section ng-controller="EseriesStorageunitsController" ng-init="find()">
+  <div class="page-header">
+    <h1>New Storage Unit</h1>
+  </div>
+  <div class="col-md-6">
+    <form name="storageunitForm" class="form-horizontal" ng-submit="create(storageunitForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group">
+          <!-- <p class="faint-text">A Storage Unit takes the form of a NetApp NFS Export, CIFS Share or iSCSI LUN. Configuration covers:<ul><li>Storage Type</li><li>Storage Size</li><li>Storage Access</li></ul></p> -->
+        </div>
+        <div class="form-group required" show-errors>
+          <label for="name">Display Name</label>
+          <input name="name" type="text" ng-model="name" id="Name" class="form-control"
+                  placeholder="Name"
+                  ng-maxlength="64"
+                  ng-minlength="3"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required>
+          <div ng-messages="storageunitForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+          </div>
+          <p class="help-block">Name to refer to the Storage Unit in this portal.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="code">Storage Name</label>
+          <input name="code" type="text" ng-model="code" id="code" class="form-control" placeholder="Code"
+            ng-pattern="/^[a-z][a-z0-9\_]*$/"
+            ng-maxlength="32"
+            ng-minlength="3"
+            required>
+          <div ng-messages="storageunitForm.code.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Code is required.</p>
+            <p class="help-block error-text" ng-message="pattern">Only lowercase alphanumeric characters and underscores are allowed <br>First character must be alphabetical</p>
+
+            <p class="help-block error-text" ng-message="maxlength">Code should be maximum 32 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Code must be minimum 3 characters long.</p>
+          </div>
+          <p class="help-block">The name of the NetApp NFS Export, CIFS Share or iSCSI LUN on the storage system.<br>The code will be visible in the NFS Export path and CIFS Share name.<br>Note: A Storage Group cannot contain multiple Storage Units with the same code.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="sizegb">Size (GB)</label>
+          <input name="sizegb" type="number" ng-model="sizegb" id="sizegb" class="form-control" placeholder="Size (GB)" required min="1" required max="5000" ng-pattern="/^[\d]*$/">
+          <div ng-messages="storageunitForm.sizegb.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storage Size in GB is required.</p>
+            <p class="help-block error-text" ng-message="min">Minimum value is 1.</p>
+            <p class="help-block error-text" ng-message="max">Maximum value is 5000.</p>
+            <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+            <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+          </div>
+          <p class="help-block">
+            The containing Storage Group will automatically be resized accordingly.</br>
+            Minimum Storage Unit size will be 100GB to ensure workable performance.</br>
+            Note: LUN cannot be resized to more than 10x original size</p>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="isRoot">
+          <label for="application">Application</label>
+          <select name="applicationId" ng-model="$parent.applicationId" id="applicationId" class="form-control" ng-options="app.applicationId as app.name for app in applications" required>
+            <option value="">Please select a Application</option>
+          </select>
+          <div ng-messages="storageunitForm.applicationId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Application name is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="systemId">Storage System</label>   
+          <select name="systemId" ng-model="systemId" id="systemId" class="form-control" ng-options="system.systemId as system.name for system in systems | orderBy: 'name'" required  ng-disabled="!systems.length">
+            <option value="">Please select a Storage System</option>
+          </select>
+          <!-- <div class="loader" ng-show="!clusters.length"></div>        -->
+          <div ng-messages="storageunitForm.systemId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storage System name is required.</p>
+          </div>
+          <p class="help-block">The Storage System the storageunit is to be created in.</p>
+        </div>
+
+
+        <div class="form-group required" show-errors>
+          <label for="workload">Workload</label>
+          <select name="workload" ng-model="workload" id="workload" class="form-control" ng-options="workload.name as workload.name for workload in workloads | orderBy: 'name'" required ng-disabled="isRoot && (!systemId || !workloads.length)"> 
+            <option value="">Please select a workload</option>
+          </select>
+          <div ng-messages="storageunitForm.workload.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Workload is required.</p>
+          </div>
+          <p class="help-block">The Workload in which the Storage Unit is to reside in.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="storagePool">Storage Pool</label>
+          <select name="storagePool" ng-model="storagePool" id="storagePool" class="form-control" ng-options="storagePool.name as storagePool.name for storagePool in storagePools | orderBy: 'name'" required ng-disabled="isRoot && (!systemId || !storagePools.length)"> 
+            <option value="">Please select a Storage Pool</option>
+          </select>
+          <div ng-messages="storageunitForm.storagePool.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storage Pool is required.</p>
+          </div>
+          <p class="help-block">The Storage Pool in which the Storage Unit is to reside in.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="targetType">Target Type</label>
+          <select class="form-control" name="targetType" id="targetType" ng-model="targetType" required placeholder="" ng-disabled="!validTargetsToAssign.length">
+              <option value="">Please select Target Type</option>
+              <option ng-repeat="targetType in validTargetsToAssign | orderBy" value="{{targetType}}">{{targetType}}</option>
+          </select>
+          <div ng-messages="storageunitForm.targetType.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Target Type is a required field.</p>
+          </div>
+          <p class="help-block">The Target Type with which the Storage Unit is to be accessed with.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="existingIgroup">Mapping&nbsp;&nbsp;</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing">Existing Server</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" checked>New Server</label>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="mapping=='new'">
+          <label for="hostType">Host Type</label>
+          <select name="hostType" ng-model="$parent.hostType" id="hostType" class="form-control" ng-options="hostType.name as hostType.name for hostType in hostTypes | orderBy: 'name'" required ng-disabled="isRoot && (!systemId || !hostTypes.length)"> 
+            <option value="">Please select a Host Type</option>
+          </select>
+          <div ng-messages="storageunitForm.workload.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Host Type is required.</p>
+          </div>
+          <p class="help-block">The Host Type in which the Storage Unit is to reside in.</p>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="mapping=='new'">
+          <label for="hostName">Host Name</label>
+          <input name="hostName" type="text" ng-model="hostName" id="Name" class="form-control"
+          placeholder="Host Name"
+          ng-maxlength="64"
+          ng-minlength="3"
+          ng-pattern="/^[a-zA-Z0-9_]*$/"
+          required>
+          <div ng-messages="storageunitForm.hostName.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Host Name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Host Name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Host Name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and underscores allowed</p>
+          </div>
+          <p class="help-block">The Host Name in which the Storage Unit is to reside in.</p>
+        </div>
+
+        <div class="form-group required" show-errors ng-if="mapping=='new'">
+          <label for="protocol">Protocol</label>
+          <select class="form-control" name="protocol" id="protocol" ng-model="$parent.protocol" required placeholder="" ng-disabled="!validProtocolsToAssign.length">
+              <option value="">Please select Protocol</option>
+              <option ng-repeat="protocol in validProtocolsToAssign | orderBy" value="{{protocol}}">{{protocol | uppercase}}</option>
+          </select>
+          <div ng-messages="storageunitForm.protocol.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Protocol is a required field.</p>
+          </div>
+          <p class="help-block">The Protocol with which the Storage Unit is to be accessed with.</p>
+        </div>
+
+      
+    
+
+        <!-- <div class="form-group required" show-errors>
+          <label for="storagegroupId">Volume</label>
+          <select name="storagegroupId" ng-model="storagegroupId" id="storagegroupId" class="form-control" ng-options="storagegroup.id as storagegroup.name for storagegroup in storagegroups | orderBy: 'name'" required ng-disabled="!serverId || storagegroups.length == 0">
+            <option value="">Please select a Volume</option>
+          </select>
+          <div ng-messages="storageunitForm.storagegroupId.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Volume name is required.</p>
+          </div>
+          <p class="help-block">The Volume in which the Storage Unit is to reside in.</p>
+        </div> -->
+
+      
+
+        <div class="form-group required" ng-if="mapping=='new'">
+          <label for="name">Port Info</label>
+          <br/>
+          <div ng-repeat="(key, value) in port_info" class="row" style="margin-left:0;">
+            <div class="col-md-5 form-group" show-errors>
+              <input name="port_info{{key}}" type="text" ng-model="value['label']" id="label" class="form-control" placeholder="Label"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['port']">
+              <div ng-messages="storageunitForm['port_info'+key].$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Port label should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Port label should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Port label must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-5 form-group" show-errors>
+              <input name="portValues{{key}}" type="text" ng-model="value['port']" id="label" class="form-control" placeholder="Port"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="portPattern"
+                    ng-required="value['label']">
+              <div ng-messages="storageunitForm['portValues'+key].$error" role="alert">
+                 <p class="help-block error-text" ng-message="required">Port should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Port should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Port must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">{{portPatternError}}</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <span ng-click="addPort()" class="btn btn-primary" ng-show="key==port_info.length-1">
+                  <i class="glyphicon glyphicon-plus"></i>
+              </span>
+              <span ng-click="removePort(key)" class="btn btn-primary" ng-hide="port_info.length==1">
+                  <i class="glyphicon glyphicon-minus"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      
+
+        <div class="form-group" show-errors ng-if="(protocol === 'iscsi' || protocol=== 'fc') && mapping =='existing'">
+          <label for="existingIgroup">Igroup</label>
+          <select name="igroup" ng-model="$parent.igroup" id="igroup" class="form-control" ng-options="igroup for igroup in igroups" required ng-disabled="!serverId || igroups.length == 0">
+            <option value="">Please select a Igroup</option>
+          </select>
+          <div ng-messages="storageunitForm.igroup.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Igroup is required.</p>
+          </div>
+          <p class="help-block">The Igroup from the existing list in which the Storage Unit is to reside in.</p>
+        </div>
+
+        <!-- <div class="form-group" show-errors ng-if="(protocol === 'iscsi' || protocol=== 'fc') && mapping=='new'">
+          <label for="igroupName">Igroup Name</label>
+          <input name="igroup" type="text" ng-model="$parent.igroup" id="igroup" class="form-control" placeholder="Igroup Name"  ng-pattern="/^[a-z][a-z0-9\_]*$/">
+          
+          <div ng-messages="storageunitForm.igroup.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Igroup  Name is required.</p>
+          </div>
+          <p class="help-block">The Igroup Name, to be created for the selected ACL</p>
+        </div>
+         -->
+        <div ng-if="mapping=='new'">         
+          <div class="form-group" show-errors>
+            <label for="lunId">LUN ID</label>
+            <input name="lunId" type="number" ng-model="$parent.lunId" id="lunId" class="form-control" placeholder="LUN ID" min="0" max="255">
+             <div ng-messages="storageunitForm.lunId.$error" role="alert">
+              <p class="help-block error-text" ng-message="min">Minimum value should be 0.</p>
+              <p class="help-block error-text" ng-message="max">Maximum value should be 255.</p>
+              <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+            </div>
+            <p class="help-block">Optional: Only to be entered if a specific LUN ID is required.<br>The storage system will by default select the next-available LUN ID.<br>Entering a LUN ID used by another LUN, which is presented to the same IQN will be prevented by the storage system.</p>
+          </div>
+        </div>
+
+        <div class="form-group text-center">
+          <input type="submit" value="Create" class="luci-button luci-button--primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

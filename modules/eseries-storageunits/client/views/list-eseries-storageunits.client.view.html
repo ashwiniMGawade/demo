@@ -1,0 +1,62 @@
+<section ng-init="rowsToDisplay()">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-md-6">
+        <h1>Ontap Storageunits</h1>
+      </div>
+      <div class="col-md-4 search-top-bar">
+        <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="rowsToDisplay()" ng-bind-html/>
+      </div>  
+      <div class="col-md-2 search-top-bar  right-loader">
+        <button class="luci-button luci-button--icon-only luci-button--primary" ui-sref="eseries-storageunits.create">
+          <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#add">
+                  </use>
+              </svg>
+          </span>
+        </button>
+        <img src='/modules/core/client/img/loaders/loader.png' width="42px" height="32px" ng-click="refreshList();" title="Refresh">
+      </div> 
+  
+    </div>
+  
+  </div>
+  <div class="table-responsive" ng-show="tableParams.total(value)">
+    <table ng-table="tableParams" class="table table-bordered table-striped">
+      <tr ng-repeat="storageunit in $data">
+        <td ng-bind="storageunit.name" title="'Name'" sortable="'name'" class="capitalize breakword"></td>
+        <td ng-bind="storageunit.code" title="'Code'" sortable="'code'" class="breakword"></td>
+        <td ng-bind="storageunit.application.name" title="'Application'" sortable="'application'" class="breakword"></td>
+        <td ng-bind="storageunit.protocol" title="'Protocol'" sortable="'protocol'" class="breakword" style="text-transform: uppercase;"></td>
+        <td ng-bind="storageunit.cluster.name" title="'Cluster'" sortable="'cluster.name'" class="breakword"></td>  
+        <td ng-bind="storageunit.server.name" ng-attr-title="{{labels.server.serverName}}" title="labels.server.serverName" sortable="'server.name'" class="breakword"></td>
+              
+        <td ng-bind="storageunit.status" title="'Status'" sortable="'status'"></td>
+        <td title="'Actions'">
+          <button  ng-if="isRoot" type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="eseries-storageunits.fix({storageunitId: storageunit.storageunitId})" title="Fix">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#manage">
+                  </use>
+              </svg>
+            </span>
+          </button>
+          <button type="button" class="luci-button luci-button--icon-only luci-button--primary" ui-sref="eseries-storageunits.view({storageunitId: storageunit.storageunitId})" title="Details">
+            <span class="luci-button__inner">
+              <svg class="luci-icon luci-button__icon luci-button__icon--left" aria-hidden="true">
+                  <use xlink:href="/assets/css/icons/luci.svg#monitor">
+                  </use>
+              </svg>
+            </span>
+          </button>    
+        </td>
+        <!-- <td ng-if="(SUAccessRoles.update | intersect : authentication.user.roles) > 0"><button type="button" class="btn btn-xs btn-primary" ng-disabled="storageunit.status!=='Operational'" ui-sref="storageunits.edit({storageunitId: storageunit.storageunitId})">Edit</button></td> -->
+
+      </tr>
+    </table>
+  </div>
+  <div class="alert alert-warning text-center" ng-show="zeroRecords">
+    No Records found.
+  </div>
+</section>

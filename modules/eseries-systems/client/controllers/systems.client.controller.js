@@ -34,7 +34,7 @@ angular.module('systems').controller('SystemsController', ['$scope', '$statePara
       var system = new Systems({
         name: $sanitize(this.name),
         wwn: $sanitize(this.wwn),
-        rest_url: $sanitize(this.rest_url),
+        rest_url_ip: $sanitize(this.rest_url_ip),
         provisioning_state: $sanitize(this.provisioning_state),
         applications: this.applications
       });
@@ -47,7 +47,7 @@ angular.module('systems').controller('SystemsController', ['$scope', '$statePara
         // Clear form fields
         $scope.name = '';
         $scope.wwn = '';
-        $scope.rest_url = '';
+        $scope.rest_url_ip = '';
         $scope.provisioning_state = '';
         $scope.rest_uri = '';
       }, function (errorResponse) {

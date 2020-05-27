@@ -1,0 +1,127 @@
+<section ng-controller="StorageunitsController" ng-init="findOne()" ng-show="storageunit.storageunitId">
+  <div class="page-header">
+    <h1>Storage Unit: <span>{{ ::storageunit.name }}</span></h1>
+  </div>
+  <form name="storageunitForm" class="form-horizontal" ng-submit="update(storageunitForm.$valid)" novalidate>
+    <fieldset>
+    <div class="row show-grid">
+      <div class="col-md-6">
+        <div class="form-group required" show-errors>
+          <label for="name">Name</label>
+          <input name="name" type="text" ng-model="storageunit.name" id="name" class="form-control"
+                  placeholder="Name"
+                  ng-maxlength="64"
+                  ng-minlength="3"
+                  ng-pattern="/^[a-zA-Z0-9 -]*$/"
+                  required ng-bind-html>
+          <div ng-messages="storageunitForm.name.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Name is required.</p>
+            <p class="help-block error-text" ng-message="maxlength">Name should be maximum 64 characters long.</p>
+            <p class="help-block error-text" ng-message="minlength">Name must be minimum 3 characters long.</p>
+            <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+          </div>
+          <p class="help-block">New Name to refer to the Storage Unit in this portal.</p>
+        </div>
+
+        <div class="form-group required" show-errors>
+          <label for="sizegb">Size (GB)</label>
+          <input name="sizegb" type="number" ng-model="storageunit.sizegb" id="sizegb" class="form-control" placeholder="Size (GB)" required min="100" required max="16384" ng-pattern="/^[\d]*$/" ng-bind-html>
+          <div ng-messages="storageunitForm.sizegb.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Storage Size in GB is required.</p>
+            <p class="help-block error-text" ng-message="min">Minimum value should be 100.</p>
+            <p class="help-block error-text" ng-message="max">Maximum value is 16384.</p>
+            <p class="help-block error-text" ng-message="number">Please enter valid number.</p>
+            <p class="help-block error-text" ng-message="pattern">Please enter valid integer.</p>
+            </div>
+          <p class="help-block">New presented size of the NFS Export, CIFS Share or iSCSI LUN.<br>
+            The size of a NFS Export or CIFS Share can be increased and decreased.<br>
+            The size of an iSCSI LUN can only be increased.<br>
+            The containing Storage Group will automatically be resized accordingly.<br>
+            Note: If expanding an iSCSI LUN, the client will need to expand the partition.<br>
+            Note: This is a non-disruptive process.</br>
+            Note: LUN cannot be resized to more than 10x original size</p>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Tags</label>
+          <br/>
+          <div ng-repeat="(key, value) in tags" class="row" style="margin-left:0;">
+            <div class="col-md-5 form-group" show-errors>
+              <input name="tags{{key}}" type="text" ng-model="value['attr']" id="name" class="form-control" placeholder="Key"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['val']">
+              <div ng-messages="storageunitForm['tags'+key].$error" role="alert">
+                <p class="help-block error-text" ng-message="required">Tag key should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-5 form-group" show-errors>
+              <input name="tagValues{{key}}" type="text" ng-model="value['val']" id="name" class="form-control" placeholder="Value"
+                    ng-maxlength="64"
+                    ng-minlength="3"
+                    ng-pattern="/^[a-zA-Z0-9-]*$/"
+                    ng-required="value['attr']">
+              <div ng-messages="storageunitForm['tagValues'+key].$error" role="alert">
+                 <p class="help-block error-text" ng-message="required">Tag value should not be blank.</p>
+                <p class="help-block error-text" ng-message="maxlength">Tag key should be maximum 64 characters long.</p>
+                <p class="help-block error-text" ng-message="minlength">Tag key must be minimum 3 characters long.</p>
+                <p class="help-block error-text" ng-message="pattern">Only Alphanumeric, spaces and dashes allowed</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <span ng-click="addTag()" class="btn btn-primary" ng-show="key==tags.length-1">
+                  <i class="glyphicon glyphicon-plus"></i>
+              </span>
+              <span ng-click="removeTag(key)" class="btn btn-primary" ng-hide="tags.length==1">
+                  <i class="glyphicon glyphicon-minus"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="storageunit.protocol === 'nfs'">
+          <div class="form-group" show-errors >
+              <label for="aclAdd">Access Control List - Add Access</label>
+              <input name="aclAdd" type="text" ng-model="storageunit.aclAdd" id="aclAdd" class="form-control" placeholder="Subnet or IP address" ng-pattern="/^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*)$/" ng-bind-html>
+              <div ng-messages="storageunitForm.aclAdd.$error" role="alert">
+                <p class="help-block error-text" ng-message="pattern">ACL Add should be valid subnet.</p>
+              </div>
+              <p class="help-block">Please specify one NFS Subnet or IP address to add to the existing Access Control List</p>
+          </div>
+        </div>
+        <div ng-if="storageunit.protocol === 'iscsi'">
+          <div class="form-group" show-errors >
+              <label for="aclAdd">Access Control List - Add Access</label>
+              <input name="aclAdd" type="text" ng-model="storageunit.aclAdd" id="aclAdd" class="form-control" placeholder="IQN" ng-pattern="/^^((?:iqn\.[0-9]{4}-[0-9]{2}(?:\.[A-Za-z](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+(?::[^,:]*)?)|(eui\.[0-9A-Fa-f]{16}))$/" ng-bind-html>
+              <div ng-messages="storageunitForm.aclAdd.$error" role="alert">
+                <p class="help-block error-text" ng-message="pattern">ACL Add should be valid IQN.</p>
+              </div>
+              <p class="help-block">Please specify one iSCSI IQN to add to the existing Access Control List</p>
+          </div>
+        </div>
+        <div ng-if="(storageunit.protocol === 'nfs' || storageunit.protocol === 'iscsi')">
+          <div class="form-group" show-errors>
+              <label for="aclRemove">Access Control List - Remove Access</label>
+              <select name="aclRemove" ng-model="storageunit.aclRemove" id="aclRemove" class="form-control" ng-options="acl  for acl in acl_array track by acl" ng-disabled="!storageunit.acl">
+                <option value="">Please select an ACL entry</option>
+              </select>
+              <p class="help-block">Please specify one iSCSI IQN or NFS Subnet or IP Address to remove from the existing Access Control List.<br>Attention: The client should unmount the storage prior to this operation.</p>
+          </div>`
+        </div>
+
+        <div class="form-group">
+          <input type="submit" value="Update" class="btn btn-xl btn-primary">
+        </div>
+
+      </div>
+    </div>
+    <div ng-show="error" class="text-danger">
+      <strong ng-bind="error"></strong>
+    </div>
+   </fieldset>
+  </form>
+</section>
