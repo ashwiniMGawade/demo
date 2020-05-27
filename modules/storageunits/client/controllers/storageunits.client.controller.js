@@ -232,7 +232,7 @@ angular.module('storageunits')
         protocol: $sanitize(this.protocol),
         applicationId:$sanitize(this.applicationId),
         dr_enabled:this.dr_enabled,
-        destinationCluster:$sanitize(this.destinationCluster.peerCluster),
+        destinationCluster:$sanitize(this.destinationCluster.peerClusterIP),
         destinationVserver:$sanitize(this.destinationVserver.peerVserver),
         destinationAggr:$sanitize(this.destinationAggr),
         schedule:$sanitize(this.schedule)
