@@ -714,7 +714,6 @@ describe('Storageunit CRUD tests', function () {
                   return done(storageunitsUpdateErr);
                 }
                 // Set assertions
-                console.log(storageunitsUpdateRes);
                 // Call the assertion callback
                 done();
               });

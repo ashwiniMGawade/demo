@@ -10,9 +10,7 @@ angular.module('dashboards').controller('DashboardsEseriesHealthController', ['$
     $scope.custom = {};
 
     
-    console.log($stateParams)
     $scope.type = $stateParams.type
-    console.log($scope.type);
     $scope.data = []
 
     var results = EseriesHealth.query({"type":$scope.type});

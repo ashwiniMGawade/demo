@@ -10,9 +10,7 @@ angular.module('dashboards').controller('DashboardsOntapHealthController', ['$sc
     $scope.custom = {};
 
     
-    console.log($stateParams)
     $scope.type = $stateParams.type
-    console.log($scope.type);
     $scope.data = []
 
     var results = OntapHealth.query({"type":$scope.type});

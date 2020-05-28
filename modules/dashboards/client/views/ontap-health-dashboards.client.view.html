@@ -2,7 +2,7 @@
     <div class="page-header">
         <div class="row">
           <div class="col-md-8">
-            <h2 class="capitalize">{{type}}</h2>
+            <h2 class="uppercase" >{{type}}</h2>
           </div>
         </div>
       </div>
@@ -155,6 +155,66 @@
                         <span class="luci-table__sort-label" ng-click="orderByFn('error_status')">Error Status</span>
                     </th>
                 </tr>
+                <tr ng-if="type=='ports'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('port')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('port')">Port</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('node')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('node')"> Node</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster')"> Cluster</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('adapterType')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('adapterType')"> Adapter Type</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('state')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('state')"> State</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='disks'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('disk')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('disk')">Disk</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('homeNode')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('homeNode')">Home Node</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('ownerNode')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('ownerNode')"> Owner Node</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster')"> Cluster</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('reason')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('reason')"> Reason</span>
+                    </th>
+                </tr>
+                <tr ng-if="type=='lifs'">
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('lif')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('lif')">LIF</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('vserver')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('vserver')">Vserver</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('homeNode')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('homeNode')">Home Node</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('currentNode')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('currentNode')"> Current Node</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('cluster')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('cluster')"> Cluster</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('role')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('role')"> Role</span>
+                    </th>
+                    <th class="luci-table__header-cell-sort--sorting" ng-class="getSortingClass('status')"  scope="col" aria-sort="true" tabindex="0">
+                        <span class="luci-table__sort-label" ng-click="orderByFn('status')"> Status</span>
+                    </th>                   
+                </tr>
             </thead>
             <tbody>                              
                 <tr ng-if="data.length==0 && isLoading==false"><td class="luci-notification luci-notification--success" style="text-align:center;font-weight: bold;" colspan="10">System health is optimal.</td></tr>
@@ -214,6 +274,30 @@
                     <td ng-bind="row.cluster_name"></td>  
                     <td class="text-danger" ng-bind="row.error_status"></td>
                                                
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='ports'" >
+                    <td ng-bind="row.port"></td>   
+                    <td ng-bind="row.node"></td>
+                    <td ng-bind="row.cluster"></td>
+                    <td ng-bind="row.adapterType"></td>
+                    <td class="text-danger" ng-bind="row.state"></td>                                                 
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='disks'" >
+                    <td ng-bind="row.disk"></td>   
+                    <td ng-bind="row.homeNode"></td>
+                    <td ng-bind="row.ownerNode"></td>
+                    <td ng-bind="row.cluster"></td>
+                    <td ng-class="row.status == 'Failed'? 'text-danger': ''" ng-bind="row.status"></td> 
+                    <td class="text-danger" ng-bind="row.reason"></td>                                                                     
+                </tr>
+                <tr ng-repeat="row in data | orderBy: orderBy | filter:search" ng-if="type=='lifs'" >
+                    <td ng-bind="row.lif"></td> 
+                    <td ng-bind="row.vserver"></td>   
+                    <td ng-bind="row.homeNode"></td>
+                    <td ng-bind="row.currentNode"></td>
+                    <td ng-bind="row.cluster"></td>
+                    <td ng-bind="row.role"></td>
+                    <td class="text-danger" ng-bind="row.status"></td>                                                                                          
                 </tr>
             </tbody>
         </table>

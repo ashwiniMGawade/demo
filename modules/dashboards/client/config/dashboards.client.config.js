@@ -23,7 +23,7 @@ angular.module('core.admin').run(['Menus',
         position: 7,
     });
     Menus.addSubMenuItem('topbar', 'ontapHealth', {
-        title: 'Svms',
+        title: 'SVMs',
         state: 'dashboards.details',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
@@ -35,7 +35,25 @@ angular.module('core.admin').run(['Menus',
         position: 7,
     });
     Menus.addSubMenuItem('topbar', 'ontapHealth', {
-        title: 'Luns',
+        title: 'LUNs',
+        state: 'dashboards.details',
+        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+        position: 7,
+    });
+    Menus.addSubMenuItem('topbar', 'ontapHealth', {
+        title: 'Ports',
+        state: 'dashboards.details',
+        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+        position: 7,
+    });
+    Menus.addSubMenuItem('topbar', 'ontapHealth', {
+        title: 'Disks',
+        state: 'dashboards.details',
+        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+        position: 7,
+    });
+    Menus.addSubMenuItem('topbar', 'ontapHealth', {
+        title: 'LIFs',
         state: 'dashboards.details',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
@@ -43,7 +61,7 @@ angular.module('core.admin').run(['Menus',
 
 
     Menus.addSubMenuItem('topbar', 'eseriesHealth', {
-        title: 'Asups',
+        title: 'ASUPs',
         state: 'dashboards.eseriesDetails',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,

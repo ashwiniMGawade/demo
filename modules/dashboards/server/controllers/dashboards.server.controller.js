@@ -224,6 +224,18 @@ exports.getOntapHealthData =function(req, res) {
     dbWfa.lunRead(callback);    
   } 
 
+  if (type == "ports") {
+    dbWfa.portRead(callback);    
+  } 
+
+  if (type == "disks") {
+    dbWfa.diskRead(callback);    
+  }
+
+  if (type == "lifs") {
+    dbWfa.lifRead(callback);    
+  }
+
  
 }
 

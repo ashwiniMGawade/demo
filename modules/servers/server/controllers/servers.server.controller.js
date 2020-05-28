@@ -127,7 +127,6 @@ exports.create = function (req, res) {
 
 
   function createSvm(clusterName) {
-    console.log("called create svm");
     var jobId;
     var args = {
       vlan: server.vlan,
