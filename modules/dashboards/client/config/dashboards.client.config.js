@@ -17,13 +17,19 @@ angular.module('core.admin').run(['Menus',
         position: 7,
     });
     Menus.addSubMenuItem('topbar', 'ontapHealth', {
+        title: 'SVMs',
+        state: 'dashboards.details',
+        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+        position: 7,
+    });
+    Menus.addSubMenuItem('topbar', 'ontapHealth', {
         title: 'Aggregates',
         state: 'dashboards.details',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
     });
     Menus.addSubMenuItem('topbar', 'ontapHealth', {
-        title: 'SVMs',
+        title: 'LIFs',
         state: 'dashboards.details',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
@@ -39,7 +45,7 @@ angular.module('core.admin').run(['Menus',
         state: 'dashboards.details',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
-    });
+    });  
     Menus.addSubMenuItem('topbar', 'ontapHealth', {
         title: 'Ports',
         state: 'dashboards.details',
@@ -52,16 +58,9 @@ angular.module('core.admin').run(['Menus',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
     });
-    Menus.addSubMenuItem('topbar', 'ontapHealth', {
-        title: 'LIFs',
-        state: 'dashboards.details',
-        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
-        position: 7,
-    });
-
-
+   
     Menus.addSubMenuItem('topbar', 'eseriesHealth', {
-        title: 'ASUPs',
+        title: 'Systems',
         state: 'dashboards.eseriesDetails',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
@@ -73,7 +72,7 @@ angular.module('core.admin').run(['Menus',
         position: 7,
     });
     Menus.addSubMenuItem('topbar', 'eseriesHealth', {
-        title: 'Drives',
+        title: 'Pools',
         state: 'dashboards.eseriesDetails',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
@@ -85,22 +84,22 @@ angular.module('core.admin').run(['Menus',
         position: 7,
     });
     Menus.addSubMenuItem('topbar', 'eseriesHealth', {
-        title: 'Pools',
-        state: 'dashboards.eseriesDetails',
-        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
-        position: 7,
-    });
-    Menus.addSubMenuItem('topbar', 'eseriesHealth', {
-        title: 'Systems',
-        state: 'dashboards.eseriesDetails',
-        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
-        position: 7,
-    });
-    Menus.addSubMenuItem('topbar', 'eseriesHealth', {
         title: 'Volumes',
         state: 'dashboards.eseriesDetails',
         roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
         position: 7,
-    });   
+    });  
+    Menus.addSubMenuItem('topbar', 'eseriesHealth', {
+        title: 'Drives',
+        state: 'dashboards.eseriesDetails',
+        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+        position: 7,
+    });
+    Menus.addSubMenuItem('topbar', 'eseriesHealth', {
+        title: 'ASUPs',
+        state: 'dashboards.eseriesDetails',
+        roles: ['user', 'admin', 'root', 'partner', 'read', 'l1ops'],
+        position: 7,
+    });  
 
   }]);
