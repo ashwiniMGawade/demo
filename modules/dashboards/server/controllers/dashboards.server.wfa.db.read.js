@@ -659,6 +659,19 @@ exports.lifRead = function (callback) {
     LEFT JOIN netapp_model.vserver mvs ON mlif.vserverId = mvs.objid
     LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid
     WHERE mlif.operationalStatusRaw = 'down' OR mlif.administrativeStatusRaw = 'down' OR mlif.isHome=0;
+
+
+    SELECT mlif.name AS 'LIF', mvs.name AS 'Vserver', mnod.name AS 'Home Node',
+(select node.name from netapp_model.node WHERE netapp_model.node.objid = mlif.currentNodeId) AS 'Current Node',
+mcls.name AS 'Cluster Name',mlif.roleRaw AS 'Role',
+CASE
+   WHEN mlif.isHome=0 THEN 'LIF is not in home node'
+   WHEN mlif.operationalStatusRaw='down' THEN 'LIF is operationally down'
+   WHEN mlif.administrativeStatusRaw='down' THEN 'LIF is administratively down'
+END AS 'Status'
+FROM netapp_model.lif mlif LEFT JOIN netapp_model.cluster mcls ON mlif.clusterId = mcls.objid
+LEFT JOIN netapp_model.vserver mvs ON mlif.vserverId = mvs.objid LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid
+WHERE mlif.operationalStatusRaw = 'down' OR mlif.administrativeStatusRaw = 'down' OR mlif.isHome=0;
   
     */
     var value = myCache.get("lifs")
@@ -673,7 +686,7 @@ exports.lifRead = function (callback) {
       "END AS 'status' " +
       "FROM netapp_model.lif mlif LEFT JOIN netapp_model.cluster mcls ON mlif.clusterId = mcls.objid "+
       "LEFT JOIN netapp_model.vserver mvs ON mlif.vserverId = mvs.objid "+
-      "LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid "
+      "LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid "+
       "WHERE mlif.operationalStatusRaw = 'down' OR mlif.administrativeStatusRaw = 'down' OR mlif.isHome=0; "
   
       logger.info('lif health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
