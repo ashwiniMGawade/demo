@@ -11,14 +11,14 @@
             <input name="name" type="text" ng-model="cluster.name" id="name" class="form-control" placeholder="Name" 
             ng-minlength="3"
             ng-maxlength="64"
-            ng-pattern="/^[a-zA-Z0-9\-]*$/"
+            ng-pattern="/^[a-zA-Z0-9\-_]*$/"
             ng-bind-html
             required>
             <div ng-messages="clusterForm.name.$error" role="alert">
               <p class="help-block error-text" ng-message="required">Cluster name is required.</p>
               <p class="help-block error-text" ng-message="minlength">Cluster name should have Minimum 3 characters</p>
             <p class="help-block error-text" ng-message="maxlength">Cluster name should have Maximum 64 characters.</p>
-            <p class="help-block error-text" ng-message="pattern">Cluster name can only include alphanumeric characters including dash.</p>
+            <p class="help-block error-text" ng-message="pattern">Cluster name can only include alphanumeric characters including dash and underscore.</p>
             </div>
             <p class="help-block">Name of the Cluster</p>
           </div>
