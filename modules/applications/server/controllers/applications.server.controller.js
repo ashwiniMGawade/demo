@@ -46,7 +46,7 @@ exports.create = function (req, res) {
             return respondError(res, 400, errorHandler.getErrorMessage(err));
           } else {
             application = applicationPopulated;
-            logger.info('Application Create: Application Populated: ' + util.inspect(application, {showHidden: false, depth: null}));
+            // logger.info('Application Create: Application Populated: ' + util.inspect(applicationPopulated, {showHidden: false, depth: null}));
             createJobRes.update('Completed', null, application);
           }
         });
