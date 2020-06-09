@@ -199,7 +199,7 @@ angular.module('storageunits')
 
     $scope.$watch("destinationCluster", function(newVal, oldVal) {
       if (newVal) {       
-        $scope.populateDestinationAggrs(newVal.sourceCluster);     
+        $scope.populateDestinationAggrs(newVal.peerCluster);     
       }        
     });
 
