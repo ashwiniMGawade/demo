@@ -271,12 +271,12 @@ angular.module('storageunits')
         storageunit.readOnlyClients = "";
 
 
-         if (tags.length > 0) {
-          var tag = new Tags({'Tags': tags, objectId: response.storageunitId });
-          tag.$create(function(response){
-            console.log("response of tags", response)
-          });
-        }
+        //  if (tags.length > 0) {
+        //   var tag = new Tags({'Tags': tags, objectId: response.storageunitId });
+        //   tag.$create(function(response){
+        //     console.log("response of tags", response)
+        //   });
+        // }
 
 
       }, function (errorResponse) {
@@ -298,26 +298,26 @@ angular.module('storageunits')
         // }
 
         //Get tags information
-        Tags.get({
-          objectId: $stateParams.storageunitId
-        }, function(data) {
-          data = data[0];
-          if (data.tags.length > 0) {
-            $scope.tags = [];
-            angular.forEach(data.tags, function(tagVal, tagKey) {
-              var obj = {};
+        // Tags.get({
+        //   objectId: $stateParams.storageunitId
+        // }, function(data) {
+        //   data = data[0];
+        //   if (data.tags.length > 0) {
+        //     $scope.tags = [];
+        //     angular.forEach(data.tags, function(tagVal, tagKey) {
+        //       var obj = {};
 
-              obj.attr = Object.keys(tagVal)[0];
-              obj.val = tagVal[obj.attr];
-              $scope.tags.push(obj);
-            });           
-          }
-        }, function(error) {
-            if(error.data.http_status_code == 404) {
-              $scope.freshTag = true;
-            }
-            //throwFlashErrorMessage(error.data.message);
-        });
+        //       obj.attr = Object.keys(tagVal)[0];
+        //       obj.val = tagVal[obj.attr];
+        //       $scope.tags.push(obj);
+        //     });           
+        //   }
+        // }, function(error) {
+        //     if(error.data.http_status_code == 404) {
+        //       $scope.freshTag = true;
+        //     }
+        //     //throwFlashErrorMessage(error.data.message);
+        // });
       }, function(error) {
         $location.path('storageunits');
         throwFlashErrorMessage('No storage unit with that identifier has been found');
