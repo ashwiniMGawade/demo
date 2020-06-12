@@ -658,7 +658,7 @@ exports.list = function (req, res) {
     query.where({ 'tenant': req.user.tenant });
   }
 
-  query.exec(function (err, storageunits) {
+  query.sort({'created':-1}).exec(function (err, storageunits) {
     respondList(err, storageunits);
   });
 
