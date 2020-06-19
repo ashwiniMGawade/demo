@@ -18,7 +18,7 @@ module.exports = function (app) {
     .get(storageunits.getListOfIgroups)
 
   // Single server routes
-  app.route('/api/eseries-storageunits/:storageunitId').all([auth.loginODIN, storageunitsPolicy.isAllowed])
+  app.route('/api/eseries-storageunits/:eseriesStorageunitId').all([auth.loginODIN, storageunitsPolicy.isAllowed])
     .get(storageunits.read)
     .put(storageunits.update)
     .delete(storageunits.delete);
@@ -28,5 +28,5 @@ module.exports = function (app) {
   
 
   // Finish by binding the server middleware
-  app.param('storageunitId', storageunits.storageunitByID);
+  app.param('eseriesStorageunitId', storageunits.storageunitByID);
 };

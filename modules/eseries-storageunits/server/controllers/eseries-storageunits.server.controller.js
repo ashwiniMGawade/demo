@@ -11,7 +11,7 @@ var _ = require('lodash'),
   mongoose = require('mongoose'),
   rabbitMqService = require(path.resolve('./config/lib/rabitmqService')),
   featuresSettings = require(path.resolve('./config/features')),
-  Storageunit = mongoose.model('Storageunit'),
+  EseriesStorageunit = mongoose.model('eseries_storageunits'),
   Subscription = mongoose.model('Subscription'),
   Peer = mongoose.model('ontap_peers'),
   Job = mongoose.model('Job'),
@@ -49,35 +49,31 @@ var handleErrorFromWFA = function(storageunit) {
 * Create Storage Unit
 */
 exports.create = function (req, res) {
-  var clientWfa = require('./storageunits.server.wfa.su.create');
+  var clientWfa = require('./eseries-storageunits.server.wfa.su.create');
   var suCreateJob;
 
-	var storageunit = new Storageunit();
+	var storageunit = new EseriesStorageunit();
   storageunit.user = req.user;
   storageunit.name = req.body.name || '';
   storageunit.code = req.body.code || '';
   storageunit.sizegb = req.body.sizegb;
-  storageunit.protocol = req.body.protocol || '';
-  storageunit.aggr = req.body.aggr || '';
-  storageunit.destinationVserver = req.body.destinationVserver || '';
-  storageunit.destinationCluster = req.body.destinationCluster || '';  
-  storageunit.destinationAggr = req.body.destinationAggr || '';
-  storageunit.dr_enabled =  req.body.dr_enabled || false;
-  storageunit.schedule = req.body.schedule || '';
+  storageunit.workload = req.body.workload || '';
+  storageunit.storagePool = req.body.storagePool || '';
+  storageunit.targetType = req.body.targetType || '';  
+  storageunit.mapping = req.body.mapping;  
 
-  if (storageunit.protocol === 'iscsi' || storageunit.protocol === 'fc' )  {
-    storageunit.lunOs = req.body.lunOs  || '';
-    storageunit.lunId = req.body.lunId || '';
-    storageunit.acl = req.body.acl || '';
-    storageunit.igroup = req.body.igroup || '';
-    storageunit.mapping = req.body.mapping || '';
-  }
+  if (storageunit.mapping == "new")  {
+    storageunit.protocol = req.body.protocol  || '';
+    storageunit.portInfo = req.body.portInfo || {};
+    storageunit.hostName = req.body.hostName || '';
+    storageunit.hostType = req.body.hostType || '';
+    storageunit.lunId = req.body.lunId || 0;
+  } 
+
+  if (storageunit.mapping == "existing")  {
+    storageunit.igroup = req.body.igroup  || '';
+  } 
  
-  if (storageunit.protocol === 'nfs') {
-    storageunit.readWriteClients = req.body.readWriteClients || '';
-    storageunit.readOnlyClients = req.body.readOnlyClients || '';
-  }
-
   if (req.body.applicationId) {
     if (mongoose.Types.ObjectId.isValid(req.body.applicationId)) {
       storageunit.application = mongoose.Types.ObjectId(req.body.applicationId);
@@ -86,23 +82,15 @@ exports.create = function (req, res) {
     }
   }
 
-  if (req.body.clusterId) {
-    if (mongoose.Types.ObjectId.isValid(req.body.clusterId)) {
-      storageunit.cluster = mongoose.Types.ObjectId(req.body.clusterId);
+  if (req.body.eseriesSystem) {
+    if (mongoose.Types.ObjectId.isValid(req.body.eseriesSystem)) {
+      storageunit.eseriesSystem = mongoose.Types.ObjectId(req.body.eseriesSystem);
     } else {
-      storageunit.cluster = mongoose.Types.ObjectId();
+      storageunit.eseriesSystem = mongoose.Types.ObjectId();
     }
   }
 
-  if (req.body.serverId) {
-    if (mongoose.Types.ObjectId.isValid(req.body.serverId)) {
-      storageunit.server = mongoose.Types.ObjectId(req.body.serverId);
-    } else {
-      storageunit.server = mongoose.Types.ObjectId();
-    }
-  }
-
-  console.log("storageunit is:", storageunit)
+  console.log("eseries-storageunit is:", storageunit)
 
   storageunit.validate(function(err) {
     if (err) {
@@ -113,15 +101,15 @@ exports.create = function (req, res) {
       });
       return respondError(res, 400, errMsg);
     } else {
-      Job.create(req, 'storageunits', function(err, createJobRes) {
+      Job.create(req, 'eseries-storageunits', function(err, createJobRes) {
         suCreateJob = createJobRes;
         storageunit.save(function (err) {
           if (err) {
             suCreateJob.update('Failed', err, storageunit);
             return respondError(res, 400, errorHandler.getErrorMessage(err));
           } else {
-            storageunit.populate('server', 'name code')
-              .populate('cluster', 'name uuid management_ip', function (err, storageunitPopulated) {
+            storageunit.populate('application', 'name code')
+              .populate('eseriesSystem', 'name rest_url_ip', function (err, storageunitPopulated) {
               if (err) {
                 suCreateJob.update('Failed', err, storageunit);
                 return respondError(res, 400, errorHandler.getErrorMessage(err));
@@ -140,90 +128,31 @@ exports.create = function (req, res) {
   function createSu() {
     var jobId;
     var args = {
-      name: storageunit.code,
+      volume_name: storageunit.code,
       protocol: storageunit.protocol,
       size: storageunit.sizegb,
       application: storageunit.application,
-      vserverName : storageunit.server.name, 
-      aggrName : storageunit.aggr, 
-      clusterName: storageunit.cluster.management_ip, 
-      destinationCluster:storageunit.destinationCluster,
-      destinationVserver:storageunit.destinationVserver,
-      destinationAggr:storageunit.destinationAggr,
-      schedule:storageunit.schedule,
-      objectType: "storageunits",
+      eseriesSystem : storageunit.eseriesSystem.name, 
+      rest_url: storageunit.eseriesSystem.rest_url_ip,
+      workload_name : storageunit.workload, 
+      storage_pool: storageunit.storagePool, 
+      protocol : storageunit.protocol,
+      target_type:storageunit.targetType,   
+      host_name: storageunit.hostName,
+      host_type: storageunit.hostType,
+      port_info:storageunit.portInfo,
+      lunId :storageunit.lunId || '',
+      igroup :storageunit.igroup || '',
+      db_info: [{"name":"jobs", "id":suCreateJob._id}, {"name":"storageunits", "id": storageunit._id}], 
       action: "create",
-      objectId: storageunit._id,
-      jobId:suCreateJob._id
     };
-
-    if (storageunit.protocol === "cifs") {
-      args.user_or_group = "";
-      args.permission = "";
-    }
-
-    if (storageunit.protocol === "nfs") {
-      args.acl = {
-        roRule : storageunit.readOnlyClients,
-        rwRule : storageunit.readWriteClients
-      }
-    }
-
-    if (storageunit.protocol === "iscsi" || storageunit.protocol === "fc") {
-      args.existingServer = storageunit.mapping == "existing" ? true : false;
-      args.igroupName = storageunit.igroup;
-      args.initiators = storageunit.mapping == "new" ? storageunit.acl : "";
-      args.osType  = storageunit.lunOs || '';
-      args.lunId = storageunit.lunId || '';
-    }
 
     logger.info('Storage unit create Args:' + util.inspect(args, {showHidden: false, depth: null}));
 
-    rabbitMqService.publisheToQueue(args);
+    rabbitMqService.publisheToQueue(args, "eseries");
 
-    // clientWfa.suCreateExec(args, function(err, resWfa) {
-    //   if (err) {
-    //     suCreateJob.update('Failed', 'Storage unit create: Failed to create WFA, Error:' + err, storageunit);
-    //     logger.info('Storage unit create: Failed to create, Error:' + err);
-    //     handleErrorFromWFA(storageunit);
-    //   } else {
-    //     jobId = resWfa.jobId;
-    //     logger.info('Storage Unit: Response from WFA: ' + util.inspect(resWfa, {showHidden: false, depth: null}));
-    //     untilCreated(jobId);
-    //   }
-    // });
   }
 
-  function untilCreated(jobId) {
-    var args = {
-      jobId: jobId
-    };
-
-    clientWfa.suCreateStatus(args, function (err, resWfa) {
-      if (err) {
-        suCreateJob.update('Failed', 'Storage unit create: Failed to obtain status WFA:' + err, storageunit);
-        logger.info('Storage unit Create: Failed to obtain status, Error: ' + err);
-        handleErrorFromWFA(storageunit);
-
-      } else {
-        if (resWfa.jobStatus === 'FAILED') {
-          suCreateJob.update('Failed', 'Storage unit create: Failed to create WFA:' + err, storageunit);
-          logger.info('Storage unit Create: Failed to create, Job ID: ' + jobId);
-          handleErrorFromWFA(storageunit);
-
-        } else if (resWfa.jobStatus !== 'COMPLETED') {
-          logger.info('Storage unit Create: Not completed yet, polling again in 30 seconds, Job ID: ' + jobId);
-          setTimeout(function () { untilCreated(jobId); }, config.wfa.refreshRate);
-
-        } else {
-          suCreateJob.update('Completed', null, storageunit);
-          logger.info("Storage unit created with completed status");
-          storageunit.status = 'Operational';
-          saveStorageUnit(storageunit, 'Storage Unit Create');
-        }
-      }
-    });
-  }
 };
 
 
@@ -233,35 +162,7 @@ exports.create = function (req, res) {
 exports.read = function (req, res) {
   var storageunit = req.storageunit.toObject();
   storageunit.storageunitId = storageunit._id;
-  res.json(storageunit);
-  // var dbWfa = require('./storageunits.server.wfa.db.read');
-  // mongoose.model('Storagegroup').findById(storageunit.storagegroup).exec(function (err, storagegroup) {
-  //   mongoose.model('Server').findById(storagegroup.server).exec(function (err, server) {
-  //     if(storageunit.protocol === 'cifs'){
-  //       storageunit.mount = '\\\\'+server.cifsServername+'.'+server.cifsDnsDomain+'\\'+storageunit.code+'$';
-  //       storageunit.mount1 = '\\\\'+server.ipMgmt+'\\'+storageunit.code+'$';
-  //       res.json(storageunit);
-  //     }else if(storageunit.protocol === 'nfs'){
-  //       storageunit.mount = server.ipMgmt+':/'+storagegroup.code+'/'+storageunit.code;
-  //       res.json(storageunit);
-  //     }else if(storageunit.protocol === 'iscsi'){
-  //       var args = {
-  //         code: storageunit.code,
-  //         server: server.code || '',
-  //         storagegroup: storagegroup.code
-  //       };
-  //       dbWfa.sgRead(args, function (err, out) {
-  //         if (err) {
-  //           logger.info('SG Create: Failed to Read LUN ID for ISCSI from  WFA, Error: ' + err);
-  //           res.json(storageunit);
-  //         } else {
-  //           storageunit.mount = server.ipsSan+':'+out.lunid;
-  //           res.json(storageunit);
-  //         }
-  //       });
-  //     }
-  //   });
-  // });
+  res.json(storageunit); 
 };
 
 /**
@@ -269,7 +170,7 @@ exports.read = function (req, res) {
  */
 exports.update = function (req, res) {
   var wfaUpdateRequired = false;
-  var clientWfa = require('./storageunits.server.wfa.su.update');
+  var clientWfa = require('./eseries-storageunits.server.wfa.su.update');
   var storageunit = req.storageunit;
   var suUpdateJob;
   var sizegbDifference = 0;
@@ -493,7 +394,7 @@ exports.update = function (req, res) {
  * Delete a Storage Unit
  */
 exports.delete = function (req, res) {
-  var clientWfa = require('./storageunits.server.wfa.su.delete.js');
+  var clientWfa = require('./eseries-storageunits.server.wfa.su.delete.js');
   var storageunit = req.storageunit;
   var suDeleteJob;
 
@@ -630,24 +531,23 @@ exports.list = function (req, res) {
   res.header('Expires', '-1');
   res.header('Pragma', 'no-cache');
 
-  var query = Storageunit.find({})
-    .populate('server', 'name code')
-    .populate('cluster', 'name management_ip')
+  var query = EseriesStorageunit.find({})
+    .populate('eseriesSystem', 'name rest_url_ip')
     .populate('application', 'name code')
 
-  if (req.query.server) {
-    if (mongoose.Types.ObjectId.isValid(req.query.server)) {
-      query.where({'server' : req.query.server});
+  if (req.query.eseriesSystem) {
+    if (mongoose.Types.ObjectId.isValid(req.query.eseriesSystem)) {
+      query.where({'eseriesSystem' : req.query.eseriesSystem});
     } else {
-      return respondError(res, 400, 'Invalid server Id');
+      return respondError(res, 400, 'Invalid eseries system Id');
     }
   }
 
-  if (req.query.cluster) {
-    if (mongoose.Types.ObjectId.isValid(req.query.cluster)) {
-      query.where({'cluster' : req.query.cluster});
+  if (req.query.application) {
+    if (mongoose.Types.ObjectId.isValid(req.query.application)) {
+      query.where({'application' : req.query.application});
     } else {
-      return respondError(res, 400, 'Invalid cluster Id');
+      return respondError(res, 400, 'Invalid application Id');
     }
   }
 
@@ -676,23 +576,25 @@ exports.list = function (req, res) {
  * Storage unit middleware
  */
 exports.storageunitByID = function (req, res, next, id) {
-
+  console.log("id", id)
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return respondError(res, 400, 'Storage unit is invalid');
   }
 
-  Storageunit.findById(id).populate('storagegroup','name code')
-  .populate('cluster','name management_ip')
-  .populate('server','name code')
+  EseriesStorageunit.findById(id)
+  .populate('eseriesSystem','name rest_url_ip')
   .populate('application', 'name code')
   .exec(function (err, storageunit) {
+    console.log(err, (storageunit && storageunit.name !== ''))
     if (err) {
       return next(err);
-    } else if (!storageunit) {
-      return respondError(res, 400, 'No storageunit with that identifier has been found');
+    } else if (storageunit && storageunit.name !== '') {
+      req.storageunit = storageunit;
+      next();
+    } else {
+      return respondError(res, 400, 'No eseries-storageunit with that identifier has been found');
     }
-    req.storageunit = storageunit;
-    next();
+   
   });
 };
 
@@ -708,7 +610,7 @@ exports.getListOfIgroups = function(req, res) {
     "vserverName": req.query['vserverName'],
     "clusterName": req.query['clusterName']
   }
-  var dbWfa = require('./storageunits.server.wfa.db.read');
+  var dbWfa = require('./eseries-storageunits.server.wfa.db.read');
   dbWfa.getIgroups(args, function (err, out) {
     if (err) {
       logger.info('SG Create: Failed to Read LUN ID for ISCSI from  WFA, Error: ' + err);

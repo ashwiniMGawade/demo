@@ -76,7 +76,7 @@ angular.module('eseries-storageunits')
       var port_info = [];
       angular.forEach(scopePorts, function(portDetail) {
         var obj = {};
-        obj[portDetail.label] = portDetail.val
+        obj[portDetail.label] = portDetail.port
         port_info.push(obj)
       });
 
@@ -142,11 +142,6 @@ angular.module('eseries-storageunits')
           $scope.portPattern = /(([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}))$/
           $scope.portPatternError = "Invalid port.  e.g. 10:00:00:00:56:78"
         }
-        $scope.populateSystems(newVal, function() {
-          if($scope.systems.length === 1){
-            $scope.systemId = $scope.systems[0].systemId;
-          }
-        });  
       }        
     });
 
@@ -159,58 +154,61 @@ angular.module('eseries-storageunits')
       });
     };
 
+    $scope.initialize = function() {
+      $scope.mapping = "existing"
+    }
   	$scope.create = function(isValid) {
 		 	if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'storageunitForm');
         return false;
       }
 
-      var port_info = preparePortInfoObjectFromScope(this.port_info);
 
+      var port_info = preparePortInfoObjectFromScope(this.port_info);
       
       // Create new storage unit object
       var storageunit = new EseriesStorageunits({
         name: $sanitize(this.name),
         code: $sanitize(this.code),
-        clusterId: $sanitize(this.clusterId),
-        serverId: $sanitize(this.serverId),
-        aggr: $sanitize(this.aggr),
+        eseriesSystem: $sanitize(this.systemId),
+        workload: $sanitize(this.workload),
+        storagePool: $sanitize(this.storagePool),
+        targetType: $sanitize(this.targetType),
         sizegb: this.sizegb,
-        protocol: $sanitize(this.protocol),
-        applicationId:$sanitize(this.applicationId),
-        dr_enabled:this.dr_enabled,
-        destinationCluster:$sanitize(this.destinationCluster.peerCluster),
-        destinationVserver:$sanitize(this.destinationVserver.peerVserver),
-        destinationAggr:$sanitize(this.destinationAggr),
-        schedule:$sanitize(this.schedule),
-        port_info:$sanitize(port_info)
+        applicationId:$sanitize(this.applicationId),        
+        mapping:this.mapping
       });
+      
 
-     
-      if(storageunit.protocol == "iscsi" || storageunit.protocol == "fc") {
-        storageunit.mapping = this.mapping
-        storageunit.acl = $sanitize(this.acl)
-        storageunit.igroup = $sanitize(this.igroup)
-        storageunit.lunOs =$sanitize(this.lunOs),
-        storageunit.lunId = $sanitize(this.lunId)
+      if(this.mapping == "new") {
+        storageunit.protocol= $sanitize(this.protocol);
+        storageunit.hostName = $sanitize(this.hostName);
+        storageunit.hostType = $sanitize(this.hostType);
+        storageunit.lunId = $sanitize(this.lunId);
+        storageunit.portInfo = port_info;
       }
+
+      if(this.mapping == "existing") {
+        storageunit.igroup= $sanitize(this.igroup);
+      }
+
       //Redirect to list page after save
       storageunit.$create(function (response) {
-        $location.path('storageunits');
+        $location.path('eseries-storageunits');
         Flash.create('success', '<strong ng-non-bindable>Submitted the Storage Unit Create request.<br>Please wait for the Status to change to Operational.</strong>', 10000, { class: '', id: '' }, true);
 
         // Clear form fields
         $scope.name = '';
         $scope.code = '';
         $scope.sizegb = '';
-        $scope.acl = '';
+        $scope.eseriesSystem = '';
         $scope.protocol = '';
         storageunit.igroup = "";
-        $scope.lunOs = '';
+        $scope.workload = '';
         $scope.lunId = '';
         storageunit.mapping = "";
-        storageunit.readWriteClients = "";
-        storageunit.readOnlyClients = "";
+        storageunit.storagePool = "";
+        storageunit.targetType = "";
 
       }, function (errorResponse) {
         throwFlashErrorMessage(errorResponse.data.message);
@@ -220,7 +218,7 @@ angular.module('eseries-storageunits')
     // get the details of storage unit
     $scope.findOne = function () {
       EseriesStorageunits.get({
-        storageunitId: $stateParams.storageunitId
+        eseriesStorageunitId: $stateParams.storageunitId
       }, function(data) {
         $scope.storageunit = data;
         $scope.freshTag = false;
@@ -231,7 +229,7 @@ angular.module('eseries-storageunits')
         // }
       
       }, function(error) {
-        $location.path('storageunits');
+        $location.path('eseries-storageunits');
         throwFlashErrorMessage('No storage unit with that identifier has been found');
       });
 

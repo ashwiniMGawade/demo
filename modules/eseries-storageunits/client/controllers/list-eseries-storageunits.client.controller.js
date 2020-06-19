@@ -2,7 +2,7 @@
 
 // List storage units controller
 
-angular.module('eseries-storageunits').controller('StorageunitsListController', ['$scope', '$filter', '$interval', 'NgTableParams', 'Authentication', 'EseriesStorageunits',
+angular.module('eseries-storageunits').controller('EseriesStorageunitsListController', ['$scope', '$filter', '$interval', 'NgTableParams', 'Authentication', 'EseriesStorageunits',
   function ($scope, $filter, $interval, NgTableParams, Authentication, EseriesStorageunits) {
   	$scope.authentication = Authentication;
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;

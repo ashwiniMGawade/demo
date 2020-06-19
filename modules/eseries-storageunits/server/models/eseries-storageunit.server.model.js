@@ -31,44 +31,6 @@ var EseriesStorageunitSchema = new Schema({
     minlength: [3, 'Storage unit code, Minimum 3 char required'],
     match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit code can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
   },
-  application: {
-    type: Schema.ObjectId,
-    ref: 'Application',
-    required: 'Application required'
-  },
-  eseriesSystem: {
-    type: Schema.ObjectId,
-    ref: 'eseries_systems',
-    required: 'Eseries System required'
-  },
-  // server: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Server',
-  //   required: 'Storage group required'
-  // },
-  workload: {
-    type: String,
-    trim: true,
-    required: "Workload name is required"
-  },
-  storagePool:{
-    type: String,
-    trim: true,
-    required: "Storage pool name is required"
-  },
-  hostName: {
-    type: String,
-    trim: true,
-    required: "Host name is required",
-    maxlength: [32, 'Storage unit code, Maximum 32 char allowed'],
-    minlength: [3, 'Storage unit host name, Minimum 3 char required'],
-    match: [/^[[a-zA-Z0-9\_]*$/, 'Storage Unit host name can only include lowercase alphanumeric characters and underscores']
-  },
-  hostType: {
-    type: String,
-    trim: true,
-    required: "Host type is required"
-  }, 
   sizegb: {
     type: Number,
     min: [1, 'Storage Unit Size should be greater than or equal to 1'],
@@ -80,19 +42,33 @@ var EseriesStorageunitSchema = new Schema({
       message   : '{VALUE} is not an integer value for size'
     }
   },
-  portInfo: {
-    type: String,
-    trim: true,
-    required: true
-    //match:[/^((((iqn\.[0-9]{4}-[0-9]{2}\.(([a-zA-Z]+[a-zA-Z0-9\-]*)+(.[a-zA-Z]+[a-zA-Z0-9\-]*)*)+(:[a-zA-Z0-9]+))+(,((iqn\.[0-9]{4}-[0-9]{2}\.(([a-zA-Z]+[a-zA-Z0-9\-]*)+(.[a-zA-Z]+[a-zA-Z0-9\-]*)*)+(:[a-zA-Z0-9]+)))+)*)|(((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+((,((((25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)((\/([8-9]|1[0-9]|2[0-6]))*))))+))*)))$/, 'Please enter valid ACL']
+  application: {
+    type: Schema.ObjectId,
+    ref: 'Application',
+    required: 'Application required'
   },
-  igroup: {
+  eseriesSystem: {
+    type: Schema.ObjectId,
+    ref: 'eseries_systems',
+    required: 'Eseries System required'
+  }, 
+  workload: {
     type: String,
     trim: true,
-    required: function() { return this.protocol === 'iscsi' || this.protocol === 'fc' ? 'Storage Unit igroup is required' : false; },
-    maxlength: [32, 'Storage unit igroup, Maximum 32 char allowed'],
-    minlength: [3, 'Storage unit igroup, Minimum 3 char required'],
-    match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit igroup can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
+    required: "Workload name is required"
+  },
+  storagePool:{
+    type: String,
+    trim: true,
+    required: "Storage pool name is required"
+  },
+  targetType: {
+    type: String,
+    enum: {
+      values: ['host', 'group'],
+      message: '`{VALUE}` not a valid value for target type'
+    },
+    required: 'Storage Unit target type is required',
   },
   mapping: {
     type: String,
@@ -100,33 +76,47 @@ var EseriesStorageunitSchema = new Schema({
       values: ["existing","new"],
       message: '`{VALUE}` not a valid value for Mapping'
     },
-    required: function() { return this.protocol === 'iscsi' || this.protocol === 'fc' ? 'Storage Unit mapping is required' : false; },
+    required: 'Storage Unit mapping is required',
+  }, 
+  hostName: {
+    type: String,
+    trim: true,    
+    maxlength: [32, 'Storage unit code, Maximum 32 char allowed'],
+    minlength: [3, 'Storage unit host name, Minimum 3 char required'],
+    match: [/^[[a-zA-Z0-9\_]*$/, 'Storage Unit host name can only include lowercase alphanumeric characters and underscores'],
+    required: function() { return this.mapping === 'new'  ? "Host name is required" : false; }
   },
+  hostType: {
+    type: String,
+    trim: true,
+    required: function() { return this.mapping === 'new'  ? "Host type is required" : false; }, 
+  },   
   protocol: {
     type: String,
     enum: {
       values: ['iscsi', 'fc'],
       message: '`{VALUE}` not a valid value for protocol'
     },
-    required: 'Storage Unit protocol required'
+    required: function() { return this.mapping === 'new'  ? 'Storage Unit protocol required' : false; }, 
   },
-  targetType: {
-    type: String,
-    enum: {
-      values: ['host', 'igroup'],
-      message: '`{VALUE}` not a valid value for target type'
-    },
-    required: 'Storage Unit target type is required',
-  },
+  portInfo: {
+    type: Object,
+    trim: true,
+    required: function() { return this.mapping === 'new'  ? 'Storage Unit port Info required' : false; },     
+  },   
   lunId: {
     type: Number,
     min:[0, 'Minimum allowed value is 0'],
     max:[255, 'Maximum allowed value is 255']
   },
-  dbInfo: {
-    type: Object,
-    required: true
-  },
+  igroup: {
+    type: String,
+    trim: true,
+    required: function() { return this.mapping === 'existing'  ? 'Storage Unit igroup is required' : false; },
+    maxlength: [32, 'Storage unit igroup, Maximum 32 char allowed'],
+    minlength: [3, 'Storage unit igroup, Minimum 3 char required'],
+    match: [/^[a-z][a-z0-9\_]*$/, 'Storage Unit igroup can only include lowercase alphanumeric characters and underscores (First character must be alphabetical)']
+  },   
   status: {
     type: String,
     default: 'Creating',
@@ -360,4 +350,4 @@ EseriesStorageunitSchema.methods.toJSON = function() {
   return obj;
 };
 
-mongoose.model('eseries_storageunit', EseriesStorageunitSchema);
+mongoose.model('eseries_storageunits', EseriesStorageunitSchema);

@@ -226,8 +226,8 @@
         </div> -->
         <div class="form-group"  ng-show="protocol === 'iscsi' || protocol === 'fc'">
           <label for="existingIgroup">Mapping</label>
-          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing">Existing Server</label>
-          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" checked>New Server</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing" checked="checked">Existing Server</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" >New Server</label>
         </div>
 
         <div class="form-group" show-errors ng-if="(protocol === 'iscsi' || protocol=== 'fc') && mapping =='existing'">

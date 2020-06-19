@@ -4,8 +4,8 @@
 
 angular.module('eseries-storageunits').factory('EseriesStorageunits', ['$resource',
   function ($resource) {
-    return $resource('api/storageunits/:storageunitId', {
-      storageunitId: '@storageunitId'
+    return $resource('api/eseries-storageunits/:eseriesStorageunitId', {
+      storageunitId: '@eseriesStorageunitId'
     }, {
       update: {
         method: 'PUT'
@@ -15,7 +15,7 @@ angular.module('eseries-storageunits').factory('EseriesStorageunits', ['$resourc
       },
       getIgroups: {
         method: 'GET',
-        url: 'api/storageunits/getListOfIgroups',
+        url: 'api/eseries-storageunits/getListOfIgroups',
         isArray: true
       },
       getPeers: {

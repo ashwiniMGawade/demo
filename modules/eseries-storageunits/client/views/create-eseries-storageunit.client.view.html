@@ -1,6 +1,6 @@
-<section ng-controller="EseriesStorageunitsController" ng-init="find()">
+<section ng-controller="EseriesStorageunitsController" ng-init="initialize()">
   <div class="page-header">
-    <h1>New Storage Unit</h1>
+    <h1>New Storage Unit {{mapping}}</h1>
   </div>
   <div class="col-md-6">
     <form name="storageunitForm" class="form-horizontal" ng-submit="create(storageunitForm.$valid)" novalidate>
@@ -115,10 +115,10 @@
           <p class="help-block">The Target Type with which the Storage Unit is to be accessed with.</p>
         </div>
 
-        <div class="form-group">
+        <div class="form-group required">
           <label for="existingIgroup">Mapping&nbsp;&nbsp;</label>
-          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing">Existing Server</label>
-          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" checked>New Server</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="mapping" value="existing" checked>Existing Server</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="mapping" value="new" >New Server</label>
         </div>
 
         <div class="form-group required" show-errors ng-if="mapping=='new'">
@@ -134,7 +134,7 @@
 
         <div class="form-group required" show-errors ng-if="mapping=='new'">
           <label for="hostName">Host Name</label>
-          <input name="hostName" type="text" ng-model="hostName" id="Name" class="form-control"
+          <input name="hostName" type="text" ng-model="$parent.hostName" id="Name" class="form-control"
           placeholder="Host Name"
           ng-maxlength="64"
           ng-minlength="3"
@@ -160,9 +160,6 @@
           </div>
           <p class="help-block">The Protocol with which the Storage Unit is to be accessed with.</p>
         </div>
-
-      
-    
 
         <!-- <div class="form-group required" show-errors>
           <label for="storagegroupId">Volume</label>

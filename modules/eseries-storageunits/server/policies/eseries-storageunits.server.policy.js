@@ -30,19 +30,19 @@ exports.invokeRolesPolicies = function () {
   }, {
     roles: featuresSettings.roles.storageunit.read,
     allows: [{
-      resources: '/api/eseries-storageunits/:storageunitId',
+      resources: '/api/eseries-storageunits/:eseriesStorageunitId',
       permissions: ['get']
     }]
   }, {
     roles: featuresSettings.roles.storageunit.update,
     allows: [{
-      resources: '/api/eseries-storageunits/:storageunitId',
+      resources: '/api/eseries-storageunits/:eseriesStorageunitId',
       permissions: ['put']
     }]
   }, {
     roles: featuresSettings.roles.storageunit.delete,
     allows: [{
-      resources: '/api/eseries-storageunits/:storageunitId',
+      resources: '/api/eseries-storageunits/:eseriesStorageunitId',
       permissions: ['delete']
     }]
   },

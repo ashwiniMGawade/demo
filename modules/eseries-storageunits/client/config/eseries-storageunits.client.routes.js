@@ -13,7 +13,7 @@ angular.module('eseries-storageunits').config(['$stateProvider',
       .state('eseries-storageunits.list', {
         url: '',
         templateUrl: 'modules/eseries-storageunits/client/views/list-eseries-storageunits.client.view.html',
-        controller: 'StorageunitsListController',
+        controller: 'EseriesStorageunitsListController',
         data: {
           roles: featuresSettings.roles.storageunit.list,
           parent: 'storagemanagement',
