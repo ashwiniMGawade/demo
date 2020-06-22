@@ -199,7 +199,7 @@ angular.module('storageunits')
 
     $scope.$watch("destinationCluster", function(newVal, oldVal) {
       if (newVal) {       
-        $scope.populateDestinationAggrs(newVal.sourceCluster);     
+        $scope.populateDestinationAggrs(newVal.peerCluster);     
       }        
     });
 
@@ -232,10 +232,10 @@ angular.module('storageunits')
         protocol: $sanitize(this.protocol),
         applicationId:$sanitize(this.applicationId),
         dr_enabled:this.dr_enabled,
-        destinationCluster:$sanitize(this.destinationCluster.peerCluster),
-        destinationVserver:$sanitize(this.destinationVserver.peerVserver),
-        destinationAggr:$sanitize(this.destinationAggr),
-        schedule:$sanitize(this.schedule)
+        destinationCluster:this.dr_enabled ? $sanitize(this.destinationCluster.peerClusterIP): "",
+        destinationVserver:this.dr_enabled ? $sanitize(this.destinationVserver.peerVserver): "",
+        destinationAggr:this.dr_enabled? $sanitize(this.destinationAggr): "",
+        schedule:this.dr_enabled? $sanitize(this.schedule): ""
       });
 
 
@@ -271,12 +271,12 @@ angular.module('storageunits')
         storageunit.readOnlyClients = "";
 
 
-         if (tags.length > 0) {
-          var tag = new Tags({'Tags': tags, objectId: response.storageunitId });
-          tag.$create(function(response){
-            console.log("response of tags", response)
-          });
-        }
+        //  if (tags.length > 0) {
+        //   var tag = new Tags({'Tags': tags, objectId: response.storageunitId });
+        //   tag.$create(function(response){
+        //     console.log("response of tags", response)
+        //   });
+        // }
 
 
       }, function (errorResponse) {
@@ -298,26 +298,26 @@ angular.module('storageunits')
         // }
 
         //Get tags information
-        Tags.get({
-          objectId: $stateParams.storageunitId
-        }, function(data) {
-          data = data[0];
-          if (data.tags.length > 0) {
-            $scope.tags = [];
-            angular.forEach(data.tags, function(tagVal, tagKey) {
-              var obj = {};
+        // Tags.get({
+        //   objectId: $stateParams.storageunitId
+        // }, function(data) {
+        //   data = data[0];
+        //   if (data.tags.length > 0) {
+        //     $scope.tags = [];
+        //     angular.forEach(data.tags, function(tagVal, tagKey) {
+        //       var obj = {};
 
-              obj.attr = Object.keys(tagVal)[0];
-              obj.val = tagVal[obj.attr];
-              $scope.tags.push(obj);
-            });           
-          }
-        }, function(error) {
-            if(error.data.http_status_code == 404) {
-              $scope.freshTag = true;
-            }
-            //throwFlashErrorMessage(error.data.message);
-        });
+        //       obj.attr = Object.keys(tagVal)[0];
+        //       obj.val = tagVal[obj.attr];
+        //       $scope.tags.push(obj);
+        //     });           
+        //   }
+        // }, function(error) {
+        //     if(error.data.http_status_code == 404) {
+        //       $scope.freshTag = true;
+        //     }
+        //     //throwFlashErrorMessage(error.data.message);
+        // });
       }, function(error) {
         $location.path('storageunits');
         throwFlashErrorMessage('No storage unit with that identifier has been found');

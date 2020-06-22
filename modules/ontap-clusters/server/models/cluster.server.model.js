@@ -33,7 +33,7 @@ var ClusterSchema = new Schema({
     required: 'Cluster name required',
     minlength: [3, 'Name: Minimum 3 char required'],
     maxlength: [64, 'Name: Maximum 64 char allowed'],
-    match: [/^[a-zA-Z0-9\-]*$/, 'Cluster name can only include alphanumeric characters including dash']   
+    match: [/^[a-zA-Z0-9\-_]*$/, 'Cluster name can only include alphanumeric characters including dash and underscore']   
   },
   apis_cluster_key: {
     type: String,

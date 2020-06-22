@@ -45,7 +45,6 @@ angular.module('servers').controller('ServerListController', ['$scope', '$filter
             })
           }
 
-          console.log(pollingParams);
           Servers.query(pollingParams, function (data) {
             $scope.servers = data;
 

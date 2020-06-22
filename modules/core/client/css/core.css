@@ -53,6 +53,9 @@ a:hover .header-profile-image {
 .capitalize {
   text-transform: capitalize;
 }
+.uppercase {
+  text-transform: uppercase;
+}
 .error-text {
   display: none;
 }

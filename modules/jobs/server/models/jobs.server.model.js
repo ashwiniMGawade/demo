@@ -80,22 +80,22 @@ JobSchema.statics.create = function (req, module, callback) {
   _this.objectType = module;
   _this.operation = getOperation(req.method);
   _this.payload = sanitizeMessage.sanitizeObjectForLoggerMessage(req.body);
-  if(req.user.tenant && _this.module !== 'notification'){
-    mongoose.model('Tenant').findById(req.user.tenant).exec(function (err, tenant) {
-      if(!err && tenant){
-        _this.tenant = {'code' : tenant.code, 'tenantId' : tenant._id };            
-      }
-      saveJob();
-    });
-  }else{
+  // if(req.user.tenant && _this.module !== 'notification'){
+  //   mongoose.model('Tenant').findById(req.user.tenant).exec(function (err, tenant) {
+  //     if(!err && tenant){
+  //       _this.tenant = {'code' : tenant.code, 'tenantId' : tenant._id };            
+  //     }
+  //     saveJob();
+  //   });
+  // }else{
     saveJob();
-  }
+  // }
   function saveJob(){
     _this.save(function(err, res) {
       if (err) {
         logger.info(err);
       }
-      logger.info("Successfully created job" + util.inspect(_this, { showHidden: true, depth: null }));
+      logger.info("Successfully created job");
       callback(null, _this);
     });
   }
@@ -122,7 +122,7 @@ JobSchema.methods.update = function(status, comments, result) {
     if (err) {
       logger.info(err);
     }
-    logger.info("Successfully updated job" + util.inspect(_this, { showHidden: true, depth: null }));
+    logger.info("Successfully updated job");
   });
 };
 

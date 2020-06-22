@@ -70,7 +70,7 @@
 
         <div class="form-group required" show-errors>
           <label for="clusterId">Cluster</label>   
-          <select name="clusterId" ng-model="clusterId" id="clusterId" class="form-control" ng-options="cluster.clusterId as cluster.name for cluster in clusters | orderBy: 'name'" required  ng-disabled="!clusters.length">
+          <select name="clusterId" ng-model="clusterId" id="clusterId" class="form-control" ng-options="cluster.clusterId as cluster.name for cluster in clusters | orderBy: 'name' | filter: {provisioning_state:'open'}" required  ng-disabled="!clusters.length">
             <option value="">Please select a cluster</option>
           </select>
           <!-- <div class="loader" ng-show="!clusters.length"></div>        -->
@@ -115,61 +115,6 @@
           </div>
           <p class="help-block">The Provision Type with which the Storage Unit is to be accessed with.</p>
         </div>
-        <div class="form-group" show-errors ng-if="showDrEnabledCheckBox && serverId  && clusterId"> 
-          <input type="checkbox" ng-model="$parent.dr_enabled"  ng-change="checkboxChanged()" name="dr_enabled" value="true">
-          <label for="dr_enabled">&nbsp;Snapmirror protection required</label>  
-       </div>
-
-       <div class="form-group required" show-errors ng-if="dr_enabled">
-        <label for="destinationCluster">Destination Cluster</label>   
-        <select name="destinationCluster" ng-model="$parent.destinationCluster" id="cluster" class="form-control" ng-options="peer.peerCluster for peer in peers | orderBy: 'peerCluster'" required  ng-disabled="!peers.length">
-          <option value="">Please select a cluster</option>
-        </select>
-        <!-- <div class="loader" ng-show="!clusters.length"></div>        -->
-        <div ng-messages="storageunitForm.destinationCluster.$error" role="alert">
-          <p class="help-block error-text" ng-message="required">Destination cluster name is required.</p>
-        </div>
-        <p class="help-block">The Destination cluster the storageunit is to be created in.</p>
-      </div>
-
-      <div class="form-group required" show-errors ng-if="dr_enabled">
-        <label for="destinationVserver">Destination {{labels.server.serverName}}</label>
-        <select name="destinationVserver" ng-model="$parent.destinationVserver" id="destinationVserver" class="form-control" ng-options="peer.peerVserver for peer in peers | orderBy: 'peerVserver' | filter: {peerCluster:$parent.destinationCluster.peerCluster}" required ng-disabled="!peers.length"> 
-          <option value="">Please select a {{labels.server.serverName}}</option>
-        </select>
-        <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
-          <p class="help-block error-text" ng-message="required">Destination {{labels.server.serverName}} is required.</p>
-        </div>
-        <p class="help-block">The Destination {{labels.server.serverName}} in which the Storage Unit is to reside in.</p>
-      </div>
-
-      <div class="form-group required" show-errors ng-if="dr_enabled">
-        <label for="destinationAggr">Destination Aggregate</label>
-        <select name="destinationAggr" ng-model="$parent.destinationAggr" id="destinationAggr" class="form-control" ng-options="aggregate.name as aggregate.name for aggregate in destinationAggregates | orderBy: 'name'" required ng-disabled="!peers.length"> 
-          <option value="">Please select a Aggregate</option>
-        </select>
-        <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
-          <p class="help-block error-text" ng-message="required">Destination Aggregate is required.</p>
-        </div>
-        <p class="help-block">The Destination Aggregate in which the Storage Unit is to reside in.</p>
-      </div>
-
-      <div class="form-group required" show-errors ng-if="dr_enabled">
-        <label for="schedule">Schedule</label>
-        <select name="schedule" ng-model="$parent.schedule" id="scehdule" class="form-control" required ng-disabled="!peers.length"> 
-          <option value="">Please select a schedule</option>
-          <option value="@00.30">@00.30</option>
-          <option value="@10.40">@10.40</option>
-          <option value="@15min">@15min</option>
-          <option value="@20.50">@20.50</option>
-          <option value="daily@0.10">daily@0.10</option>
-        </select>
-        <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
-          <p class="help-block error-text" ng-message="required">Schedule is required.</p>
-        </div>
-        <p class="help-block">The Schedule in which the Storage Unit is to reside in.</p>
-      </div>
-
 
         <!-- <div class="form-group required" show-errors>
           <label for="storagegroupId">Volume</label>
@@ -225,9 +170,15 @@
           </div>
         </div> -->
         <div class="form-group"  ng-show="protocol === 'iscsi' || protocol === 'fc'">
+<<<<<<< HEAD
           <label for="existingIgroup">Mapping</label>
           <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing" checked="checked">Existing Server</label>
           <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" >New Server</label>
+=======
+          <label for="existingIgroup">Mapping&nbsp;&nbsp;&nbsp;</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="existing">Existing Server</label>
+          <label class="radio-inline"><input type="radio" name="scope" ng-model="$parent.mapping" value="new" checked>New Server</label>
+>>>>>>> 7a525a44b57b85cbd3ca9721d02dd4c87afc4f4b
         </div>
 
         <div class="form-group" show-errors ng-if="(protocol === 'iscsi' || protocol=== 'fc') && mapping =='existing'">
@@ -264,10 +215,10 @@
 
         <div class="form-group" show-errors ng-if="(protocol=== 'fc') && mapping=='new'">
           <label for="acl">Access Control List</label>
-          <input name="acl" type="text" ng-model="$parent.acl" id="acl" class="form-control" placeholder="ACL" ng-pattern="/(([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}))+(?:,(([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}):([0-9]{2}))+)*$/">
+          <input name="acl" type="text" ng-model="$parent.acl" id="acl" class="form-control" placeholder="ACL" ng-pattern="/(([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}))+(?:,(([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}):([A-Z0-9]{2}))+)*$/">
           <div ng-messages="storageunitForm.acl.$error" role="alert">
           <p class="help-block error-text" ng-message="pattern">Please enter valid ACL.</p>
-          <p class="help-block">The list of FC WWPN allowed to access the Storage Unit.<br>Comma-separated notation without spaces is accepted.<br>FC: e.g. 10:00:00:00:56:78</p>
+          <p class="help-block">The list of FC WWPN allowed to access the Storage Unit.<br>Comma-separated notation without spaces is accepted.<br>FC: e.g. 10:00:00:90:FA:C0:AE:73</p>
           </div>
         </div>
 
@@ -311,6 +262,60 @@
             </div>
             <p class="help-block">Optional: Only to be entered if a specific LUN ID is required.<br>The storage system will by default select the next-available LUN ID.<br>Entering a LUN ID used by another LUN, which is presented to the same IQN will be prevented by the storage system.</p>
           </div>
+        </div>
+
+        <div class="form-group" show-errors ng-if="showDrEnabledCheckBox && serverId  && clusterId"> 
+          <input type="checkbox" ng-model="$parent.dr_enabled"  ng-change="checkboxChanged()" name="dr_enabled" value="true">
+          <label for="dr_enabled">&nbsp;Snapmirror protection required</label>  
+       </div>
+        <div class="form-group required" show-errors ng-if="dr_enabled">
+          <label for="destinationCluster">Destination Cluster</label>   
+          <select name="destinationCluster" ng-model="$parent.destinationCluster" id="cluster" class="form-control" ng-options="peer.peerCluster for peer in peers | orderBy: 'peerCluster'" required  ng-disabled="!peers.length">
+            <option value="">Please select a cluster</option>
+          </select>
+          <!-- <div class="loader" ng-show="!clusters.length"></div>        -->
+          <div ng-messages="storageunitForm.destinationCluster.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Destination cluster name is required.</p>
+          </div>
+          <p class="help-block">The Destination cluster the storageunit is to be created in.</p>
+        </div>
+  
+        <div class="form-group required" show-errors ng-if="dr_enabled">
+          <label for="destinationVserver">Destination {{labels.server.serverName}}</label>
+          <select name="destinationVserver" ng-model="$parent.destinationVserver" id="destinationVserver" class="form-control" ng-options="peer.peerVserver for peer in peers | orderBy: 'peerVserver' | filter: {peerCluster:$parent.destinationCluster.peerCluster}" required ng-disabled="!peers.length"> 
+            <option value="">Please select a {{labels.server.serverName}}</option>
+          </select>
+          <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Destination {{labels.server.serverName}} is required.</p>
+          </div>
+          <p class="help-block">The Destination {{labels.server.serverName}} in which the Storage Unit is to reside in.</p>
+        </div>
+  
+        <div class="form-group required" show-errors ng-if="dr_enabled">
+          <label for="destinationAggr">Destination Aggregate</label>
+          <select name="destinationAggr" ng-model="$parent.destinationAggr" id="destinationAggr" class="form-control" ng-options="aggregate.name as aggregate.name for aggregate in destinationAggregates | orderBy: 'name'" required ng-disabled="!peers.length"> 
+            <option value="">Please select a Aggregate</option>
+          </select>
+          <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Destination Aggregate is required.</p>
+          </div>
+          <p class="help-block">The Destination Aggregate in which the Storage Unit is to reside in.</p>
+        </div>
+  
+        <div class="form-group required" show-errors ng-if="dr_enabled">
+          <label for="schedule">Schedule</label>
+          <select name="schedule" ng-model="$parent.schedule" id="scehdule" class="form-control" required ng-disabled="!peers.length"> 
+            <option value="">Please select a schedule</option>
+            <!-- <option value="@00.30">@00.30</option> -->
+            <!-- <option value="@10.40">@10.40</option> -->
+            <option value="15min">15min</option>
+            <!-- <option value="@20.50">@20.50</option> -->
+            <option value="daily">daily</option>
+          </select>
+          <div ng-messages="storageunitForm.destinationVserver.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Schedule is required.</p>
+          </div>
+          <p class="help-block">The Schedule in which the Storage Unit is to reside in.</p>
         </div>
 
         <div class="form-group text-center">

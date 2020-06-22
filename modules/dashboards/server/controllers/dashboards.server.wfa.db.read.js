@@ -541,4 +541,178 @@ exports.lunRead = function (callback) {
 };
  
 
+exports.portRead = function (callback) {
+  /*
+  Port:
+
+SELECT madp.name AS 'Port', mnod.name AS 'Node', mcls.name AS 'Cluster',
+
+replace(substring(madp.adapterType,-3),'_','') AS 'Adapater Type', COALESCE(madp.stateRaw) AS 'State'
+
+FROM netapp_model.storage_adapter madp LEFT JOIN netapp_model.cluster mcls ON madp.clusterId = mcls.objid
+
+LEFT JOIN netapp_model.node mnod ON madp.nodeId = mnod.objid WHERE madp.stateRaw='down';
+
+  */
+  var value = myCache.get("ports")
+  if(value == undefined){
+    var args = "SELECT madp.name AS 'port', mnod.name AS 'node', mcls.name AS 'cluster', " +
+    "replace(substring(madp.adapterType,-3),'_','') AS 'adapterType', COALESCE(madp.stateRaw) AS 'state'  " +
+    "FROM netapp_model.storage_adapter madp LEFT JOIN netapp_model.cluster mcls ON madp.clusterId = mcls.objid " +
+    "LEFT JOIN netapp_model.node mnod ON madp.nodeId = mnod.objid WHERE madp.stateRaw='down'; ";
+
+    logger.info('port health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
+    connectionPool.getConnection(function(err, connection) {
+      if(err){
+        logger.error('port health MySQL Read: Connection Error: ' + err);
+        //On error send empty output
+        return callback(err, [])
+      }else{
+        connection.query(args, function (err, result) {
+          connection.release();
+          logger.info('port health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
+          if (err) {
+            logger.info('port health MySQL Read: Error: ' + err);
+          } else if (result.length > 0) {
+            myCache.set( "ports", result, 100 );  
+            return callback(null, result);
+          }
+          return callback(null, []);          
+        });
+      }
+    });
+  } else {
+    logger.info("Loading ports from cache");
+    //  logger.info(util.inspect(value, {showHidden: false, depth: null}));
+    callback(null, value);
+  }
+};
+
+
+exports.diskRead = function (callback) {
+/*
+    Disk:
+
+    SELECT mdsk.name AS 'Disk', if((mdsk.homeNodeName is not null),mdsk.homeNodeName,'NA') AS 'Home Node',
+    if((mdsk.activeNodeName is not null),mdsk.activeNodeName,'NA') AS 'Owner Node', mcls.name AS 'Cluster',
+    CASE
+      WHEN mdsk.containerType = 'UNASSIGNED' THEN 'UNASSIGNED'
+      WHEN mdsk.containerType = 'UNKNOWN' THEN 'UNKNOWN'
+      WHEN mdsk.isFailed=1 THEN 'Failed'
+    END AS 'Status', mdsk.failedReason AS 'Reason'
+    FROM netapp_model.disk mdsk LEFT JOIN netapp_model.cluster mcls ON mdsk.clusterId = mcls.objid
+    WHERE mdsk.containerType = 'UNASSIGNED' OR mdsk.containerType = 'UNKNOWN' OR mdsk.isFailed=1;
+
+  */
+  var value = myCache.get("disks")
+  if(value == undefined){
+    var args = "SELECT mdsk.name AS 'disk', if((mdsk.homeNodeName is not null),mdsk.homeNodeName,'NA') AS 'homeNode', " +
+    "if((mdsk.activeNodeName is not null),mdsk.activeNodeName,'NA') AS 'ownerNode', mcls.name AS 'cluster',  " +
+    "CASE "+
+      "WHEN mdsk.containerType = 'UNASSIGNED' THEN 'UNASSIGNED' "+
+      "WHEN mdsk.containerType = 'UNKNOWN' THEN 'UNKNOWN' "+
+      "WHEN mdsk.isFailed=1 THEN 'Failed' "+
+    "END AS 'status', mdsk.failedReason AS 'reason' " +
+    "FROM netapp_model.disk mdsk LEFT JOIN netapp_model.cluster mcls ON mdsk.clusterId = mcls.objid "+
+    "WHERE mdsk.containerType = 'UNASSIGNED' OR mdsk.containerType = 'UNKNOWN' OR mdsk.isFailed=1; "
+
+    logger.info('disk health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
+    connectionPool.getConnection(function(err, connection) {
+      if(err){
+        logger.error('disk health MySQL Read: Connection Error: ' + err);
+        //On error send empty output
+        return callback(err, [])
+      }else{
+        connection.query(args, function (err, result) {
+          connection.release();
+          logger.info('disk health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
+          if (err) {
+            logger.info('disk health MySQL Read: Error: ' + err);
+          } else if (result.length > 0) {
+            myCache.set( "disks", result, 100 );  
+            return callback(null, result);
+          }
+          return callback(null, []);          
+        });
+      }
+    });
+  } else {
+    logger.info("Loading disks from cache");
+    //  logger.info(util.inspect(value, {showHidden: false, depth: null}));
+    callback(null, value);
+  }
+};
+
+exports.lifRead = function (callback) {
+  /*
+      LIF: 
+
+    SELECT mlif.name AS 'LIF', mvs.name AS 'Vserver', mnod.name AS 'Home Node',
+    (select node.name from netapp_model.node WHERE netapp_model.node.objid = mlif.currentNodeId) AS 'Current Node',
+    mcls.name AS 'Cluster Name',mlif.roleRaw AS 'Role',
+    CASE
+      WHEN mlif.isHome=0 THEN 'LIF is not in home node'
+      WHEN mlif.operationalStatusRaw='down' THEN 'LIF is operationally down'
+      WHEN mlif.administrativeStatusRaw='down' THEN 'LIF is administratively down'
+    END AS 'Status'
+    FROM netapp_model.lif mlif LEFT JOIN netapp_model.cluster mcls ON mlif.clusterId = mcls.objid
+    LEFT JOIN netapp_model.vserver mvs ON mlif.vserverId = mvs.objid
+    LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid
+    WHERE mlif.operationalStatusRaw = 'down' OR mlif.administrativeStatusRaw = 'down' OR mlif.isHome=0;
+
+
+    SELECT mlif.name AS 'LIF', mvs.name AS 'Vserver', mnod.name AS 'Home Node',
+(select node.name from netapp_model.node WHERE netapp_model.node.objid = mlif.currentNodeId) AS 'Current Node',
+mcls.name AS 'Cluster Name',mlif.roleRaw AS 'Role',
+CASE
+   WHEN mlif.isHome=0 THEN 'LIF is not in home node'
+   WHEN mlif.operationalStatusRaw='down' THEN 'LIF is operationally down'
+   WHEN mlif.administrativeStatusRaw='down' THEN 'LIF is administratively down'
+END AS 'Status'
+FROM netapp_model.lif mlif LEFT JOIN netapp_model.cluster mcls ON mlif.clusterId = mcls.objid
+LEFT JOIN netapp_model.vserver mvs ON mlif.vserverId = mvs.objid LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid
+WHERE mlif.operationalStatusRaw = 'down' OR mlif.administrativeStatusRaw = 'down' OR mlif.isHome=0;
+  
+    */
+    var value = myCache.get("lifs")
+    if(value == undefined){
+      var args = "SELECT mlif.name AS 'lif', mvs.name AS 'vserver', mnod.name AS 'homeNode', " +
+      "(select node.name from netapp_model.node WHERE netapp_model.node.objid = mlif.currentNodeId) AS 'currentNode', " +
+      "mcls.name AS 'cluster',mlif.roleRaw AS 'role', "+
+      "CASE "+
+        "WHEN mlif.isHome=0 THEN 'LIF is not in home node' "+
+        "WHEN mlif.operationalStatusRaw='down' THEN 'LIF is operationally down' "+
+        "WHEN mlif.administrativeStatusRaw='down' THEN 'LIF is administratively down' "+
+      "END AS 'status' " +
+      "FROM netapp_model.lif mlif LEFT JOIN netapp_model.cluster mcls ON mlif.clusterId = mcls.objid "+
+      "LEFT JOIN netapp_model.vserver mvs ON mlif.vserverId = mvs.objid "+
+      "LEFT JOIN netapp_model.node mnod ON mlif.homeNodeId = mnod.objid "+
+      "WHERE mlif.operationalStatusRaw = 'down' OR mlif.administrativeStatusRaw = 'down' OR mlif.isHome=0; "
+  
+      logger.info('lif health MySQL Read: Query: ' + util.inspect(args, {showHidden: false, depth: null}));
+      connectionPool.getConnection(function(err, connection) {
+        if(err){
+          logger.error('lif health MySQL Read: Connection Error: ' + err);
+          //On error send empty output
+          return callback(err, [])
+        }else{
+          connection.query(args, function (err, result) {
+            connection.release();
+            logger.info('lif health MySQL Read: Result: ' + util.inspect(result, {showHidden: false, depth: null}));
+            if (err) {
+              logger.info('lif health MySQL Read: Error: ' + err);
+            } else if (result.length > 0) {
+              myCache.set( "lifs", result, 100 );  
+              return callback(null, result);
+            }
+            return callback(null, []);          
+          });
+        }
+      });
+    } else {
+      logger.info("Loading lifs from cache");
+      //  logger.info(util.inspect(value, {showHidden: false, depth: null}));
+      callback(null, value);
+    }
+  };
 

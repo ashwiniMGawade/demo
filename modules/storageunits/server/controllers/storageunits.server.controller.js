@@ -658,7 +658,7 @@ exports.list = function (req, res) {
     query.where({ 'tenant': req.user.tenant });
   }
 
-  query.exec(function (err, storageunits) {
+  query.sort({'created':-1}).exec(function (err, storageunits) {
     respondList(err, storageunits);
   });
 
@@ -700,7 +700,6 @@ exports.storageunitByID = function (req, res, next, id) {
  * Get list of available igroups under given server and cluster
  */
 exports.getListOfIgroups = function(req, res) {
-  console.log(req.query);
   if (req.query['vserverName'] == "" || req.query['clusterName'] == "" ) {
     res.json([])
   }
@@ -725,13 +724,11 @@ exports.getPeers = function(req, res) {
   var clusterName = req.query.clusterName || '';
   if (serverName != "" && clusterName != "") {
     var query = {"sourceCluster": clusterName, "sourceVserver": serverName};
-    console.log(query)
     Peer.find(query)
     .exec(function (err, peers) {
       if (err) {
         return respondError(res, 400, 'No peer with that identifier has been found');
       } else if (peers.length > 0 ) {
-        console.log(peers)
         res.json(peers)        
       } else {
         res.json([])
