@@ -11,14 +11,19 @@ var amqp = require('amqplib/callback_api'),
 
 let channel = null;
 
-var q = 'ontap_provision';
+var q_ontap = 'ontap_provision';
+var q_eseries = 'eseries_provision';
 
 var bail = function(err) {
     console.error(err);
     process.exit(1);
 }
 
-var publisheToQueue = function(message) {
+var publisheToQueue = function(message, type) {
+    var q = q_ontap;
+    if(type == "eseries") {
+      q = q_eseries;
+    }
     amqpConn.createChannel(on_open);
     function on_open(err, ch) {
       channel = ch;
