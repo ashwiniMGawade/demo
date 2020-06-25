@@ -20,7 +20,7 @@ angular.module('eseries-storageunits')
     $scope.clusterName = "";
     
     $scope.validProtocolsToAssign = ["fc", "iscsi"];
-    $scope.validTargetsToAssign = ["host","group" ]
+    $scope.validTargetsToAssign = ["host"] //"group" 
     
    
     $scope.isRoot = Authentication.user.roles.indexOf('root') !== -1;
@@ -76,7 +76,8 @@ angular.module('eseries-storageunits')
       var port_info = [];
       angular.forEach(scopePorts, function(portDetail) {
         var obj = {};
-        obj[portDetail.label] = portDetail.port
+        obj['label'] = portDetail.label;
+        obj['port'] = portDetail.port
         port_info.push(obj)
       });
 

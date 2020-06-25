@@ -133,7 +133,7 @@ exports.create = function (req, res) {
       size: storageunit.sizegb,
       application: storageunit.application,
       eseriesSystem : storageunit.eseriesSystem.name, 
-      rest_url: storageunit.eseriesSystem.rest_url_ip,
+      rest_url_ip: storageunit.eseriesSystem.rest_url_ip,
       workload_name : storageunit.workload, 
       storage_pool: storageunit.storagePool, 
       protocol : storageunit.protocol,
@@ -141,8 +141,7 @@ exports.create = function (req, res) {
       host_name: storageunit.hostName,
       host_type: storageunit.hostType,
       port_info:storageunit.portInfo,
-      lunId :storageunit.lunId || '',
-      igroup :storageunit.igroup || '',
+      lun_id :storageunit.lunId || null,
       db_info: [{"name":"jobs", "id":suCreateJob._id}, {"name":"storageunits", "id": storageunit._id}], 
       action: "create",
     };

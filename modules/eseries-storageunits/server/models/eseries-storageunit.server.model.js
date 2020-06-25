@@ -65,7 +65,7 @@ var EseriesStorageunitSchema = new Schema({
   targetType: {
     type: String,
     enum: {
-      values: ['host', 'group'],
+      values: ['host'], //'group'
       message: '`{VALUE}` not a valid value for target type'
     },
     required: 'Storage Unit target type is required',
