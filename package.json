@@ -43,7 +43,7 @@
     "amazon-s3-uri": "0.0.3",
     "amqplib": "^0.5.5",
     "async": "~2.5.0",
-    "aws-sdk": "^2.123.0",
+    "aws-sdk": "^2.814.0",
     "body-parser": "^1.18.2",
     "bower": "^1.8.2",
     "chalk": "~2.1.0",
